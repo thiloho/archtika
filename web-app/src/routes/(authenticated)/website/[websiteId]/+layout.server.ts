@@ -1,5 +1,5 @@
 export const load = async ({ params, fetch, cookies }) => {
-  const websiteData = await fetch(`http://localhost:3000/cms_content?id=eq.${params.websiteId}`, {
+  const websiteData = await fetch(`http://localhost:3000/content?id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

@@ -5,7 +5,7 @@ import { ALLOWED_MIME_TYPES } from "$lib/utils.js";
 
 export const load = async ({ params, fetch, cookies, url }) => {
   const globalSettingsData = await fetch(
-    `http://localhost:3000/cms_settings?content_id=eq.${params.websiteId}&select=*,cms_media(*)`,
+    `http://localhost:3000/settings?website_id=eq.${params.websiteId}&select=*,media(*)`,
     {
       method: "GET",
       headers: {
@@ -17,7 +17,7 @@ export const load = async ({ params, fetch, cookies, url }) => {
   );
 
   const headerData = await fetch(
-    `http://localhost:3000/cms_header?content_id=eq.${params.websiteId}&select=*,cms_media(*)`,
+    `http://localhost:3000/header?website_id=eq.${params.websiteId}&select=*,media(*)`,
     {
       method: "GET",
       headers: {
@@ -28,7 +28,7 @@ export const load = async ({ params, fetch, cookies, url }) => {
     }
   );
 
-  const homeData = await fetch(`http://localhost:3000/cms_home?content_id=eq.${params.websiteId}`, {
+  const homeData = await fetch(`http://localhost:3000/home?website_id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -37,24 +37,21 @@ export const load = async ({ params, fetch, cookies, url }) => {
     }
   });
 
-  const footerData = await fetch(
-    `http://localhost:3000/cms_footer?content_id=eq.${params.websiteId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
-      }
+  const footerData = await fetch(`http://localhost:3000/footer?website_id=eq.${params.websiteId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json"
     }
-  );
+  });
 
   const searchQuery = url.searchParams.get("article_search_query");
   const sortBy = url.searchParams.get("article_sort");
 
   const parameters = new URLSearchParams();
 
-  const baseFetchUrl = `http://localhost:3000/cms_article?content_id=eq.${params.websiteId}&select=*,cms_media(*)`;
+  const baseFetchUrl = `http://localhost:3000/article?website_id=eq.${params.websiteId}&select=*,media(*)`;
 
   if (searchQuery) {
     parameters.append("title", `ilike.*${searchQuery}*`);
@@ -117,21 +114,18 @@ export const actions = {
       return favicon;
     }
 
-    const res = await fetch(
-      `http://localhost:3000/cms_settings?content_id=eq.${params.websiteId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        },
-        body: JSON.stringify({
-          accent_color_light_theme: data.get("accent-color-light"),
-          accent_color_dark_theme: data.get("accent-color-dark"),
-          favicon_image: favicon?.content
-        })
-      }
-    );
+    const res = await fetch(`http://localhost:3000/settings?website_id=eq.${params.websiteId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
+      },
+      body: JSON.stringify({
+        accent_color_light_theme: data.get("accent-color-light"),
+        accent_color_dark_theme: data.get("accent-color-dark"),
+        favicon_image: favicon?.content
+      })
+    });
 
     if (!res.ok) {
       const response = await res.json();
@@ -160,7 +154,7 @@ export const actions = {
       return logo;
     }
 
-    const res = await fetch(`http://localhost:3000/cms_header?content_id=eq.${params.websiteId}`, {
+    const res = await fetch(`http://localhost:3000/header?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -187,7 +181,7 @@ export const actions = {
   updateHome: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`http://localhost:3000/cms_home?content_id=eq.${params.websiteId}`, {
+    const res = await fetch(`http://localhost:3000/home?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -208,7 +202,7 @@ export const actions = {
   updateFooter: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`http://localhost:3000/cms_footer?content_id=eq.${params.websiteId}`, {
+    const res = await fetch(`http://localhost:3000/footer?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -233,14 +227,14 @@ export const actions = {
   createArticle: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch("http://localhost:3000/cms_article", {
+    const res = await fetch("http://localhost:3000/article", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${cookies.get("session_token")}`
       },
       body: JSON.stringify({
-        content_id: params.websiteId,
+        website_id: params.websiteId,
         title: data.get("title")
       })
     });
@@ -268,7 +262,7 @@ export const actions = {
       return cover;
     }
 
-    const res = await fetch(`http://localhost:3000/cms_article?id=eq.${data.get("article-id")}`, {
+    const res = await fetch(`http://localhost:3000/article?id=eq.${data.get("article-id")}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -294,7 +288,7 @@ export const actions = {
   deleteArticle: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(`http://localhost:3000/cms_article?id=eq.${data.get("article-id")}`, {
+    const res = await fetch(`http://localhost:3000/article?id=eq.${data.get("article-id")}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -348,7 +342,7 @@ const handleFileUpload = async (
 
   const relativePath = relative(join(process.cwd(), "static"), filepath);
 
-  const res = await customFetch("http://localhost:3000/cms_media", {
+  const res = await customFetch("http://localhost:3000/media", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -357,7 +351,7 @@ const handleFileUpload = async (
       Accept: "application/vnd.pgrst.object+json"
     },
     body: JSON.stringify({
-      content_id: contentId,
+      website_id: contentId,
       user_id: userId,
       original_name: file.name,
       file_system_path: relativePath
