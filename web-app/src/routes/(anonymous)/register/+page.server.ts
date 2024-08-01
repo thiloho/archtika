@@ -17,6 +17,6 @@ export const actions = {
       return { success: false, message: response.message };
     }
 
-    return { success: true };
+    return { success: true, message: "Successfully registered, you can now login" };
   }
 };

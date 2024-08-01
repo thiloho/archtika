@@ -4,6 +4,14 @@
   const { data, form } = $props();
 </script>
 
+{#if form?.success}
+  <p>{form.message}</p>
+{/if}
+
+{#if form?.success === false}
+  <p>{form.message}</p>
+{/if}
+
 <section>
   <h2>Overview</h2>
 
@@ -20,10 +28,6 @@
 <section>
   <h2>Logout</h2>
 
-  {#if form?.logout?.success}
-    <p>Successfully logged out</p>
-  {/if}
-
   <form method="POST" action="?/logout" use:enhance>
     <button type="submit">Logout</button>
   </form>
@@ -32,17 +36,9 @@
 <section>
   <h2>Delete account</h2>
 
-  {#if form?.deleteAccount?.success}
-    <p>Account was deleted</p>
-  {/if}
-
-  {#if form?.deleteAccount?.success === false}
-    <p>{form.deleteAccount.message}</p>
-  {/if}
-
   <form method="POST" action="?/deleteAccount" use:enhance>
     <label>
-      Password
+      Password:
       <input type="password" name="password" required />
     </label>
 

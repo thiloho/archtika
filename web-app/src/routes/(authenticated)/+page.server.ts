@@ -7,10 +7,11 @@ export const load = async ({ fetch, cookies, url }) => {
   const baseFetchUrl = "http://localhost:3000/website";
 
   if (searchQuery) {
-    params.append("website_title", `ilike.*${searchQuery}*`);
+    params.append("title", `ilike.*${searchQuery}*`);
   }
 
   switch (sortBy) {
+    case null:
     case "creation-time":
       params.append("order", "created_at.desc");
       break;
@@ -27,6 +28,19 @@ export const load = async ({ fetch, cookies, url }) => {
 
   const constructedFetchUrl = `${baseFetchUrl}?${params.toString()}`;
 
+  const totalWebsitesData = await fetch(baseFetchUrl, {
+    method: "HEAD",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Prefer: "count=exact"
+    }
+  });
+
+  const totalWebsiteCount = Number(
+    totalWebsitesData.headers.get("content-range")?.split("/").at(-1)
+  );
+
   const websiteData = await fetch(constructedFetchUrl, {
     method: "GET",
     headers: {
@@ -38,6 +52,7 @@ export const load = async ({ fetch, cookies, url }) => {
   const websites = await websiteData.json();
 
   return {
+    totalWebsiteCount,
     websites
   };
 };
@@ -60,10 +75,10 @@ export const actions = {
 
     if (!res.ok) {
       const response = await res.json();
-      return { createWebsite: { success: false, message: response.message } };
+      return { success: false, message: response.message };
     }
 
-    return { createWebsite: { success: true, operation: "created" } };
+    return { success: true, message: "Successfully created website" };
   },
   updateWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
@@ -81,10 +96,10 @@ export const actions = {
 
     if (!res.ok) {
       const response = await res.json();
-      return { updateWebsite: { success: false, message: response.message } };
+      return { success: false, message: response.message };
     }
 
-    return { updateWebsite: { success: true, operation: "updated" } };
+    return { success: true, message: "Successfully updated website" };
   },
   deleteWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
@@ -99,9 +114,9 @@ export const actions = {
 
     if (!res.ok) {
       const response = await res.json();
-      return { deleteWebsite: { success: false, message: response.message } };
+      return { success: false, message: response.message };
     }
 
-    return { deleteWebsite: { success: true, operation: "deleted" } };
+    return { success: true, message: "Successfully deleted website" };
   }
 };

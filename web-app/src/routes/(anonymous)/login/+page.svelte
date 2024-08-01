@@ -4,21 +4,21 @@
   const { form } = $props();
 </script>
 
+{#if form?.success}
+  <p>{form.message}</p>
+{/if}
+
+{#if form?.success === false}
+  <p>{form.message}</p>
+{/if}
+
 <form method="POST" use:enhance>
-  {#if form?.success}
-    <p>Successfully logged in</p>
-  {/if}
-
-  {#if form?.success === false}
-    <p>{form.message}</p>
-  {/if}
-
   <label>
-    Username
+    Username:
     <input type="text" name="username" required />
   </label>
   <label>
-    Password
+    Password:
     <input type="password" name="password" required />
   </label>
 

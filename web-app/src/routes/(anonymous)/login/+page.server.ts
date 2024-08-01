@@ -18,6 +18,6 @@ export const actions = {
     }
 
     cookies.set("session_token", response.token, { path: "/" });
-    return { success: true };
+    return { success: true, message: "Successfully logged in" };
   }
 };

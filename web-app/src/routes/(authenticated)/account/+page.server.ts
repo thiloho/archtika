@@ -8,7 +8,7 @@ export const actions = {
   logout: async ({ cookies }) => {
     cookies.delete("session_token", { path: "/" });
 
-    return { logout: { success: true } };
+    return { success: true, message: "Successfully logged out" };
   },
   deleteAccount: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
@@ -27,10 +27,10 @@ export const actions = {
     const response = await res.json();
 
     if (!res.ok) {
-      return { deleteAccount: { success: false, message: response.message } };
+      return { success: false, message: response.message };
     }
 
     cookies.delete("session_token", { path: "/" });
-    return { deleteAccount: { success: true } };
+    return { success: true, message: "Successfully deleted account" };
   }
 };
