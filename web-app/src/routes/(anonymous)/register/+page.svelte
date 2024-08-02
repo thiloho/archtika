@@ -1,16 +1,11 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import SuccessOrError from "$lib/components/SuccessOrError.svelte";
 
   const { form } = $props();
 </script>
 
-{#if form?.success}
-  <p>{form.message}</p>
-{/if}
-
-{#if form?.success === false}
-  <p>{form.message}</p>
-{/if}
+<SuccessOrError success={form?.success} message={form?.message} />
 
 <form method="POST" use:enhance>
   <label>

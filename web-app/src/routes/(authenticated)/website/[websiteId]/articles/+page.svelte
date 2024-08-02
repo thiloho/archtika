@@ -4,17 +4,12 @@
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import Modal from "$lib/components/Modal.svelte";
+  import SuccessOrError from "$lib/components/SuccessOrError.svelte";
 
   const { data, form } = $props();
 </script>
 
-{#if form?.success}
-  <p>{form.message}</p>
-{/if}
-
-{#if form?.success === false}
-  <p>{form.message}</p>
-{/if}
+<SuccessOrError success={form?.success} message={form?.message} />
 
 <WebsiteEditor
   id={data.website.id}
@@ -27,7 +22,16 @@
     <Modal id="create-article" text="Create article">
       <h3>Create article</h3>
 
-      <form method="POST" action="?/createArticle" use:enhance>
+      <form
+        method="POST"
+        action="?/createArticle"
+        use:enhance={() => {
+          return async ({ update }) => {
+            await update();
+            window.location.hash = "!";
+          };
+        }}
+      >
         <label>
           Title:
           <input type="text" name="title" />
@@ -78,7 +82,16 @@
                 Deleting this article will irretrievably erase all data.
               </p>
 
-              <form method="POST" action="?/deleteArticle" use:enhance>
+              <form
+                method="POST"
+                action="?/deleteArticle"
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update();
+                    window.location.hash = "!";
+                  };
+                }}
+              >
                 <input type="hidden" name="id" value={id} />
 
                 <button type="submit">Permanently delete article</button>

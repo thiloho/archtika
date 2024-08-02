@@ -33,10 +33,10 @@
   }
 
   .operations {
-    inline-size: 50%;
     border-inline-end: var(--border-primary);
     resize: horizontal;
     overflow-y: auto;
+    inline-size: 50%;
   }
 
   .operations__nav {
@@ -51,6 +51,6 @@
   }
 
   .preview {
-    flex-grow: 1;
+    flex: 1;
   }
 </style>

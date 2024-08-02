@@ -4,17 +4,12 @@
   import { sortOptions } from "$lib/utils.js";
   import { page } from "$app/stores";
   import Modal from "$lib/components/Modal.svelte";
+  import SuccessOrError from "$lib/components/SuccessOrError.svelte";
 
   const { form, data } = $props();
 </script>
 
-{#if form?.success}
-  <p>{form.message}</p>
-{/if}
-
-{#if form?.success === false}
-  <p>{form.message}</p>
-{/if}
+<SuccessOrError success={form?.success} message={form?.message} />
 
 <section>
   <h2>Create website</h2>
@@ -22,7 +17,16 @@
   <Modal id="create-website" text="Create website">
     <h3>Create website</h3>
 
-    <form method="POST" action="?/createWebsite" use:enhance>
+    <form
+      method="POST"
+      action="?/createWebsite"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update();
+          window.location.hash = "!";
+        };
+      }}
+    >
       <label>
         Type:
         <select name="content-type">
@@ -100,6 +104,7 @@
                 use:enhance={() => {
                   return async ({ update }) => {
                     await update({ reset: false });
+                    window.location.hash = "!";
                   };
                 }}
               >
@@ -119,7 +124,16 @@
                 <strong>Caution!</strong>
                 Deleting this website will irretrievably erase all data.
               </p>
-              <form method="POST" action="?/deleteWebsite" use:enhance>
+              <form
+                method="POST"
+                action="?/deleteWebsite"
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update();
+                    window.location.hash = "!";
+                  };
+                }}
+              >
                 <input type="hidden" name="id" value={id} />
 
                 <button type="submit">Permanently delete website</button>

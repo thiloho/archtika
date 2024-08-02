@@ -1,17 +1,12 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import Modal from "$lib/components/Modal.svelte";
+  import SuccessOrError from "$lib/components/SuccessOrError.svelte";
 
   const { data, form } = $props();
 </script>
 
-{#if form?.success}
-  <p>{form.message}</p>
-{/if}
-
-{#if form?.success === false}
-  <p>{form.message}</p>
-{/if}
+<SuccessOrError success={form?.success} message={form?.message} />
 
 <section>
   <h2>Overview</h2>
@@ -45,7 +40,16 @@
       Deleting your account will irretrievably erase all data.
     </p>
 
-    <form method="POST" action="?/deleteAccount" use:enhance>
+    <form
+      method="POST"
+      action="?/deleteAccount"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update();
+          window.location.hash = "!";
+        };
+      }}
+    >
       <label>
         Password:
         <input type="password" name="password" required />

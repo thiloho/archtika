@@ -68,7 +68,6 @@
     inline-size: min(100% - 2rem, 1536px);
     block-size: calc(100vh - 7rem);
     border: var(--border-primary);
-    overflow-y: auto;
     display: flex;
     padding-block: 0;
   }

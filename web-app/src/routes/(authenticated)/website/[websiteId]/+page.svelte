@@ -2,17 +2,12 @@
   import { enhance } from "$app/forms";
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
   import { ALLOWED_MIME_TYPES } from "$lib/utils";
+  import SuccessOrError from "$lib/components/SuccessOrError.svelte";
 
   const { data, form } = $props();
 </script>
 
-{#if form?.success}
-  <p>{form.message}</p>
-{/if}
-
-{#if form?.success === false}
-  <p>{form.message}</p>
-{/if}
+<SuccessOrError success={form?.success} message={form?.message} />
 
 <WebsiteEditor
   id={data.website.id}
