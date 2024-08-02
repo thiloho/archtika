@@ -12,10 +12,10 @@
 <div class="operations">
   <h1>{title}</h1>
 
-  <div>
+  <nav class="operations__nav">
     <a href="/website/{id}">Settings</a>
     <a href="/website/{id}/articles">Articles</a>
-  </div>
+  </nav>
 
   {@render children()}
 </div>
@@ -34,9 +34,20 @@
 
   .operations {
     inline-size: 50%;
-    border-inline-end: 0.0625rem solid hsl(0 0% 50%);
+    border-inline-end: var(--border-primary);
     resize: horizontal;
     overflow-y: auto;
+  }
+
+  .operations__nav {
+    margin-block: 1rem 2rem;
+  }
+
+  .operations__nav > a {
+    display: inline-block;
+    padding-inline: 0.5rem;
+    padding-block: 0.25rem;
+    overflow-x: auto;
   }
 
   .preview {

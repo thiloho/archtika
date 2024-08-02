@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import Modal from "$lib/components/Modal.svelte";
 
   const { data, form } = $props();
 </script>
@@ -36,12 +37,21 @@
 <section>
   <h2>Delete account</h2>
 
-  <form method="POST" action="?/deleteAccount" use:enhance>
-    <label>
-      Password:
-      <input type="password" name="password" required />
-    </label>
+  <Modal id="delete-account" text="Delete account">
+    <h3>Delete account</h3>
 
-    <button type="submit">Delete account</button>
-  </form>
+    <p>
+      <strong>Caution!</strong>
+      Deleting your account will irretrievably erase all data.
+    </p>
+
+    <form method="POST" action="?/deleteAccount" use:enhance>
+      <label>
+        Password:
+        <input type="password" name="password" required />
+      </label>
+
+      <button type="submit">Permanently delete account</button>
+    </form>
+  </Modal>
 </section>

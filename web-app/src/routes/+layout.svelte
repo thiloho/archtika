@@ -1,8 +1,14 @@
 <script lang="ts">
+  import "../app.css";
   import { page } from "$app/stores";
   const { data, children } = $props();
 
   const isProjectRoute = $derived($page.url.pathname.startsWith("/website"));
+  const routeName = $derived(
+    $page.url.pathname === "/"
+      ? "Dashboard"
+      : `${$page.url.pathname.charAt(1).toUpperCase()}${$page.url.pathname.slice(2)}`
+  );
 </script>
 
 <nav>
@@ -18,7 +24,7 @@
 
 {#if !isProjectRoute}
   <header>
-    <h1>{$page.url.pathname}</h1>
+    <h1>{routeName}</h1>
   </header>
 {/if}
 
@@ -42,28 +48,28 @@
     margin-inline: auto;
   }
 
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    overflow-x: auto;
+  }
+
+  nav > *:first-child {
+    margin-inline-end: auto;
+  }
+
   footer {
     text-align: center;
+    margin-block-start: auto;
   }
 
   .editor {
     inline-size: min(100% - 2rem, 1536px);
     block-size: calc(100vh - 7rem);
-    border: 0.0625rem solid hsl(0 0% 50%);
+    border: var(--border-primary);
     overflow-y: auto;
     display: flex;
     padding-block: 0;
-  }
-
-  :global(section) {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  :global(form) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
   }
 </style>

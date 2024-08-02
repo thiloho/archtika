@@ -3,6 +3,7 @@
   import { sortOptions } from "$lib/utils.js";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
+  import Modal from "$lib/components/Modal.svelte";
 
   const { data, form } = $props();
 </script>
@@ -23,14 +24,18 @@
   <section>
     <h2>Create article</h2>
 
-    <form method="POST" action="?/createArticle" use:enhance>
-      <label>
-        Title:
-        <input type="text" name="title" />
-      </label>
+    <Modal id="create-article" text="Create article">
+      <h3>Create article</h3>
 
-      <button type="submit">Submit</button>
-    </form>
+      <form method="POST" action="?/createArticle" use:enhance>
+        <label>
+          Title:
+          <input type="text" name="title" />
+        </label>
+
+        <button type="submit">Submit</button>
+      </form>
+    </Modal>
   </section>
 
   {#if data.totalArticleCount > 0}
@@ -60,23 +65,49 @@
       </form>
 
       {#each data.articles as { id, title }}
-        <article>
+        <article class="article-card">
           <h3>{title}</h3>
-          <a href="/website/{data.website.id}/articles/{id}">Edit</a>
-          <details>
-            <summary>Delete</summary>
-            <p>
-              <strong>Caution!</strong>
-              Deleting this article will irretrievably erase all data.
-            </p>
-            <form method="POST" action="?/deleteArticle" use:enhance>
-              <input type="hidden" name="id" value={id} />
 
-              <button type="submit">Permanently delete article</button>
-            </form>
-          </details>
+          <div class="article-card__actions">
+            <a href="/website/{data.website.id}/articles/{id}">Edit</a>
+            <Modal id="delete-article-{id}" text="Delete">
+              <h4>Delete article</h4>
+
+              <p>
+                <strong>Caution!</strong>
+                Deleting this article will irretrievably erase all data.
+              </p>
+
+              <form method="POST" action="?/deleteArticle" use:enhance>
+                <input type="hidden" name="id" value={id} />
+
+                <button type="submit">Permanently delete article</button>
+              </form>
+            </Modal>
+          </div>
         </article>
       {/each}
     </section>
   {/if}
 </WebsiteEditor>
+
+<style>
+  .article-card {
+    display: flex;
+    align-items: center;
+    column-gap: 2rem;
+    row-gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .article-card:nth-of-type(1) {
+    margin-block-start: 1rem;
+  }
+
+  .article-card__actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+</style>
