@@ -8,55 +8,111 @@ FROM internal.user;
 CREATE VIEW api.website
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  id,
+  owner_id,
+  content_type,
+  title,
+  created_at,
+  last_modified_at,
+  last_modified_by
 FROM internal.website;
 
 CREATE VIEW api.media
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  id,
+  website_id,
+  user_id,
+  original_name,
+  file_system_path,
+  created_at
 FROM internal.media;
 
 CREATE VIEW api.settings
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  accent_color_light_theme,
+  accent_color_dark_theme,
+  favicon_image,
+  last_modified_at,
+  last_modified_by
 FROM internal.settings;
 
 CREATE VIEW api.header
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  logo_type,
+  logo_text,
+  logo_image,
+  last_modified_at,
+  last_modified_by
 FROM internal.header;
 
 CREATE view api.home
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  main_content,
+  last_modified_at,
+  last_modified_by
 FROM internal.home;
 
 CREATE VIEW api.article
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  id,
+  website_id,
+  title,
+  meta_description,
+  meta_author,
+  cover_image,
+  publication_date,
+  main_content,
+  created_at,
+  last_modified_at,
+  last_modified_by
 FROM internal.article;
 
 CREATE VIEW api.footer
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  additional_text,
+  last_modified_at,
+  last_modified_by
 FROM internal.footer;
 
 CREATE VIEW api.collab
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  user_id,
+  permission_level,
+  added_at,
+  last_modified_at,
+  last_modified_by
 FROM internal.collab;
 
 CREATE VIEW api.change_log
 WITH (security_invoker = on)
 AS
-SELECT *
+SELECT
+  website_id,
+  user_id,
+  change_summary,
+  previous_value,
+  new_value,
+  timestamp
 FROM internal.change_log;
 
 CREATE FUNCTION
