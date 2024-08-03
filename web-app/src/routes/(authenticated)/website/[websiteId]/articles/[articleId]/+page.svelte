@@ -32,7 +32,7 @@
       </label>
       <label>
         Description:
-        <textarea name="description">{data.article.meta_description}</textarea>
+        <textarea name="description" rows="5">{data.article.meta_description}</textarea>
       </label>
       <label>
         Author:
@@ -48,7 +48,7 @@
       </label>
       <label>
         Main content:
-        <textarea name="main-content">{data.article.main_content}</textarea>
+        <textarea name="main-content" rows="20">{data.article.main_content}</textarea>
       </label>
 
       <button type="submit">Submit</button>

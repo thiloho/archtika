@@ -86,6 +86,10 @@ select {
   background-color: var(--bg-primary);
 }
 
+textarea {
+  resize: vertical;
+}
+
 a {
   color: var(--color-accent);
 }

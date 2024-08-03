@@ -11,14 +11,16 @@
 <section>
   <h2>Overview</h2>
 
-  <p>
-    <strong>Username:</strong>
-    {data.user.username}
-  </p>
-  <p>
-    <strong>ID:</strong>
-    {data.user.id}
-  </p>
+  <ul>
+    <li>
+      <strong>Id:</strong>
+      {data.user.id}
+    </li>
+    <li>
+      <strong>Username:</strong>
+      {data.user.username}
+    </li>
+  </ul>
 </section>
 
 <section>

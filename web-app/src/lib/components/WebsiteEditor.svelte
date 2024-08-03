@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import markdownit from "markdown-it";
+  import hljs from "highlight.js";
 
   const { id, title, children, previewContent } = $props<{
     id: string;
@@ -7,6 +9,20 @@
     children: Snippet;
     previewContent: string;
   }>();
+
+  const md = markdownit({
+    linkify: true,
+    typographer: true,
+    highlight: (str, lang) => {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return hljs.highlight(str, { language: lang }).value;
+        } catch (_) {}
+      }
+
+      return "";
+    }
+  });
 </script>
 
 <div class="operations">
@@ -21,22 +37,18 @@
 </div>
 
 <div class="preview">
-  {@html previewContent}
+  {@html md.render(previewContent)}
 </div>
 
 <style>
   .operations,
   .preview {
     padding: 1rem;
-    min-inline-size: 15rem;
-    block-size: 100%;
+    overflow-y: auto;
   }
 
   .operations {
     border-inline-end: var(--border-primary);
-    resize: horizontal;
-    overflow-y: auto;
-    inline-size: 50%;
   }
 
   .operations__nav {
@@ -51,6 +63,8 @@
   }
 
   .preview {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 </style>

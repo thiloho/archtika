@@ -68,7 +68,7 @@
         <button type="submit">Submit</button>
       </form>
 
-      {#each data.articles as { id, title }}
+      {#each data.articles as { id, title } (id)}
         <article class="article-card">
           <h3>{title}</h3>
 

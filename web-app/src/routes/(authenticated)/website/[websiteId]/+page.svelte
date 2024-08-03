@@ -98,7 +98,7 @@
     >
       <label>
         Main content:
-        <textarea name="main-content">{data.home.main_content}</textarea>
+        <textarea name="main-content" rows="20">{data.home.main_content}</textarea>
       </label>
 
       <button type="submit">Submit</button>
@@ -119,7 +119,7 @@
     >
       <label>
         Additional text:
-        <textarea name="additional-text">{data.footer.additional_text}</textarea>
+        <textarea name="additional-text" rows="5">{data.footer.additional_text}</textarea>
       </label>
 
       <button type="submit">Submit</button>

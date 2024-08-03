@@ -67,8 +67,9 @@
   .editor {
     inline-size: min(100% - 2rem, 1536px);
     block-size: calc(100vh - 7rem);
-    border: var(--border-primary);
-    display: flex;
+    border-block-start: var(--border-primary);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     padding-block: 0;
   }
 </style>

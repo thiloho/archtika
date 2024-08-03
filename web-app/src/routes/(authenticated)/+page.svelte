@@ -79,7 +79,7 @@
     </form>
 
     <div class="website-grid">
-      {#each data.websites as { id, content_type, title, created_at }}
+      {#each data.websites as { id, content_type, title, created_at } (id)}
         <article class="website-card">
           <h3>
             <a href="/website/{id}">{title}</a>
