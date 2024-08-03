@@ -57,7 +57,7 @@
         <input type="password" name="password" required />
       </label>
 
-      <button type="submit">Permanently delete account</button>
+      <button type="submit">Delete account</button>
     </form>
   </Modal>
 </section>

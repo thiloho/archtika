@@ -35,7 +35,7 @@
         />
       </label>
       <label>
-        Light accent color:
+        Dark accent color:
         <input
           type="color"
           name="accent-color-dark"

@@ -12,7 +12,8 @@
 <WebsiteEditor
   id={data.website.id}
   title={data.website.title}
-  previewContent={data.article.main_content}
+  previewContent={data.article.main_content ||
+    "Put some markdown content in main content to see a live preview here"}
 >
   <section>
     <h2>Edit article</h2>

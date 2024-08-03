@@ -22,7 +22,10 @@
   }
 
   .modal:target {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
   }
 
   .modal__closeoverlay {
@@ -41,12 +44,10 @@
     background-color: var(--bg-primary);
     border-radius: var(--border-radius);
     border: var(--border-primary);
+    inline-size: 300px;
+    max-inline-size: 100%;
+    max-block-size: calc(100vh - 2rem);
+    overflow-y: auto;
     z-index: 20;
-    position: absolute;
-    max-inline-size: 300px;
-    margin-inline: auto;
-    inset-block-start: 2rem;
-    inset-inline-start: 50%;
-    transform: translateX(-50%);
   }
 </style>

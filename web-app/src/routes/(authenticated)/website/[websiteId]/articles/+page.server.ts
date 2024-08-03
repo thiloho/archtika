@@ -50,12 +50,13 @@ export const load = async ({ params, fetch, cookies, url, parent }) => {
   });
 
   const articles = await articlesData.json();
-  const { website } = await parent();
+  const { website, home } = await parent();
 
   return {
     totalArticleCount,
     articles,
-    website
+    website,
+    home
   };
 };
 

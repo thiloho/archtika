@@ -94,7 +94,7 @@
               >
                 <input type="hidden" name="id" value={id} />
 
-                <button type="submit">Permanently delete article</button>
+                <button type="submit">Delete article</button>
               </form>
             </Modal>
           </div>

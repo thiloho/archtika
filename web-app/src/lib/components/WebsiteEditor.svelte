@@ -3,10 +3,17 @@
   import markdownit from "markdown-it";
   import hljs from "highlight.js";
 
-  const { id, title, children, previewContent } = $props<{
+  const {
+    id,
+    title,
+    children,
+    fullPreview = false,
+    previewContent
+  } = $props<{
     id: string;
     title: string;
     children: Snippet;
+    fullPreview?: boolean;
     previewContent: string;
   }>();
 
@@ -31,13 +38,18 @@
   <nav class="operations__nav">
     <a href="/website/{id}">Settings</a>
     <a href="/website/{id}/articles">Articles</a>
+    <a href="/website/{id}/publish">Publish</a>
   </nav>
 
   {@render children()}
 </div>
 
 <div class="preview">
-  {@html md.render(previewContent)}
+  {#if fullPreview}
+    <iframe src={previewContent} title="Preview"></iframe>
+  {:else}
+    {@html md.render(previewContent)}
+  {/if}
 </div>
 
 <style>
@@ -53,12 +65,8 @@
 
   .operations__nav {
     margin-block: 1rem 2rem;
-  }
-
-  .operations__nav > a {
-    display: inline-block;
-    padding-inline: 0.5rem;
-    padding-block: 0.25rem;
+    display: flex;
+    gap: 1rem;
     overflow-x: auto;
   }
 
@@ -66,5 +74,11 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  iframe {
+    inline-size: 100%;
+    block-size: 100%;
+    border: var(--border-primary);
   }
 </style>

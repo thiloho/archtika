@@ -136,7 +136,7 @@
               >
                 <input type="hidden" name="id" value={id} />
 
-                <button type="submit">Permanently delete website</button>
+                <button type="submit">Delete website</button>
               </form>
             </Modal>
           </div>
