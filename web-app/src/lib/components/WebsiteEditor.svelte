@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import markdownit from "markdown-it";
-  import hljs from "highlight.js";
+  import { md } from "$lib/utils";
 
   const {
     id,
@@ -16,20 +15,6 @@
     fullPreview?: boolean;
     previewContent: string;
   }>();
-
-  const md = markdownit({
-    linkify: true,
-    typographer: true,
-    highlight: (str, lang) => {
-      if (lang && hljs.getLanguage(lang)) {
-        try {
-          return hljs.highlight(str, { language: lang }).value;
-        } catch (_) {}
-      }
-
-      return "";
-    }
-  });
 </script>
 
 <div class="operations">
@@ -46,7 +31,10 @@
 
 <div class="preview">
   {#if fullPreview}
-    <iframe src={previewContent} title="Preview"></iframe>
+    <iframe
+      src="http://localhost:5173/user-websites/e6710116-f2b7-4318-82de-35a25d22ed2e/0015130f-3024-402b-8421-aaee4a6f0890/index.html"
+      title="Preview"
+    ></iframe>
   {:else}
     {@html md.render(previewContent)}
   {/if}
