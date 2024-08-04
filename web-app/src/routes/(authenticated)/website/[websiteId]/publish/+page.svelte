@@ -21,6 +21,7 @@
     </p>
 
     <form method="POST" action="?/publishWebsite" use:enhance>
+      <input type="hidden" name="website-overview" value={JSON.stringify(data.websiteOverview)} />
       <button type="submit">Publish</button>
     </form>
   </section>

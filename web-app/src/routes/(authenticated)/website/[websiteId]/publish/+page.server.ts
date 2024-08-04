@@ -17,41 +17,7 @@ export const load = async ({ params, fetch, cookies, locals }) => {
 
   const websiteOverview = await websiteOverviewData.json();
 
-  const templatePath = join(
-    process.cwd(),
-    "..",
-    "templates",
-    websiteOverview.content_type.toLowerCase()
-  );
-
-  const indexFile = await readFile(join(templatePath, "index.html"), { encoding: "utf-8" });
-  const articleFileContents = await readFile(join(templatePath, "article.html"), {
-    encoding: "utf-8"
-  });
-
-  const indexFileContents = indexFile
-    .replace("{{title}}", `<h1>${websiteOverview.title}</h1>`)
-    .replace("{{main_content}}", md.render(websiteOverview.main_content))
-    .replace("{{additional_text}}", md.render(websiteOverview.additional_text));
-
-  const uploadDir = join(
-    process.cwd(),
-    "static",
-    "user-websites",
-    locals.user.id,
-    params.websiteId
-  );
-  await mkdir(uploadDir, { recursive: true });
-
-  await writeFile(join(uploadDir, "index.html"), indexFileContents);
-
-  await mkdir(join(uploadDir, "articles"), { recursive: true });
-
-  for (const article of websiteOverview.articles) {
-    const articleFileName = article.title.toLowerCase().split(" ").join("-");
-
-    await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
-  }
+  generateStaticFiles(websiteOverview, locals.user.id, params.websiteId);
 
   return {
     websiteOverview
@@ -59,9 +25,93 @@ export const load = async ({ params, fetch, cookies, locals }) => {
 };
 
 export const actions = {
-  publishWebsite: async ({ fetch }) => {
-    console.log("test");
+  publishWebsite: async ({ request, fetch, cookies, params, locals }) => {
+    const data = await request.formData();
+    const websiteOverview = JSON.parse(data.get("website-overview") as string);
+
+    generateStaticFiles(websiteOverview, locals.user.id, params.websiteId, false);
   }
 };
 
-const generateWebsiteOutput = async () => {};
+const generateStaticFiles = async (
+  websiteData: any,
+  userId: string,
+  websiteId: string,
+  isPreview: boolean = true
+) => {
+  const templatePath = join(
+    process.cwd(),
+    "..",
+    "templates",
+    websiteData.content_type.toLowerCase()
+  );
+
+  const indexFile = await readFile(join(templatePath, "index.html"), { encoding: "utf-8" });
+  const articleFile = await readFile(join(templatePath, "article.html"), {
+    encoding: "utf-8"
+  });
+
+  const indexFileContents = indexFile
+    .replace(
+      "{{logo}}",
+      websiteData.logo_type === "text"
+        ? `<strong>${websiteData.logo_text}</strong>`
+        : `<img src="https://picsum.photos/32/32" />`
+    )
+    .replace("{{title}}", `<h1>${websiteData.title}</h1>`)
+    .replace("{{main_content}}", md.render(websiteData.main_content))
+    .replace(
+      "{{articles}}",
+      websiteData.articles
+        .map((article: { title: string; publication_date: string; meta_description: string }) => {
+          const articleFileName = article.title.toLowerCase().split(" ").join("-");
+
+          return `
+            <article>
+              <p>${article.publication_date}</p>
+              <h3>
+                <a href="./articles/${articleFileName}.html">
+                  ${article.title}
+                </a>
+              </h3>
+              <p>${article.meta_description}</p>
+            </article>
+        `;
+        })
+        .join("")
+    )
+    .replace("{{additional_text}}", md.render(websiteData.additional_text));
+
+  let uploadDir = "";
+
+  if (isPreview) {
+    uploadDir = join(process.cwd(), "static", "user-websites", userId, websiteId);
+  } else {
+    uploadDir = join("/", "var", "www", "archtika-websites", userId, websiteId);
+  }
+
+  await mkdir(uploadDir, { recursive: true });
+
+  await writeFile(join(uploadDir, "index.html"), indexFileContents);
+
+  await mkdir(join(uploadDir, "articles"), { recursive: true });
+
+  for (const article of websiteData.articles) {
+    const articleFileName = article.title.toLowerCase().split(" ").join("-");
+
+    const articleFileContents = articleFile
+      .replace(
+        "{{logo}}",
+        websiteData.logo_type === "text"
+          ? `<strong>${websiteData.logo_text}</strong>`
+          : `<img src="https://picsum.photos/32/32" />`
+      )
+      .replace("{{cover_image}}", `<img src="https://picsum.photos/600/200" />`)
+      .replace("{{title}}", `<h1>${article.title}</h1>`)
+      .replace("{{publication_date}}", `<p>${article.publication_date}</p>`)
+      .replace("{{main_content}}", md.render(article.main_content))
+      .replace("{{additional_text}}", md.render(websiteData.additional_text));
+
+    await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
+  }
+};
