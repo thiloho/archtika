@@ -8,9 +8,9 @@ ALTER TABLE internal.home ENABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.article ENABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.footer ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY view_own_user ON internal.user
+CREATE POLICY view_user ON internal.user
 FOR SELECT
-USING (id = (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID);
+USING (true);
 
 CREATE POLICY view_own_websites ON internal.website
 FOR SELECT
@@ -179,7 +179,7 @@ USING (
 
 
 -- migrate:down
-DROP POLICY view_own_user ON internal.user;
+DROP POLICY view_user ON internal.user;
 DROP POLICY view_own_websites ON internal.website;
 DROP POLICY delete_own_website ON internal.website;
 DROP POLICY update_own_website ON internal.website;

@@ -5,7 +5,7 @@ import { ALLOWED_MIME_TYPES } from "../utils";
 
 export const handleFileUpload = async (
   file: File,
-  contentId: string,
+  websiteId: string,
   userId: string,
   session_token: string | undefined,
   customFetch: typeof fetch
@@ -49,7 +49,7 @@ export const handleFileUpload = async (
       Accept: "application/vnd.pgrst.object+json"
     },
     body: JSON.stringify({
-      website_id: contentId,
+      website_id: websiteId,
       user_id: userId,
       original_name: file.name,
       file_system_path: relativePath

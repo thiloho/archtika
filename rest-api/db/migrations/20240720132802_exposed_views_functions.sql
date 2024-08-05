@@ -1,4 +1,11 @@
 -- migrate:up
+CREATE VIEW api.account
+WITH (security_invoker = on)
+AS
+SELECT id, username
+FROM internal.user
+WHERE id = (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID;
+
 CREATE VIEW api.user
 WITH (security_invoker = on)
 AS
@@ -151,6 +158,7 @@ GRANT EXECUTE ON FUNCTION api.create_website(VARCHAR(10), VARCHAR(50)) TO authen
 
 -- Security invoker only works on views if the user has access to the underlying table
 GRANT SELECT ON internal.user TO authenticated_user;
+GRANT SELECT ON api.account TO authenticated_user;
 GRANT SELECT ON api.user TO authenticated_user;
 GRANT SELECT, UPDATE, DELETE ON internal.website TO authenticated_user;
 GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
@@ -194,3 +202,4 @@ DROP VIEW api.settings;
 DROP VIEW api.media;
 DROP VIEW api.website;
 DROP VIEW api.user;
+DROP VIEW api.account;

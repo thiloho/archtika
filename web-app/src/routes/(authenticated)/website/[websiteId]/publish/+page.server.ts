@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) =
 };
 
 export const actions: Actions = {
-  publishWebsite: async ({ request, fetch, cookies, params, locals }) => {
+  publishWebsite: async ({ request, params, locals }) => {
     const data = await request.formData();
     const websiteOverview = JSON.parse(data.get("website-overview") as string);
 

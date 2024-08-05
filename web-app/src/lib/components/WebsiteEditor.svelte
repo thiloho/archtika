@@ -23,6 +23,7 @@
   <nav class="operations__nav">
     <a href="/website/{id}">Settings</a>
     <a href="/website/{id}/articles">Articles</a>
+    <a href="/website/{id}/collaborators">Collaborators</a>
     <a href="/website/{id}/publish">Publish</a>
   </nav>
 
