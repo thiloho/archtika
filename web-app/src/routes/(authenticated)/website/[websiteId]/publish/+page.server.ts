@@ -1,8 +1,9 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { md } from "$lib/utils";
+import type { Actions, PageServerLoad } from "./$types";
 
-export const load = async ({ params, fetch, cookies, locals }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) => {
   const websiteOverviewData = await fetch(
     `http://localhost:3000/website_overview?id=eq.${params.websiteId}`,
     {
@@ -24,7 +25,7 @@ export const load = async ({ params, fetch, cookies, locals }) => {
   };
 };
 
-export const actions = {
+export const actions: Actions = {
   publishWebsite: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
     const websiteOverview = JSON.parse(data.get("website-overview") as string);

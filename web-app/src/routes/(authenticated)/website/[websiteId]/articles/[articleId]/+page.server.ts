@@ -1,6 +1,7 @@
 import { handleFileUpload } from "$lib/server/utils.js";
+import type { Actions, PageServerLoad } from "./$types";
 
-export const load = async ({ parent, params, cookies, fetch }) => {
+export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
   const articleData = await fetch(`http://localhost:3000/article?id=eq.${params.articleId}`, {
     method: "GET",
     headers: {
@@ -16,7 +17,7 @@ export const load = async ({ parent, params, cookies, fetch }) => {
   return { website, article };
 };
 
-export const actions = {
+export const actions: Actions = {
   default: async ({ fetch, cookies, request, params, locals }) => {
     const data = await request.formData();
 

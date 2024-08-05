@@ -1,8 +1,9 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
+  import type { ActionData, PageServerData } from "./$types";
 
-  const { data } = $props();
+  const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
 
 <WebsiteEditor

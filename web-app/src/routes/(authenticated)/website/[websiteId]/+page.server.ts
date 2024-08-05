@@ -1,6 +1,7 @@
 import { handleFileUpload } from "$lib/server/utils.js";
+import type { Actions, PageServerLoad } from "./$types";
 
-export const load = async ({ params, fetch, cookies, url }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
   const globalSettingsData = await fetch(
     `http://localhost:3000/settings?website_id=eq.${params.websiteId}&select=*,media(*)`,
     {
@@ -45,7 +46,7 @@ export const load = async ({ params, fetch, cookies, url }) => {
   };
 };
 
-export const actions = {
+export const actions: Actions = {
   updateGlobal: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
 

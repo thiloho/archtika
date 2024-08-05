@@ -5,8 +5,9 @@
   import { page } from "$app/stores";
   import Modal from "$lib/components/Modal.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
+  import type { ActionData, PageServerData } from "./$types";
 
-  const { form, data } = $props();
+  const { form, data } = $props<{ form: ActionData; data: PageServerData }>();
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />

@@ -1,7 +1,10 @@
 <script lang="ts">
   import "../app.css";
   import { page } from "$app/stores";
-  const { data, children } = $props();
+  import type { LayoutServerData } from "./$types";
+  import type { Snippet } from "svelte";
+
+  const { data, children } = $props<{ data: LayoutServerData; children: Snippet }>();
 
   const isProjectRoute = $derived($page.url.pathname.startsWith("/website"));
   const routeName = $derived(

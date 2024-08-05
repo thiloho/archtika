@@ -1,4 +1,6 @@
-export const load = async ({ params, fetch, cookies }) => {
+import type { LayoutServerLoad } from "./$types";
+
+export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
   const websiteData = await fetch(`http://localhost:3000/website?id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {

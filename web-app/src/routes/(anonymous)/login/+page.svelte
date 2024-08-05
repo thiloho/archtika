@@ -1,8 +1,9 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
+  import type { ActionData } from "./$types";
 
-  const { form } = $props();
+  const { form } = $props<{ form: ActionData }>();
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />

@@ -1,10 +1,12 @@
-export const load = async ({ locals }) => {
+import type { Actions, PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ locals }) => {
   return {
     user: locals.user
   };
 };
 
-export const actions = {
+export const actions: Actions = {
   logout: async ({ cookies }) => {
     cookies.delete("session_token", { path: "/" });
 

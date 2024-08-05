@@ -1,4 +1,6 @@
-export const load = async ({ params, fetch, cookies, url, parent }) => {
+import type { Actions, PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent }) => {
   const searchQuery = url.searchParams.get("article_search_query");
   const sortBy = url.searchParams.get("article_sort");
 
@@ -60,7 +62,7 @@ export const load = async ({ params, fetch, cookies, url, parent }) => {
   };
 };
 
-export const actions = {
+export const actions: Actions = {
   createArticle: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 

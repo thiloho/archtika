@@ -1,4 +1,6 @@
-export const actions = {
+import type { Actions } from "./$types";
+
+export const actions: Actions = {
   default: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 

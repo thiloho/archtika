@@ -3,8 +3,9 @@
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
   import { ALLOWED_MIME_TYPES } from "$lib/utils";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
+  import type { ActionData, PageServerData } from "./$types";
 
-  const { data, form } = $props();
+  const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />

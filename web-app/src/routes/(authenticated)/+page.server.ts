@@ -1,4 +1,6 @@
-export const load = async ({ fetch, cookies, url }) => {
+import type { Actions, PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
   const searchQuery = url.searchParams.get("website_search_query");
   const sortBy = url.searchParams.get("website_sort");
 
@@ -57,7 +59,7 @@ export const load = async ({ fetch, cookies, url }) => {
   };
 };
 
-export const actions = {
+export const actions: Actions = {
   createWebsite: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
