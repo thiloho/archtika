@@ -37,7 +37,7 @@
       </label>
       <label>
         Title:
-        <input type="text" name="title" />
+        <input type="text" name="title" maxlength="50" pattern="\S(.*\S)?" required />
       </label>
 
       <button type="submit">Submit</button>
@@ -112,7 +112,14 @@
                 <input type="hidden" name="id" value={id} />
                 <label>
                   Title
-                  <input type="text" name="title" value={title} />
+                  <input
+                    type="text"
+                    name="title"
+                    value={title}
+                    maxlength="50"
+                    pattern="\S(.*\S)?"
+                    required
+                  />
                 </label>
 
                 <button type="submit">Submit</button>

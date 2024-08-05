@@ -35,7 +35,7 @@
       >
         <label>
           Title:
-          <input type="text" name="title" />
+          <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
         </label>
 
         <button type="submit">Submit</button>

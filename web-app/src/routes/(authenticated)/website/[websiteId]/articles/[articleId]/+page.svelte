@@ -30,19 +30,35 @@
     >
       <label>
         Title:
-        <input type="text" name="title" value={data.article.title} />
+        <input
+          type="text"
+          name="title"
+          value={data.article.title}
+          pattern="\S(.*\S)?"
+          maxlength="100"
+          required
+        />
       </label>
       <label>
         Description:
-        <textarea name="description" rows="5">{data.article.meta_description}</textarea>
+        <textarea name="description" rows="5" maxlength="250" required
+          >{data.article.meta_description}</textarea
+        >
       </label>
       <label>
         Author:
-        <input type="text" name="author" value={data.article.meta_author} />
+        <input
+          type="text"
+          name="author"
+          value={data.article.meta_author}
+          pattern="\S(.*\S)?"
+          maxlength="100"
+          required
+        />
       </label>
       <label>
         Publication date:
-        <input type="date" name="publication-date" value={data.article.publication_date} />
+        <input type="date" name="publication-date" value={data.article.publication_date} required />
       </label>
       <label>
         Cover image:
@@ -50,7 +66,7 @@
       </label>
       <label>
         Main content:
-        <textarea name="main-content" rows="20">{data.article.main_content}</textarea>
+        <textarea name="main-content" rows="20" required>{data.article.main_content}</textarea>
       </label>
 
       <button type="submit">Submit</button>

@@ -24,9 +24,9 @@ CREATE TABLE internal.website (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id UUID REFERENCES internal.user(id) ON DELETE CASCADE NOT NULL DEFAULT (current_setting('request.jwt.claims', true)::JSON->>'user_id')::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
-  title VARCHAR(50) NOT NULL,
+  title VARCHAR(50) NOT NULL CHECK (trim(title) <> ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_at TIMESTAMPTZ,
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
 
@@ -44,44 +44,48 @@ CREATE TABLE internal.settings (
   accent_color_light_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#a5d8ff',
   accent_color_dark_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#114678',
   favicon_image UUID REFERENCES internal.media(id) ON DELETE SET NULL,
-  last_modified_at TIMESTAMPTZ,
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
 
 CREATE TABLE internal.header (
   website_id UUID PRIMARY KEY REFERENCES internal.website(id) ON DELETE CASCADE,
   logo_type TEXT CHECK (logo_type IN ('text', 'image')) NOT NULL DEFAULT 'text',
-  logo_text VARCHAR(255),
+  logo_text VARCHAR(50),
   logo_image UUID REFERENCES internal.media(id) ON DELETE SET NULL,
-  last_modified_at TIMESTAMPTZ,
-  last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
+  last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL,
+  CONSTRAINT logo_content_check CHECK (
+    (logo_type = 'text' AND logo_text IS NOT NULL AND trim(logo_text) <> '') OR
+    (logo_type = 'image' AND logo_image IS NOT NULL)
+  )
 );
 
 CREATE TABLE internal.home (
   website_id UUID PRIMARY KEY REFERENCES internal.website(id) ON DELETE CASCADE,
-  main_content TEXT,
-  last_modified_at TIMESTAMPTZ,
+  main_content TEXT NOT NULL CHECK (trim(main_content) <> ''),
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
 
 CREATE TABLE internal.article (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   website_id UUID REFERENCES internal.website(id) ON DELETE CASCADE NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  meta_description VARCHAR(500),
-  meta_author VARCHAR(255),
+  title VARCHAR(100) NOT NULL CHECK (trim(title) <> ''),
+  meta_description VARCHAR(250) NOT NULL CHECK (trim(meta_description) <> ''),
+  meta_author VARCHAR(100) NOT NULL CHECK (trim(meta_author) <> ''),
   cover_image UUID REFERENCES internal.media(id) ON DELETE SET NULL,
   publication_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  main_content TEXT,
+  main_content TEXT NOT NULL CHECK (trim(main_content) <> ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_at TIMESTAMPTZ,
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
 
 CREATE TABLE internal.footer (
   website_id UUID PRIMARY KEY REFERENCES internal.website(id) ON DELETE CASCADE,
-  additional_text VARCHAR(255),
-  last_modified_at TIMESTAMPTZ,
+  additional_text VARCHAR(250) NOT NULL CHECK (trim(additional_text) <> ''),
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
 
@@ -90,7 +94,7 @@ CREATE TABLE internal.collab (
   user_id UUID REFERENCES internal.user(id) ON DELETE CASCADE,
   permission_level INTEGER CHECK (permission_level IN (10, 20, 30)) NOT NULL DEFAULT 10,
   added_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_at TIMESTAMPTZ,
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL,
   PRIMARY KEY (website_id, user_id)
 );

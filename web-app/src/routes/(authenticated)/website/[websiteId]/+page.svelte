@@ -33,6 +33,8 @@
           type="color"
           name="accent-color-light"
           value={data.globalSettings.accent_color_light_theme}
+          pattern="\S(.*\S)?"
+          required
         />
       </label>
       <label>
@@ -41,6 +43,8 @@
           type="color"
           name="accent-color-dark"
           value={data.globalSettings.accent_color_dark_theme}
+          pattern="\S(.*\S)?"
+          required
         />
       </label>
       <label>
@@ -74,11 +78,22 @@
       </label>
       <label>
         Logo text:
-        <input type="text" name="logo-text" value={data.header.logo_text} />
+        <input
+          type="text"
+          name="logo-text"
+          value={data.header.logo_text}
+          pattern="\S(.*\S)?"
+          required={data.header.logo_type === "text"}
+        />
       </label>
       <label>
         Logo image:
-        <input type="file" name="logo-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
+        <input
+          type="file"
+          name="logo-image"
+          accept={ALLOWED_MIME_TYPES.join(", ")}
+          required={data.header.logo_type === "image"}
+        />
       </label>
 
       <button type="submit">Submit</button>
@@ -99,7 +114,7 @@
     >
       <label>
         Main content:
-        <textarea name="main-content" rows="20">{data.home.main_content}</textarea>
+        <textarea name="main-content" rows="20" required>{data.home.main_content}</textarea>
       </label>
 
       <button type="submit">Submit</button>
@@ -120,7 +135,9 @@
     >
       <label>
         Additional text:
-        <textarea name="additional-text" rows="5">{data.footer.additional_text}</textarea>
+        <textarea name="additional-text" rows="5" maxlength="250" required
+          >{data.footer.additional_text}</textarea
+        >
       </label>
 
       <button type="submit">Submit</button>
