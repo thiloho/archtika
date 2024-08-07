@@ -1,5 +1,7 @@
 -- migrate:up
-CREATE VIEW api.website_overview AS
+CREATE VIEW api.website_overview
+WITH (security_invoker = on)
+AS
 SELECT
   w.id,
   w.owner_id,

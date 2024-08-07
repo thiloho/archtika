@@ -50,10 +50,10 @@
     </Modal>
   </section>
 
-  <section>
-    <h2>All collaborators</h2>
+  {#if data.collaborators.length > 0}
+    <section>
+      <h2>All collaborators</h2>
 
-    {#if data.collaborators.length > 0}
       {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
         <article class="collaborator-card">
           <h3>{username} ({permission_level})</h3>
@@ -109,8 +109,8 @@
           </div>
         </article>
       {/each}
-    {/if}
-  </section>
+    </section>
+  {/if}
 </WebsiteEditor>
 
 <style>
