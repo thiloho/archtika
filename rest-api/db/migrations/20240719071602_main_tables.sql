@@ -71,12 +71,13 @@ CREATE TABLE internal.home (
 CREATE TABLE internal.article (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   website_id UUID REFERENCES internal.website(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES internal.user(id) ON DELETE SET NULL,
   title VARCHAR(100) NOT NULL CHECK (trim(title) <> ''),
-  meta_description VARCHAR(250) NOT NULL CHECK (trim(meta_description) <> ''),
-  meta_author VARCHAR(100) NOT NULL CHECK (trim(meta_author) <> ''),
+  meta_description VARCHAR(250) CHECK (trim(meta_description) <> ''),
+  meta_author VARCHAR(100) CHECK (trim(meta_author) <> ''),
   cover_image UUID REFERENCES internal.media(id) ON DELETE SET NULL,
   publication_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  main_content TEXT NOT NULL CHECK (trim(main_content) <> ''),
+  main_content TEXT CHECK (trim(main_content) <> ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL

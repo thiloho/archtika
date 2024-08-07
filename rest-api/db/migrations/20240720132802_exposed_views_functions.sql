@@ -77,6 +77,7 @@ AS
 SELECT
   id,
   website_id,
+  user_id,
   title,
   meta_description,
   meta_author,
@@ -126,7 +127,10 @@ CREATE FUNCTION
 api.create_website(content_type VARCHAR(10), title VARCHAR(50), OUT website_id UUID) AS $$
 DECLARE
   _website_id UUID;
+  _user_id UUID;
 BEGIN
+  _user_id := (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID;
+
   INSERT INTO internal.website (content_type, title)
   VALUES (create_website.content_type, create_website.title)
   RETURNING id INTO _website_id;
@@ -141,10 +145,10 @@ BEGIN
   VALUES
     (_website_id, '## Main content comes in here');
 
-  INSERT INTO internal.article (website_id, title, meta_description, meta_author, main_content)
+  INSERT INTO internal.article (website_id, user_id, title, meta_description, meta_author, main_content)
   VALUES
-    (_website_id, 'First article', 'This is the first sample article', 'Author Name', '## First article'),
-    (_website_id, 'Second article', 'This is the second sample article', 'Author Name', '## Second article');
+    (_website_id, _user_id, 'First article', 'This is the first sample article', 'Author Name', '## First article'),
+    (_website_id, _user_id, 'Second article', 'This is the second sample article', 'Author Name', '## Second article');
 
   INSERT INTO internal.footer (website_id, additional_text)
   VALUES (_website_id, 'This website was created with archtika'); 

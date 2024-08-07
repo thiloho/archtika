@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 };
 
 export const actions: Actions = {
-  createArticle: async ({ request, fetch, cookies, params }) => {
+  createArticle: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
 
     const res = await fetch("http://localhost:3000/article", {
@@ -74,6 +74,7 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
+        user_id: locals.user.id,
         title: data.get("title")
       })
     });
