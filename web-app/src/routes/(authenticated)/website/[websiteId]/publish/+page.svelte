@@ -12,7 +12,8 @@
 <WebsiteEditor
   id={data.website.id}
   title={data.website.title}
-  previewContent="https://aurora.thilohohlt.com"
+  previewContent="http://localhost:5173/user-websites/{data.websiteOverview.owner_id}/{data
+    .websiteOverview.id}/index.html"
   fullPreview={true}
 >
   <section>

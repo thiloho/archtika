@@ -32,10 +32,7 @@
 
 <div class="preview">
   {#if fullPreview}
-    <iframe
-      src="http://localhost:5173/user-websites/e6710116-f2b7-4318-82de-35a25d22ed2e/0015130f-3024-402b-8421-aaee4a6f0890/index.html"
-      title="Preview"
-    ></iframe>
+    <iframe src={previewContent} title="Preview"></iframe>
   {:else}
     {@html md.render(previewContent)}
   {/if}

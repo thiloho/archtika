@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) =
 
   const websiteOverview = await websiteOverviewData.json();
 
-  generateStaticFiles(websiteOverview, locals.user.id, params.websiteId);
+  generateStaticFiles(websiteOverview);
 
   return {
     websiteOverview
@@ -30,16 +30,11 @@ export const actions: Actions = {
     const data = await request.formData();
     const websiteOverview = JSON.parse(data.get("website-overview") as string);
 
-    generateStaticFiles(websiteOverview, locals.user.id, params.websiteId, false);
+    generateStaticFiles(websiteOverview, false);
   }
 };
 
-const generateStaticFiles = async (
-  websiteData: any,
-  userId: string,
-  websiteId: string,
-  isPreview: boolean = true
-) => {
+const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) => {
   const templatePath = join(
     process.cwd(),
     "..",
@@ -60,7 +55,7 @@ const generateStaticFiles = async (
         : `<img src="https://picsum.photos/32/32" />`
     )
     .replace("{{title}}", `<h1>${websiteData.title}</h1>`)
-    .replace("{{main_content}}", md.render(websiteData.main_content))
+    .replace("{{main_content}}", md.render(websiteData.main_content || ""))
     .replace(
       "{{articles}}",
       websiteData.articles
@@ -81,14 +76,20 @@ const generateStaticFiles = async (
         })
         .join("")
     )
-    .replace("{{additional_text}}", md.render(websiteData.additional_text));
+    .replace("{{additional_text}}", md.render(websiteData.additional_text || ""));
 
   let uploadDir = "";
 
   if (isPreview) {
-    uploadDir = join(process.cwd(), "static", "user-websites", userId, websiteId);
+    uploadDir = join(
+      process.cwd(),
+      "static",
+      "user-websites",
+      websiteData.owner_id,
+      websiteData.id
+    );
   } else {
-    uploadDir = join("/", "var", "www", "archtika-websites", userId, websiteId);
+    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.owner_id, websiteData.id);
   }
 
   await mkdir(uploadDir, { recursive: true });
@@ -110,8 +111,8 @@ const generateStaticFiles = async (
       .replace("{{cover_image}}", `<img src="https://picsum.photos/600/200" />`)
       .replace("{{title}}", `<h1>${article.title}</h1>`)
       .replace("{{publication_date}}", `<p>${article.publication_date}</p>`)
-      .replace("{{main_content}}", md.render(article.main_content))
-      .replace("{{additional_text}}", md.render(websiteData.additional_text));
+      .replace("{{main_content}}", md.render(article.main_content || ""))
+      .replace("{{additional_text}}", md.render(websiteData.additional_text || ""));
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }
