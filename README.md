@@ -14,4 +14,8 @@ sudo mkdir -p /var/www/archtika-websites
 sudo chown $USER:$(id -gn) /var/www/archtika-websites
 ```
 
+```bash
+nix run .#dev-vm
+```
+
 For production, a separate `node` user can be created to run the systemd service for the node process; this user would have only the essential permissions to maintain the principle of least privilege.
