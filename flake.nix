@@ -27,6 +27,10 @@
               dbmate
               postgrest
             ];
+
+            shellHook = ''
+              alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
+            '';
           };
           web = pkgs.mkShell { packages = with pkgs; [ nodejs_22 ]; };
         }
