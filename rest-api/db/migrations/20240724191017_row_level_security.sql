@@ -9,7 +9,14 @@ ALTER TABLE internal.article ENABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.footer ENABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.collab ENABLE ROW LEVEL SECURITY;
 
-CREATE FUNCTION internal.user_has_website_access(website_id UUID, required_permission INTEGER DEFAULT 10)
+CREATE FUNCTION internal.user_has_website_access(
+  website_id UUID,
+  required_permission INTEGER,
+  collaborator_permission_level INTEGER DEFAULT NULL,
+  collaborator_user_id UUID DEFAULT NULL,
+  article_user_id UUID DEFAULT NULL,
+  raise_error BOOLEAN DEFAULT true
+)
 RETURNS BOOLEAN AS $$
 DECLARE
   _user_id UUID;
@@ -33,7 +40,29 @@ BEGIN
     WHERE c.website_id = user_has_website_access.website_id
     AND c.user_id = (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID
     AND c.permission_level >= user_has_website_access.required_permission
+    AND (
+      user_has_website_access.article_user_id IS NULL
+      OR
+      (
+        c.permission_level = 30
+        OR
+        user_has_website_access.article_user_id = _user_id
+      )
+    )
+    AND (
+      user_has_website_access.collaborator_permission_level IS NULL
+      OR
+      (
+        user_has_website_access.collaborator_user_id != _user_id
+        AND
+        user_has_website_access.collaborator_permission_level < 30
+      )
+    )
   ) INTO _has_access;
+
+  IF NOT _has_access AND user_has_website_access.raise_error THEN
+    RAISE insufficient_privilege USING MESSAGE = 'You do not have the required permissions for this action.';
+  END IF;
 
   RETURN _has_access;
 END;
@@ -46,7 +75,7 @@ USING (true);
 
 CREATE POLICY view_websites ON internal.website
 FOR SELECT
-USING (internal.user_has_website_access(id, 10));
+USING (internal.user_has_website_access(id, 10, raise_error => false));
 
 CREATE POLICY update_website ON internal.website
 FOR UPDATE
@@ -103,15 +132,7 @@ USING (internal.user_has_website_access(website_id, 20));
 
 CREATE POLICY delete_article ON internal.article
 FOR DELETE
-USING (
-  internal.user_has_website_access(website_id, 30)
-  OR
-  (
-    internal.user_has_website_access(website_id, 20)
-    AND
-    user_id = (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID
-  )
-);
+USING (internal.user_has_website_access(website_id, 20, article_user_id => user_id));
 
 CREATE POLICY insert_article ON internal.article
 FOR INSERT
@@ -133,48 +154,15 @@ USING (internal.user_has_website_access(website_id, 10));
 
 CREATE POLICY insert_collaborations ON internal.collab
 FOR INSERT
-WITH CHECK (
-  CASE
-    WHEN internal.user_has_website_access(website_id, 40) THEN
-      true
-    WHEN internal.user_has_website_access(website_id, 30) THEN
-      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
-      AND
-      (permission_level < 30)
-    ELSE
-      false
-  END
-);
+WITH CHECK (internal.user_has_website_access(website_id, 30, collaborator_permission_level => permission_level, collaborator_user_id => user_id));
 
 CREATE POLICY update_collaborations ON internal.collab
 FOR UPDATE
-USING (
-  CASE
-    WHEN internal.user_has_website_access(website_id, 40) THEN
-      true
-    WHEN internal.user_has_website_access(website_id, 30) THEN
-      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
-      AND
-      (permission_level < 30)
-    ELSE
-      false
-  END
-);
+USING (internal.user_has_website_access(website_id, 30, collaborator_permission_level => permission_level, collaborator_user_id => user_id));
 
 CREATE POLICY delete_collaborations ON internal.collab
 FOR DELETE
-USING (
-  CASE
-    WHEN internal.user_has_website_access(website_id, 40) THEN
-      TRUE
-    WHEN internal.user_has_website_access(website_id, 30) THEN
-      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
-      AND
-      (permission_level < 30)
-    ELSE
-      FALSE
-  END
-);
+USING (internal.user_has_website_access(website_id, 30, collaborator_permission_level => permission_level, collaborator_user_id => user_id));
 
 
 -- migrate:down
@@ -200,7 +188,7 @@ DROP POLICY view_collaborations ON internal.collab;
 DROP POLICY insert_collaborations ON internal.collab;
 DROP POLICY update_collaborations ON internal.collab;
 DROP POLICY delete_collaborations ON internal.collab;
-DROP FUNCTION internal.user_has_website_access(UUID, INTEGER);
+DROP FUNCTION internal.user_has_website_access(UUID, INTEGER, INTEGER, UUID, UUID, BOOLEAN);
 
 ALTER TABLE internal.user DISABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.website DISABLE ROW LEVEL SECURITY;

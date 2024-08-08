@@ -55,28 +55,35 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
         : `<img src="https://picsum.photos/32/32" />`
     )
     .replace("{{title}}", `<h1>${websiteData.title}</h1>`)
-    .replace("{{main_content}}", md.render(websiteData.main_content || ""))
+    .replace("{{main_content}}", md.render(websiteData.main_content ?? ""))
     .replace(
       "{{articles}}",
-      websiteData.articles
-        .map((article: { title: string; publication_date: string; meta_description: string }) => {
-          const articleFileName = article.title.toLowerCase().split(" ").join("-");
+      Array.isArray(websiteData.articles) && websiteData.articles.length > 0
+        ? `
+          <h2>Articles</h2>
+          ${websiteData.articles
+            .map(
+              (article: { title: string; publication_date: string; meta_description: string }) => {
+                const articleFileName = article.title.toLowerCase().split(" ").join("-");
 
-          return `
-            <article>
-              <p>${article.publication_date}</p>
-              <h3>
-                <a href="./articles/${articleFileName}.html">
-                  ${article.title}
-                </a>
-              </h3>
-              <p>${article.meta_description}</p>
-            </article>
-        `;
-        })
-        .join("")
+                return `
+                  <article>
+                    <p>${article.publication_date}</p>
+                    <h3>
+                      <a href="./articles/${articleFileName}.html">
+                        ${article.title}
+                      </a>
+                    </h3>
+                    <p>${article.meta_description ?? "No description provided"}</p>
+                  </article>
+                `;
+              }
+            )
+            .join("")}
+        `
+        : "<h2>Articles</h2><p>No articles available at this time.</p>"
     )
-    .replace("{{additional_text}}", md.render(websiteData.additional_text || ""));
+    .replace("{{additional_text}}", md.render(websiteData.additional_text ?? ""));
 
   let uploadDir = "";
 
@@ -92,7 +99,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
 
   await mkdir(join(uploadDir, "articles"), { recursive: true });
 
-  for (const article of websiteData.articles) {
+  for (const article of websiteData.articles ?? []) {
     const articleFileName = article.title.toLowerCase().split(" ").join("-");
 
     const articleFileContents = articleFile
@@ -105,8 +112,8 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
       .replace("{{cover_image}}", `<img src="https://picsum.photos/600/200" />`)
       .replace("{{title}}", `<h1>${article.title}</h1>`)
       .replace("{{publication_date}}", `<p>${article.publication_date}</p>`)
-      .replace("{{main_content}}", md.render(article.main_content || ""))
-      .replace("{{additional_text}}", md.render(websiteData.additional_text || ""));
+      .replace("{{main_content}}", md.render(article.main_content ?? ""))
+      .replace("{{additional_text}}", md.render(websiteData.additional_text ?? ""));
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }
