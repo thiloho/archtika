@@ -4,7 +4,7 @@ WITH (security_invoker = on)
 AS
 SELECT
   w.id,
-  w.owner_id,
+  w.user_id,
   w.content_type,
   w.title,
   s.accent_color_light_theme,

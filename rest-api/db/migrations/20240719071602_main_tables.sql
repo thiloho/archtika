@@ -22,9 +22,9 @@ CREATE TABLE internal.user (
 
 CREATE TABLE internal.website (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id UUID REFERENCES internal.user(id) ON DELETE CASCADE NOT NULL DEFAULT (current_setting('request.jwt.claims', true)::JSON->>'user_id')::UUID,
+  user_id UUID REFERENCES internal.user(id) ON DELETE CASCADE NOT NULL DEFAULT (current_setting('request.jwt.claims', true)::JSON->>'user_id')::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
-  title VARCHAR(50) NOT NULL CHECK (trim(title) <> ''),
+  title VARCHAR(50) NOT NULL CHECK (trim(title) != ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
@@ -56,14 +56,14 @@ CREATE TABLE internal.header (
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL,
   CONSTRAINT logo_content_check CHECK (
-    (logo_type = 'text' AND logo_text IS NOT NULL AND trim(logo_text) <> '') OR
+    (logo_type = 'text' AND logo_text IS NOT NULL AND trim(logo_text) != '') OR
     (logo_type = 'image' AND logo_image IS NOT NULL)
   )
 );
 
 CREATE TABLE internal.home (
   website_id UUID PRIMARY KEY REFERENCES internal.website(id) ON DELETE CASCADE,
-  main_content TEXT NOT NULL CHECK (trim(main_content) <> ''),
+  main_content TEXT NOT NULL CHECK (trim(main_content) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );
@@ -72,12 +72,12 @@ CREATE TABLE internal.article (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   website_id UUID REFERENCES internal.website(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user(id) ON DELETE SET NULL,
-  title VARCHAR(100) NOT NULL CHECK (trim(title) <> ''),
-  meta_description VARCHAR(250) CHECK (trim(meta_description) <> ''),
-  meta_author VARCHAR(100) CHECK (trim(meta_author) <> ''),
+  title VARCHAR(100) NOT NULL CHECK (trim(title) != ''),
+  meta_description VARCHAR(250) CHECK (trim(meta_description) != ''),
+  meta_author VARCHAR(100) CHECK (trim(meta_author) != ''),
   cover_image UUID REFERENCES internal.media(id) ON DELETE SET NULL,
   publication_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  main_content TEXT CHECK (trim(main_content) <> ''),
+  main_content TEXT CHECK (trim(main_content) != ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
@@ -85,7 +85,7 @@ CREATE TABLE internal.article (
 
 CREATE TABLE internal.footer (
   website_id UUID PRIMARY KEY REFERENCES internal.website(id) ON DELETE CASCADE,
-  additional_text VARCHAR(250) NOT NULL CHECK (trim(additional_text) <> ''),
+  additional_text VARCHAR(250) NOT NULL CHECK (trim(additional_text) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user(id) ON DELETE SET NULL
 );

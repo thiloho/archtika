@@ -81,15 +81,9 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
   let uploadDir = "";
 
   if (isPreview) {
-    uploadDir = join(
-      process.cwd(),
-      "static",
-      "user-websites",
-      websiteData.owner_id,
-      websiteData.id
-    );
+    uploadDir = join(process.cwd(), "static", "user-websites", websiteData.user_id, websiteData.id);
   } else {
-    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.owner_id, websiteData.id);
+    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.user_id, websiteData.id);
   }
 
   await mkdir(uploadDir, { recursive: true });

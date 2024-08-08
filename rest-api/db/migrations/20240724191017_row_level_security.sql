@@ -20,7 +20,7 @@ BEGIN
   SELECT EXISTS (
     SELECT 1
     FROM internal.website
-    WHERE id = website_id AND owner_id = _user_id
+    WHERE id = website_id AND user_id = _user_id
   ) INTO _has_access;
   
   IF _has_access THEN
@@ -103,7 +103,15 @@ USING (internal.user_has_website_access(website_id, 20));
 
 CREATE POLICY delete_article ON internal.article
 FOR DELETE
-USING (internal.user_has_website_access(website_id, 30));
+USING (
+  internal.user_has_website_access(website_id, 30)
+  OR
+  (
+    internal.user_has_website_access(website_id, 20)
+    AND
+    user_id = (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID
+  )
+);
 
 CREATE POLICY insert_article ON internal.article
 FOR INSERT
@@ -125,15 +133,48 @@ USING (internal.user_has_website_access(website_id, 10));
 
 CREATE POLICY insert_collaborations ON internal.collab
 FOR INSERT
-WITH CHECK (internal.user_has_website_access(website_id, 30));
+WITH CHECK (
+  CASE
+    WHEN internal.user_has_website_access(website_id, 40) THEN
+      true
+    WHEN internal.user_has_website_access(website_id, 30) THEN
+      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
+      AND
+      (permission_level < 30)
+    ELSE
+      false
+  END
+);
 
 CREATE POLICY update_collaborations ON internal.collab
 FOR UPDATE
-USING (internal.user_has_website_access(website_id, 30));
+USING (
+  CASE
+    WHEN internal.user_has_website_access(website_id, 40) THEN
+      true
+    WHEN internal.user_has_website_access(website_id, 30) THEN
+      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
+      AND
+      (permission_level < 30)
+    ELSE
+      false
+  END
+);
 
 CREATE POLICY delete_collaborations ON internal.collab
 FOR DELETE
-USING (internal.user_has_website_access(website_id, 30));
+USING (
+  CASE
+    WHEN internal.user_has_website_access(website_id, 40) THEN
+      TRUE
+    WHEN internal.user_has_website_access(website_id, 30) THEN
+      (user_id != (current_setting('request.jwt.claims', true)::json->>'user_id')::UUID)
+      AND
+      (permission_level < 30)
+    ELSE
+      FALSE
+  END
+);
 
 
 -- migrate:down

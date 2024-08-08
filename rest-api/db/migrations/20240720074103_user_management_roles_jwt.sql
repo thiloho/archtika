@@ -23,7 +23,7 @@ EXECUTE FUNCTION internal.check_role_exists();
 CREATE FUNCTION
 internal.encrypt_pass() RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_OP = 'INSERT' OR NEW.password_hash <> OLD.password_hash THEN
+  IF TG_OP = 'INSERT' OR NEW.password_hash != OLD.password_hash THEN
     NEW.password_hash = crypt(NEW.password_hash, gen_salt('bf'));
   END IF;
   RETURN NEW;

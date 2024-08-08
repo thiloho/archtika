@@ -17,7 +17,7 @@ WITH (security_invoker = on)
 AS
 SELECT
   id,
-  owner_id,
+  user_id,
   content_type,
   title,
   created_at,
