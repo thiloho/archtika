@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  archtikaPackages,
   ...
 }:
 
@@ -14,6 +13,8 @@ in
 {
   options.services.archtika = {
     enable = mkEnableOption "archtika service";
+
+    package = mkPackageOption pkgs "archtika" { };
 
     user = mkOption {
       type = types.str;
@@ -78,7 +79,7 @@ in
       script = ''
         ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '${cfg.jwtSecret}'"
 
-        ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${archtikaPackages.api}/migrations up
+        ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
         PGRST_SERVER_PORT=${toString cfg.port} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="${cfg.jwtSecret}" ${pkgs.postgrest}/bin/postgrest
       '';
@@ -96,7 +97,7 @@ in
       };
 
       script = ''
-        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${archtikaPackages.web}
+        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 

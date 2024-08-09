@@ -2,6 +2,7 @@
   pkgs,
   lib,
   modulesPath,
+  localArchtikaPackage,
   ...
 }:
 {
@@ -42,6 +43,7 @@
 
   services.archtika = {
     enable = true;
+    package = localArchtikaPackage;
     jwtSecret = "test-secret";
   };
 
