@@ -4,6 +4,7 @@
   import { ALLOWED_MIME_TYPES } from "$lib/utils";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import Modal from "$lib/components/Modal.svelte";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
@@ -60,10 +61,20 @@
         Publication date:
         <input type="date" name="publication-date" value={data.article.publication_date} required />
       </label>
-      <label>
-        Cover image:
-        <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
-      </label>
+      <div class="file-field">
+        <label>
+          Cover image:
+          <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
+        </label>
+        {#if data.article.media}
+          <Modal id="preview-cover-article-{data.article.id}" text="Preview">
+            <img
+              src={`http://localhost:5173/${data.article.media.file_system_path}`}
+              alt={data.article.media.original_name}
+            />
+          </Modal>
+        {/if}
+      </div>
       <label>
         Main content:
         <textarea name="main-content" rows="20" required>{data.article.main_content}</textarea>

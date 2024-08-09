@@ -42,6 +42,8 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          dev-vm = self.nixosConfigurations.${system}.dev-vm.config.system.build.vm;
+
           api-setup = pkgs.writeShellScriptBin "api-setup" ''
             source .env
 
@@ -53,7 +55,38 @@
 
             PGRST_DB_URI="$PGRST_DB_URI" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest postgrest.conf
           '';
-          dev-vm = self.nixosConfigurations.${system}.dev-vm.config.system.build.vm;
+
+          web = pkgs.buildNpmPackage {
+            name = "archtika-web-app";
+            src = ./web-app;
+            npmDepsHash = "sha256-DmIII/x5ANlEpKtnZC/JlbVAvhbgnSiNn8hkj+qVCZY=";
+            npmFlags = [ "--legacy-peer-deps" ];
+            installPhase = ''
+              mkdir $out
+              cp package.json $out
+              cp -r node_modules $out
+              cp -r build/* $out
+            '';
+          };
+        }
+      );
+
+      apps = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          web = {
+            type = "app";
+            program = "${pkgs.writeShellScriptBin "web-wrapper" ''
+              export ORIGIN=http://localhost:4000
+              export HOST=127.0.0.1
+              export PORT=4000
+
+              ${pkgs.nodejs_22}/bin/node ${self.packages.${system}.web}
+            ''}/bin/web-wrapper";
+          };
         }
       );
 

@@ -2,14 +2,17 @@ import { handleFileUpload } from "$lib/server/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
-  const articleData = await fetch(`http://localhost:3000/article?id=eq.${params.articleId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
-      Accept: "application/vnd.pgrst.object+json"
+  const articleData = await fetch(
+    `http://localhost:3000/article?id=eq.${params.articleId}&select=*,media(*)`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json"
+      }
     }
-  });
+  );
 
   const article = await articleData.json();
   const { website } = await parent();

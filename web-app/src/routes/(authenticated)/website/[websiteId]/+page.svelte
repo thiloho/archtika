@@ -4,6 +4,7 @@
   import { ALLOWED_MIME_TYPES } from "$lib/utils";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import Modal from "$lib/components/Modal.svelte";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
@@ -47,10 +48,20 @@
           required
         />
       </label>
-      <label>
-        Favicon:
-        <input type="file" name="favicon" accept={ALLOWED_MIME_TYPES.join(", ")} />
-      </label>
+      <div class="file-field">
+        <label>
+          Favicon:
+          <input type="file" name="favicon" accept={ALLOWED_MIME_TYPES.join(", ")} />
+        </label>
+        {#if data.globalSettings.media}
+          <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
+            <img
+              src={`http://localhost:5173/${data.globalSettings.media.file_system_path}`}
+              alt={data.globalSettings.media.original_name}
+            />
+          </Modal>
+        {/if}
+      </div>
 
       <button type="submit">Submit</button>
     </form>
@@ -86,15 +97,25 @@
           required={data.header.logo_type === "text"}
         />
       </label>
-      <label>
-        Logo image:
-        <input
-          type="file"
-          name="logo-image"
-          accept={ALLOWED_MIME_TYPES.join(", ")}
-          required={data.header.logo_type === "image"}
-        />
-      </label>
+      <div class="file-field">
+        <label>
+          Logo image:
+          <input
+            type="file"
+            name="logo-image"
+            accept={ALLOWED_MIME_TYPES.join(", ")}
+            required={data.header.logo_type === "image"}
+          />
+        </label>
+        {#if data.header.media}
+          <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
+            <img
+              src={`http://localhost:5173/${data.header.media.file_system_path}`}
+              alt={data.header.media.original_name}
+            />
+          </Modal>
+        {/if}
+      </div>
 
       <button type="submit">Submit</button>
     </form>

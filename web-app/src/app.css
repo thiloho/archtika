@@ -161,13 +161,20 @@ form[method="GET"] > button[type="submit"] {
   align-self: end;
 }
 
-form > label {
+form label {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   max-inline-size: 30ch;
 }
 
-form > label:has(textarea) {
+form label:has(textarea) {
   max-inline-size: 65ch;
+}
+
+form .file-field {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
