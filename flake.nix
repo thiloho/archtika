@@ -44,18 +44,6 @@
         {
           dev-vm = self.nixosConfigurations.${system}.dev-vm.config.system.build.vm;
 
-          api-setup = pkgs.writeShellScriptBin "api-setup" ''
-            source .env
-
-            ${pkgs.postgresql_16}/bin/psql $DATABASE_URL -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
-
-            ${pkgs.dbmate}/bin/dbmate up
-
-            echo "Running command: PGRST_DB_URI=\"$PGRST_DB_URI\" PGRST_JWT_SECRET=\"$JWT_SECRET\" ${pkgs.postgrest}/bin/postgrest postgrest.conf"
-
-            PGRST_DB_URI="$PGRST_DB_URI" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest postgrest.conf
-          '';
-
           web = pkgs.buildNpmPackage {
             name = "archtika-web-app";
             src = ./web-app;
@@ -77,6 +65,19 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          api = {
+            type = "app";
+            program = "${pkgs.writeShellScriptBin "api-setup" ''
+              source .env
+
+              ${pkgs.postgresql_16}/bin/psql $DATABASE_URL -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
+
+              ${pkgs.dbmate}/bin/dbmate up
+
+              PGRST_DB_URI="$PGRST_DB_URI" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest postgrest.conf
+            ''}/bin/api-setup";
+          };
+
           web = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "web-wrapper" ''
