@@ -23,10 +23,8 @@
         in
         {
           api = pkgs.mkShell {
-            packages = with pkgs; [ dbmate ];
-
             shellHook = ''
-              alias dbmate="dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
+              alias dbmate="${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
             '';
           };
@@ -40,6 +38,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          module-test = self.nixosConfigurations.${system}.module-test.config.system.build.vm;
           dev-vm = self.nixosConfigurations.${system}.dev-vm.config.system.build.vm;
 
           web = pkgs.buildNpmPackage {
@@ -93,112 +92,27 @@
       );
 
       nixosConfigurations = forAllSystems (system: {
-        dev-vm = nixpkgs.lib.nixosSystem {
+        module-test = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
-            self.nixosModules.dev-vm
-            {
-              virtualisation =
-                nixpkgs.lib.optionalAttrs
-                  (nixpkgs.lib.elem system [
-                    "x86_64-darwin"
-                    "aarch64-darwin"
-                  ])
-                  {
-                    vmVariant = {
-                      virtualisation.host.pkgs = nixpkgs.legacyPackages.${system};
-                    };
-                  };
-            }
+            ./nix/module-test.nix
+            { _module.args.archtikaPackages = self.packages.${system}; }
           ];
+        };
+        dev-vm = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ ./nix/dev-vm.nix ];
         };
       });
 
-      nixosModules.dev-vm =
-        {
-          pkgs,
-          lib,
-          modulesPath,
-          ...
-        }:
-        {
-          imports = [ "${modulesPath}/virtualisation/qemu-vm.nix" ];
-
-          networking = {
-            hostName = "archtika";
-            firewall.enable = false;
+      nixosModules = {
+        archtika =
+          { pkgs, ... }:
+          {
+            imports = [ ./nix/module.nix ];
+            _module.args.archtikaPackages = self.packages.${pkgs.system};
           };
-
-          nix.settings.experimental-features = [ "nix-command flakes" ];
-
-          users.users.dev = {
-            isNormalUser = true;
-            extraGroups = [ "wheel" ];
-            password = "dev";
-          };
-
-          systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0777 root root -" ];
-
-          virtualisation = {
-            graphics = false;
-            sharedDirectories = {
-              websites = {
-                source = "/var/www/archtika-websites";
-                target = "/var/www/archtika-websites";
-              };
-            };
-            # Alternatively a bridge network for QEMU could be setup, but requires much more effort
-            forwardPorts = [
-              {
-                from = "host";
-                host.port = 15432;
-                guest.port = 5432;
-              }
-              {
-                from = "host";
-                host.port = 18000;
-                guest.port = 80;
-              }
-            ];
-          };
-
-          services = {
-            postgresql = {
-              enable = true;
-              package = pkgs.postgresql_16;
-              ensureDatabases = [ "archtika" ];
-              authentication = lib.mkForce ''
-                local all all trust
-                host all all all trust
-              '';
-              enableTCPIP = true;
-              extraPlugins = with pkgs.postgresql16Packages; [ pgjwt ];
-            };
-            nginx = {
-              enable = true;
-              virtualHosts."_" = {
-                listen = [
-                  {
-                    addr = "0.0.0.0";
-                    port = 80;
-                  }
-                ];
-                locations = {
-                  "/" = {
-                    root = "/var/www/archtika-websites";
-                    index = "index.html";
-                    tryFiles = "$uri $uri/ $uri/index.html =404";
-                    extraConfig = ''
-                      autoindex on;
-                    '';
-                  };
-                };
-              };
-            };
-          };
-
-          system.stateVersion = "24.05";
-        };
+      };
 
       formatter = forAllSystems (
         system:

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  archtikaPackages,
   ...
 }:
 
@@ -67,54 +68,50 @@ in
         "network.target"
         "postgresql.service"
       ];
-      environment = {
-        PGRST_DB_URI = "postgres://authenticator@localhost:5432/${cfg.databaseName}";
-        PGRST_JWT_SECRET = cfg.jwtSecret;
-      };
 
       serviceConfig = {
-        ExecStart = "${pkgs.postgrest}/bin/postgrest";
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
       };
+
+      script = ''
+        ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '${cfg.jwtSecret}'"
+
+        ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${archtikaPackages.api}/migrations up
+
+        PGRST_SERVER_PORT=${toString cfg.port} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="${cfg.jwtSecret}" ${pkgs.postgrest}/bin/postgrest
+      '';
     };
 
     systemd.services.archtika-web = {
-      description = "Archtika Web App service";
+      description = "archtika Web App service";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
-      environment = {
-        ORIGIN = "https://${cfg.domain}";
-        HOST = "127.0.0.1";
-        PORT = toString cfg.webAppPort;
-      };
 
       serviceConfig = {
-        ExecStart = "${pkgs.nodejs_22}/bin/node ${pkgs.callPackage ../packages/web.nix { }}";
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
       };
+
+      script = ''
+        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${archtikaPackages.web}
+      '';
     };
 
     services.postgresql = {
       enable = true;
       package = pkgs.postgresql_16;
       ensureDatabases = [ cfg.databaseName ];
-      ensureUsers = [
-        {
-          name = cfg.user;
-          ensurePermissions = {
-            "DATABASE ${cfg.databaseName}" = "ALL PRIVILEGES";
-          };
-        }
-      ];
       authentication = lib.mkForce ''
-        local all all trust
-        host all all 127.0.0.1/32 trust
+        # IPv4 local connections:
+        host    all    all    127.0.0.1/32    trust
+        # IPv6 local connections:
+        host    all    all    ::1/128         trust
+        # Local socket connections:
+        local   all    all                    trust
       '';
-      enableTCPIP = true;
       extraPlugins = with pkgs.postgresql16Packages; [ pgjwt ];
     };
 
@@ -122,37 +119,6 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
-
-      virtualHosts.${cfg.domain} = {
-        forceSSL = true;
-        enableACME = true;
-
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.webAppPort}";
-        };
-
-        locations."/api/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.port}/";
-        };
-      };
     };
-
-    networking.firewall.allowedTCPPorts = [
-      80
-      443
-    ];
-
-    system.activationScripts.archtika-setup = ''
-      mkdir -p /etc/archtika
-      cat > /etc/archtika/postgrest.conf << EOF
-      db-uri = "$(systemd-escape "postgres://${cfg.user}:${cfg.user}@localhost/${cfg.databaseName}")"
-      db-schema = "api"
-      db-anon-role = "anon"
-      jwt-secret = "$(systemd-escape "${cfg.jwtSecret}")"
-      server-port = ${toString cfg.port}
-      EOF
-      chown -R ${cfg.user}:${cfg.group} /etc/archtika
-      chmod 600 /etc/archtika/postgrest.conf
-    '';
   };
 }
