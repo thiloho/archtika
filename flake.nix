@@ -23,12 +23,10 @@
         in
         {
           api = pkgs.mkShell {
-            packages = with pkgs; [
-              dbmate
-              postgrest
-            ];
+            packages = with pkgs; [ dbmate ];
 
             shellHook = ''
+              alias dbmate="dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
             '';
           };
@@ -56,6 +54,15 @@
               cp -r build/* $out
             '';
           };
+
+          api = pkgs.stdenv.mkDerivation {
+            name = "archtika-api";
+            src = ./rest-api;
+            installPhase = ''
+              mkdir $out
+              cp -r db/migrations $out
+            '';
+          };
         }
       );
 
@@ -68,24 +75,18 @@
           api = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "api-setup" ''
-              source .env
+              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO 'a42kVyAhTImYxZeebZkApoAZLmf0VtDA'"
 
-              ${pkgs.postgresql_16}/bin/psql $DATABASE_URL -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
+              ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${self.packages.${system}.api}/migrations up
 
-              ${pkgs.dbmate}/bin/dbmate up
-
-              PGRST_DB_URI="$PGRST_DB_URI" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest postgrest.conf
+              PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:15432/archtika" PGRST_JWT_SECRET="a42kVyAhTImYxZeebZkApoAZLmf0VtDA" ${pkgs.postgrest}/bin/postgrest
             ''}/bin/api-setup";
           };
 
           web = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "web-wrapper" ''
-              export ORIGIN=http://localhost:4000
-              export HOST=127.0.0.1
-              export PORT=4000
-
-              ${pkgs.nodejs_22}/bin/node ${self.packages.${system}.web}
+              ORIGIN=http://localhost:4000 HOST=127.0.0.1 PORT=4000 ${pkgs.nodejs_22}/bin/node ${self.packages.${system}.web}
             ''}/bin/web-wrapper";
           };
         }
