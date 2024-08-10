@@ -1,18 +1,14 @@
-import { handleFileUpload } from "$lib/server/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
-  const articleData = await fetch(
-    `http://localhost:3000/article?id=eq.${params.articleId}&select=*,media(*)`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
-      }
+  const articleData = await fetch(`http://localhost:3000/article?id=eq.${params.articleId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json"
     }
-  );
+  });
 
   const article = await articleData.json();
   const { website } = await parent();
@@ -23,18 +19,25 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
 export const actions: Actions = {
   default: async ({ fetch, cookies, request, params, locals }) => {
     const data = await request.formData();
-
     const coverFile = data.get("cover-image") as File;
-    const cover = await handleFileUpload(
-      coverFile,
-      params.websiteId,
-      locals.user.id,
-      cookies.get("session_token"),
-      fetch
-    );
 
-    if (cover?.success === false) {
-      return cover;
+    const uploadedImageData = await fetch(`http://localhost:3000/rpc/upload_file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": coverFile.type,
+        "X-Original-Filename": coverFile.name
+      },
+      body: await coverFile.arrayBuffer()
+    });
+
+    const uploadedImage = await uploadedImageData.json();
+
+    if (!uploadedImageData.ok) {
+      return { success: false, message: uploadedImage.message };
     }
 
     const res = await fetch(`http://localhost:3000/article?id=eq.${params.articleId}`, {
@@ -47,7 +50,7 @@ export const actions: Actions = {
         title: data.get("title"),
         meta_description: data.get("description"),
         meta_author: data.get("author"),
-        cover_image: cover?.content,
+        cover_image: uploadedImage.file_id,
         publication_date: data.get("publication-date"),
         main_content: data.get("main-content")
       })

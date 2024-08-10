@@ -38,8 +38,9 @@ CREATE TABLE internal.media (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
+  blob BYTEA NOT NULL,
+  mimetype TEXT NOT NULL,
   original_name TEXT NOT NULL,
-  file_system_path TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP()
 );
 

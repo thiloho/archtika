@@ -1,9 +1,8 @@
-import { handleFileUpload } from "$lib/server/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
   const globalSettingsData = await fetch(
-    `http://localhost:3000/settings?website_id=eq.${params.websiteId}&select=*,media(*)`,
+    `http://localhost:3000/settings?website_id=eq.${params.websiteId}`,
     {
       method: "GET",
       headers: {
@@ -14,17 +13,14 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
     }
   );
 
-  const headerData = await fetch(
-    `http://localhost:3000/header?website_id=eq.${params.websiteId}&select=*,media(*)`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
-      }
+  const headerData = await fetch(`http://localhost:3000/header?website_id=eq.${params.websiteId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json"
     }
-  );
+  });
 
   const footerData = await fetch(`http://localhost:3000/footer?website_id=eq.${params.websiteId}`, {
     method: "GET",
@@ -49,18 +45,25 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
 export const actions: Actions = {
   updateGlobal: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
-
     const faviconFile = data.get("favicon") as File;
-    const favicon = await handleFileUpload(
-      faviconFile,
-      params.websiteId,
-      locals.user.id,
-      cookies.get("session_token"),
-      fetch
-    );
 
-    if (favicon?.success === false) {
-      return favicon;
+    const uploadedImageData = await fetch(`http://localhost:3000/rpc/upload_file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": faviconFile.type,
+        "X-Original-Filename": faviconFile.name
+      },
+      body: await faviconFile.arrayBuffer()
+    });
+
+    const uploadedImage = await uploadedImageData.json();
+
+    if (!uploadedImageData.ok) {
+      return { success: false, message: uploadedImage.message };
     }
 
     const res = await fetch(`http://localhost:3000/settings?website_id=eq.${params.websiteId}`, {
@@ -72,7 +75,7 @@ export const actions: Actions = {
       body: JSON.stringify({
         accent_color_light_theme: data.get("accent-color-light"),
         accent_color_dark_theme: data.get("accent-color-dark"),
-        favicon_image: favicon?.content
+        favicon_image: uploadedImage.file_id
       })
     });
 
@@ -86,20 +89,27 @@ export const actions: Actions = {
       message: "Successfully updated global settings"
     };
   },
-  updateHeader: async ({ request, fetch, cookies, locals, params }) => {
+  updateHeader: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
+    const logoImage = data.get("logo-image") as File;
 
-    const logoFile = data.get("logo-image") as File;
-    const logo = await handleFileUpload(
-      logoFile,
-      params.websiteId,
-      locals.user.id,
-      cookies.get("session_token"),
-      fetch
-    );
+    const uploadedImageData = await fetch(`http://localhost:3000/rpc/upload_file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": logoImage.type,
+        "X-Original-Filename": logoImage.name
+      },
+      body: await logoImage.arrayBuffer()
+    });
 
-    if (logo?.success === false) {
-      return logo;
+    const uploadedImage = await uploadedImageData.json();
+
+    if (!uploadedImageData.ok) {
+      return { success: false, message: uploadedImage.message };
     }
 
     const res = await fetch(`http://localhost:3000/header?website_id=eq.${params.websiteId}`, {
@@ -111,7 +121,7 @@ export const actions: Actions = {
       body: JSON.stringify({
         logo_type: data.get("logo-type"),
         logo_text: data.get("logo-text"),
-        logo_image: logo?.content
+        logo_image: uploadedImage.file_id
       })
     });
 

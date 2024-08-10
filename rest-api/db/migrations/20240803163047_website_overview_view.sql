@@ -36,7 +36,5 @@ FROM
 GRANT SELECT ON api.website_overview TO authenticated_user;
 
 -- migrate:down
-REVOKE SELECT ON api.website_overview FROM authenticated_user;
-
 DROP VIEW api.website_overview;
 

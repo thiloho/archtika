@@ -33,18 +33,6 @@ SELECT
 FROM
   internal.website;
 
-CREATE VIEW api.media WITH ( security_invoker = ON
-) AS
-SELECT
-  id,
-  website_id,
-  user_id,
-  original_name,
-  file_system_path,
-  created_at
-FROM
-  internal.media;
-
 CREATE VIEW api.settings WITH ( security_invoker = ON
 ) AS
 SELECT
@@ -183,10 +171,6 @@ GRANT SELECT, UPDATE, DELETE ON internal.website TO authenticated_user;
 
 GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
 
-GRANT SELECT, INSERT ON internal.media TO authenticated_user;
-
-GRANT SELECT, INSERT ON api.media TO authenticated_user;
-
 GRANT SELECT, UPDATE ON internal.settings TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.settings TO authenticated_user;
@@ -216,24 +200,6 @@ GRANT SELECT ON internal.change_log TO authenticated_user;
 GRANT SELECT ON api.change_log TO authenticated_user;
 
 -- migrate:down
-REVOKE SELECT ON internal.user FROM authenticated_user;
-
-REVOKE SELECT, UPDATE, DELETE ON internal.website FROM authenticated_user;
-
-REVOKE SELECT, INSERT ON internal.media FROM authenticated_user;
-
-REVOKE SELECT, UPDATE ON internal.settings FROM authenticated_user;
-
-REVOKE SELECT, UPDATE ON internal.header FROM authenticated_user;
-
-REVOKE SELECT, INSERT, UPDATE, DELETE ON internal.article FROM authenticated_user;
-
-REVOKE SELECT, UPDATE ON internal.footer FROM authenticated_user;
-
-REVOKE SELECT, INSERT, UPDATE, DELETE ON internal.collab FROM authenticated_user;
-
-REVOKE SELECT ON internal.change_log FROM authenticated_user;
-
 DROP FUNCTION api.create_website (VARCHAR(10), VARCHAR(50));
 
 DROP VIEW api.change_log;
@@ -249,8 +215,6 @@ DROP VIEW api.article;
 DROP VIEW api.header;
 
 DROP VIEW api.settings;
-
-DROP VIEW api.media;
 
 DROP VIEW api.website;
 

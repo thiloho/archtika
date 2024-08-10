@@ -53,11 +53,11 @@
           Favicon:
           <input type="file" name="favicon" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
-        {#if data.globalSettings.media}
+        {#if data.globalSettings.favicon_image}
           <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
             <img
-              src={`http://localhost:5173/${data.globalSettings.media.file_system_path}`}
-              alt={data.globalSettings.media.original_name}
+              src={`http://localhost:3000/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
+              alt=""
             />
           </Modal>
         {/if}
@@ -107,11 +107,11 @@
             required={data.header.logo_type === "image"}
           />
         </label>
-        {#if data.header.media}
+        {#if data.header.logo_image}
           <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
             <img
-              src={`http://localhost:5173/${data.header.media.file_system_path}`}
-              alt={data.header.media.original_name}
+              src={`http://localhost:3000/rpc/retrieve_file?id=${data.header.logo_image}`}
+              alt=""
             />
           </Modal>
         {/if}

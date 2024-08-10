@@ -66,11 +66,11 @@
           Cover image:
           <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
-        {#if data.article.media}
+        {#if data.article.cover_image}
           <Modal id="preview-cover-article-{data.article.id}" text="Preview">
             <img
-              src={`http://localhost:5173/${data.article.media.file_system_path}`}
-              alt={data.article.media.original_name}
+              src={`http://localhost:3000/rpc/retrieve_file?id=${data.article.cover_image}`}
+              alt=""
             />
           </Modal>
         {/if}
