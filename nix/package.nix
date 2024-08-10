@@ -32,12 +32,23 @@ let
       cp -r db/migrations/* $out/rest-api/db/migrations
     '';
   };
+
+  templates = stdenv.mkDerivation {
+    inherit pname version;
+    name = "archtika-templates";
+    src = ../templates;
+    installPhase = ''
+      mkdir -p $out/templates
+      cp -r * $out/templates
+    '';
+  };
 in
 symlinkJoin {
   name = pname;
   paths = [
     web
     api
+    templates
   ];
 
   meta = with lib; {
