@@ -41,14 +41,20 @@ in
 
     port = mkOption {
       type = types.port;
-      default = 3000;
+      default = 5000;
       description = "Port on which the API runs.";
     };
 
     webAppPort = mkOption {
       type = types.port;
-      default = 4000;
+      default = 10000;
       description = "Port on which the web application runs.";
+    };
+
+    nginxPort = mkOption {
+      type = types.port;
+      default = 15000;
+      description = "Port on which NGINX runs.";
     };
   };
 
@@ -56,11 +62,11 @@ in
     users.users.${cfg.user} = {
       isSystemUser = true;
       group = cfg.group;
-      home = "/var/lib/archtika";
-      createHome = true;
     };
 
     users.groups.${cfg.group} = { };
+
+    systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0755 ${cfg.user} ${cfg.group} -" ];
 
     systemd.services.archtika-api = {
       description = "archtika API service";
@@ -97,7 +103,7 @@ in
       };
 
       script = ''
-        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ARCHTIKA_API_PORT=${toString cfg.port} ARCHTIKA_NGINX_PORT=${toString cfg.nginxPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -120,6 +126,25 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
+
+      virtualHosts."_" = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = cfg.nginxPort;
+          }
+        ];
+        locations = {
+          "/" = {
+            root = "/var/www/archtika-websites";
+            index = "index.html";
+            tryFiles = "$uri $uri/ $uri/index.html =404";
+            extraConfig = ''
+              autoindex on;
+            '';
+          };
+        };
+      };
     };
   };
 }

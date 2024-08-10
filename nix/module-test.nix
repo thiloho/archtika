@@ -30,13 +30,18 @@
     forwardPorts = [
       {
         from = "host";
-        host.port = 13000;
-        guest.port = 3000;
+        host.port = 5000;
+        guest.port = 5000;
       }
       {
         from = "host";
-        host.port = 14000;
-        guest.port = 4000;
+        host.port = 10000;
+        guest.port = 10000;
+      }
+      {
+        from = "host";
+        host.port = 15000;
+        guest.port = 15000;
       }
     ];
   };
@@ -44,7 +49,7 @@
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
-    jwtSecret = "test-secret";
+    jwtSecret = "a42kVyAhTImYxZeebZkApoAZLmf0VtDA";
   };
 
   system.stateVersion = "24.05";

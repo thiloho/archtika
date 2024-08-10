@@ -56,7 +56,7 @@
         {#if data.globalSettings.favicon_image}
           <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
             <img
-              src={`http://localhost:3000/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
+              src={`http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
               alt=""
             />
           </Modal>
@@ -110,7 +110,7 @@
         {#if data.header.logo_image}
           <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
             <img
-              src={`http://localhost:3000/rpc/retrieve_file?id=${data.header.logo_image}`}
+              src={`http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/retrieve_file?id=${data.header.logo_image}`}
               alt=""
             />
           </Modal>

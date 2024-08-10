@@ -12,8 +12,7 @@
 <WebsiteEditor
   id={data.website.id}
   title={data.website.title}
-  previewContent="http://localhost:5173/user-websites/{data.websiteOverview.user_id}/{data
-    .websiteOverview.id}/index.html"
+  previewContent={data.websitePreviewUrl}
   fullPreview={true}
 >
   <section>

@@ -15,16 +15,19 @@ export const actions: Actions = {
   deleteAccount: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch("http://localhost:3000/rpc/delete_account", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
-        password: data.get("password")
-      })
-    });
+    const res = await fetch(
+      `http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/delete_account`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.get("session_token")}`
+        },
+        body: JSON.stringify({
+          password: data.get("password")
+        })
+      }
+    );
 
     const response = await res.json();
 

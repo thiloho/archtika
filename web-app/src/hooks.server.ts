@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 
 export const handle = async ({ event, resolve }) => {
-  const userData = await event.fetch("http://localhost:3000/account", {
+  const userData = await event.fetch(`http://localhost:${process.env.ARCHTIKA_API_PORT}/account`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

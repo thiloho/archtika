@@ -67,7 +67,7 @@
           web = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "web-wrapper" ''
-              ORIGIN=http://localhost:4000 HOST=127.0.0.1 PORT=4000 ${pkgs.nodejs_22}/bin/node ${
+              ORIGIN=http://localhost:4000 HOST=127.0.0.1 PORT=4000 ARCHTIKA_API_PORT=3000 ARCHTIKA_NGINX_PORT=18000 ${pkgs.nodejs_22}/bin/node ${
                 self.packages.${system}.default
               }/web-app
             ''}/bin/web-wrapper";

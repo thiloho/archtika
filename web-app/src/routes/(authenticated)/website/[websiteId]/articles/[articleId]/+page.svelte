@@ -69,7 +69,7 @@
         {#if data.article.cover_image}
           <Modal id="preview-cover-article-{data.article.id}" text="Preview">
             <img
-              src={`http://localhost:3000/rpc/retrieve_file?id=${data.article.cover_image}`}
+              src={`http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/retrieve_file?id=${data.article.cover_image}`}
               alt=""
             />
           </Modal>

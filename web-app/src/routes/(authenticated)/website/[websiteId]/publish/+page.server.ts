@@ -5,7 +5,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) => {
   const websiteOverviewData = await fetch(
-    `http://localhost:3000/website_overview?id=eq.${params.websiteId}`,
+    `http://localhost:${process.env.ARCHTIKA_API_PORT}/website_overview?id=eq.${params.websiteId}`,
     {
       method: "GET",
       headers: {
@@ -20,17 +20,22 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) =
 
   generateStaticFiles(websiteOverview);
 
+  const websitePreviewUrl = `http://localhost:${process.env.ARCHTIKA_NGINX_PORT}/previews/${websiteOverview.user_id}/${websiteOverview.id}/index.html`;
+
   return {
-    websiteOverview
+    websiteOverview,
+    websitePreviewUrl
   };
 };
 
 export const actions: Actions = {
-  publishWebsite: async ({ request, params, locals }) => {
+  publishWebsite: async ({ request }) => {
     const data = await request.formData();
     const websiteOverview = JSON.parse(data.get("website-overview") as string);
 
     generateStaticFiles(websiteOverview, false);
+
+    return { success: true, message: "Successfully published website" };
   }
 };
 
@@ -46,6 +51,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
   const articleFile = await readFile(join(templatePath, "article.html"), {
     encoding: "utf-8"
   });
+  const stylesFile = await readFile(join(templatePath, "styles.css"), { encoding: "utf-8" });
 
   const indexFileContents = indexFile
     .replace(
@@ -88,7 +94,15 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
   let uploadDir = "";
 
   if (isPreview) {
-    uploadDir = join(process.cwd(), "static", "user-websites", websiteData.user_id, websiteData.id);
+    uploadDir = join(
+      "/",
+      "var",
+      "www",
+      "archtika-websites",
+      "previews",
+      websiteData.user_id,
+      websiteData.id
+    );
   } else {
     uploadDir = join("/", "var", "www", "archtika-websites", websiteData.user_id, websiteData.id);
   }
@@ -109,7 +123,10 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
           ? `<strong>${websiteData.logo_text}</strong>`
           : `<img src="https://picsum.photos/32/32" />`
       )
-      .replace("{{cover_image}}", `<img src="https://picsum.photos/600/200" />`)
+      .replace(
+        "{{cover_image}}",
+        `<img src="${article.cover_image ? `http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/retrieve_file?id=${article.cover_image}` : "https://picsum.photos/600/200"}" />`
+      )
       .replace("{{title}}", `<h1>${article.title}</h1>`)
       .replace("{{publication_date}}", `<p>${article.publication_date}</p>`)
       .replace("{{main_content}}", md.render(article.main_content ?? ""))
@@ -117,4 +134,6 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }
+
+  await writeFile(join(uploadDir, "styles.css"), stylesFile);
 };
