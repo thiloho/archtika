@@ -89,7 +89,7 @@
         };
         demo-server = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ ./nix/demo-server.nix ];
+          modules = [ ./nix/demo-server ];
         };
       });
 
