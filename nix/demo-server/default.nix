@@ -23,6 +23,8 @@
 
   networking.hostName = "archtika-demo-server";
 
+  security.pam.sshAgentAuth.enable = true;
+
   users = {
     mutableUsers = false;
     users = {
