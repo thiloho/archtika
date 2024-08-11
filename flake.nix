@@ -88,7 +88,7 @@
           modules = [ ./nix/dev-vm.nix ];
         };
         demo-server = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";;
+          system = "aarch64-linux";
           modules = [ ./nix/demo-server ];
         };
       });
