@@ -75,23 +75,23 @@
         }
       );
 
-      nixosConfigurations = forAllSystems (system: {
+      nixosConfigurations = {
         module-test = nixpkgs.lib.nixosSystem {
-          inherit system;
+          system = "x86_64-linux";
           modules = [
             ./nix/module-test.nix
-            { _module.args.localArchtikaPackage = self.packages.${system}.default; }
+            { _module.args.localArchtikaPackage = self.packages."x86_64-linux".default; }
           ];
         };
         dev-vm = nixpkgs.lib.nixosSystem {
-          inherit system;
+          system = "x86_64-linux";
           modules = [ ./nix/dev-vm.nix ];
         };
         demo-server = nixpkgs.lib.nixosSystem {
-          inherit system;
+          system = "aarch64-linux";
           modules = [ ./nix/demo-server ];
         };
-      });
+      };
 
       formatter = forAllSystems (
         system:
