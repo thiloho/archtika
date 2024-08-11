@@ -128,7 +128,7 @@ in
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
 
-      virtualHosts."_" = {
+      virtualHosts."archtika" = {
         listen = [
           {
             addr = "0.0.0.0";

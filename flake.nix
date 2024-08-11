@@ -87,6 +87,10 @@
           inherit system;
           modules = [ ./nix/dev-vm.nix ];
         };
+        demo-server = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ ./nix/demo-server.nix ];
+        };
       });
 
       formatter = forAllSystems (
