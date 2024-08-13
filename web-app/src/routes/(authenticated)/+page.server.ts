@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 
   const params = new URLSearchParams();
 
-  const baseFetchUrl = `http://localhost:${process.env.ARCHTIKA_API_PORT}/website`;
+  const baseFetchUrl = `/api/website`;
 
   if (searchQuery) {
     params.append("title", `ilike.*${searchQuery}*`);
@@ -63,20 +63,17 @@ export const actions: Actions = {
   createWebsite: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/create_website`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        },
-        body: JSON.stringify({
-          content_type: data.get("content-type"),
-          title: data.get("title")
-        })
-      }
-    );
+    const res = await fetch(`/api/rpc/create_website`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
+      },
+      body: JSON.stringify({
+        content_type: data.get("content-type"),
+        title: data.get("title")
+      })
+    });
 
     if (!res.ok) {
       const response = await res.json();
@@ -88,19 +85,16 @@ export const actions: Actions = {
   updateWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/website?id=eq.${data.get("id")}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        },
-        body: JSON.stringify({
-          title: data.get("title")
-        })
-      }
-    );
+    const res = await fetch(`/api/website?id=eq.${data.get("id")}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
+      },
+      body: JSON.stringify({
+        title: data.get("title")
+      })
+    });
 
     if (!res.ok) {
       const response = await res.json();
@@ -112,16 +106,13 @@ export const actions: Actions = {
   deleteWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/website?id=eq.${data.get("id")}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        }
+    const res = await fetch(`/api/website?id=eq.${data.get("id")}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
       }
-    );
+    });
 
     if (!res.ok) {
       const response = await res.json();

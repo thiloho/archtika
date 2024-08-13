@@ -1,27 +1,29 @@
 import { redirect } from "@sveltejs/kit";
 
 export const handle = async ({ event, resolve }) => {
-  const userData = await event.fetch(`http://localhost:${process.env.ARCHTIKA_API_PORT}/account`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${event.cookies.get("session_token")}`,
-      Accept: "application/vnd.pgrst.object+json"
-    }
-  });
+  if (!event.url.pathname.startsWith("/api/")) {
+    const userData = await event.fetch(`/api/account`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${event.cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json"
+      }
+    });
 
-  if (!userData.ok && !["/login", "/register"].includes(event.url.pathname)) {
-    throw redirect(303, "/login");
-  }
-
-  if (userData.ok) {
-    if (["/login", "/register"].includes(event.url.pathname)) {
-      throw redirect(303, "/");
+    if (!userData.ok && !["/login", "/register"].includes(event.url.pathname)) {
+      throw redirect(303, "/login");
     }
 
-    const user = await userData.json();
+    if (userData.ok) {
+      if (["/login", "/register"].includes(event.url.pathname)) {
+        throw redirect(303, "/");
+      }
 
-    event.locals.user = user;
+      const user = await userData.json();
+
+      event.locals.user = user;
+    }
   }
 
   return await resolve(event);

@@ -4,7 +4,7 @@ export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) =
   const { website, home } = await parent();
 
   const collabData = await fetch(
-    `http://localhost:${process.env.ARCHTIKA_API_PORT}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)`,
+    `/api/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)`,
     {
       method: "GET",
       headers: {
@@ -27,7 +27,7 @@ export const actions: Actions = {
   addCollaborator: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`http://localhost:${process.env.ARCHTIKA_API_PORT}/collab`, {
+    const res = await fetch(`/api/collab`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export const actions: Actions = {
     const data = await request.formData();
 
     const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      `/api/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
       {
         method: "PATCH",
         headers: {
@@ -75,7 +75,7 @@ export const actions: Actions = {
     const data = await request.formData();
 
     const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      `/api/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
       {
         method: "DELETE",
         headers: {

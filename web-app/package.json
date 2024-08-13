@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "ARCHTIKA_API_PORT=3000 ARCHTIKA_NGINX_PORT=18000 vite dev",
+    "dev": "vite dev",
     "build": "vite build",
-    "preview": "ARCHTIKA_API_PORT=3000 ARCHTIKA_NGINX_PORT=18000 vite preview",
+    "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check .",

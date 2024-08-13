@@ -4,23 +4,20 @@ import { md } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) => {
-  const websiteOverviewData = await fetch(
-    `http://localhost:${process.env.ARCHTIKA_API_PORT}/website_overview?id=eq.${params.websiteId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
-      }
+  const websiteOverviewData = await fetch(`/api/website_overview?id=eq.${params.websiteId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json"
     }
-  );
+  });
 
   const websiteOverview = await websiteOverviewData.json();
 
   generateStaticFiles(websiteOverview);
 
-  const websitePreviewUrl = `http://localhost:${process.env.ARCHTIKA_NGINX_PORT}/previews/${websiteOverview.user_id}/${websiteOverview.id}/index.html`;
+  const websitePreviewUrl = `/user-websites/previews/${websiteOverview.user_id}/${websiteOverview.id}/index.html`;
 
   return {
     websiteOverview,
@@ -125,7 +122,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
       )
       .replace(
         "{{cover_image}}",
-        `<img src="${article.cover_image ? `http://localhost:${process.env.ARCHTIKA_API_PORT}/rpc/retrieve_file?id=${article.cover_image}` : "https://picsum.photos/600/200"}" />`
+        `<img src="${article.cover_image ? `/api/rpc/retrieve_file?id=${article.cover_image}` : "https://picsum.photos/600/200"}" />`
       )
       .replace("{{title}}", `<h1>${article.title}</h1>`)
       .replace("{{publication_date}}", `<p>${article.publication_date}</p>`)

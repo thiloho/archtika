@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 
   const parameters = new URLSearchParams();
 
-  const baseFetchUrl = `http://localhost:${process.env.ARCHTIKA_API_PORT}/article?website_id=eq.${params.websiteId}&select=id,title`;
+  const baseFetchUrl = `/api/article?website_id=eq.${params.websiteId}&select=id,title`;
 
   if (searchQuery) {
     parameters.append("title", `ilike.*${searchQuery}*`);
@@ -66,7 +66,7 @@ export const actions: Actions = {
   createArticle: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
 
-    const res = await fetch(`http://localhost:${process.env.ARCHTIKA_API_PORT}/article`, {
+    const res = await fetch(`/api/article`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,16 +89,13 @@ export const actions: Actions = {
   deleteArticle: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `http://localhost:${process.env.ARCHTIKA_API_PORT}/article?id=eq.${data.get("id")}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        }
+    const res = await fetch(`/api/article?id=eq.${data.get("id")}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
       }
-    );
+    });
 
     if (!res.ok) {
       const response = await res.json();

@@ -39,7 +39,7 @@
       }
       {
         from = "host";
-        host.port = 18000;
+        host.port = 80;
         guest.port = 80;
       }
     ];

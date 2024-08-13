@@ -50,12 +50,6 @@ in
       default = 10000;
       description = "Port on which the web application runs.";
     };
-
-    nginxPort = mkOption {
-      type = types.port;
-      default = 15000;
-      description = "Port on which NGINX runs.";
-    };
   };
 
   config = mkIf cfg.enable {
@@ -110,7 +104,7 @@ in
       };
 
       script = ''
-        ORIGIN=http://localhost:${toString cfg.webAppPort} PORT=${toString cfg.webAppPort} ARCHTIKA_API_PORT=${toString cfg.port} ARCHTIKA_NGINX_PORT=${toString cfg.nginxPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        ORIGIN=https://demo.archtika.com PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -134,24 +128,40 @@ in
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
 
-      virtualHosts."archtika" = {
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = cfg.nginxPort;
-          }
-        ];
-        locations = {
-          "/" = {
-            root = "/var/www/archtika-websites";
-            index = "index.html";
-            tryFiles = "$uri $uri/ $uri/index.html =404";
-            extraConfig = ''
-              autoindex on;
-            '';
+      virtualHosts = {
+        "demo.archtika.com" = {
+          enableACME = true;
+          forceSSL = true;
+          locations = {
+            "/" = {
+              proxyPass = "http://localhost:${toString cfg.webAppPort}";
+            };
+            "/user-websites/" = {
+              alias = "/var/www/archtika-websites/";
+              index = "index.html";
+              tryFiles = "$uri $uri/ $uri/index.html =404";
+              extraConfig = ''
+                autoindex on;
+              '';
+            };
+            "/api/" = {
+              proxyPass = "http://localhost:${toString cfg.port}/";
+              extraConfig = ''
+                default_type  application/json;
+                proxy_hide_header Content-Location;
+                add_header Content-Location /api/$upstream_http_content_location;
+                proxy_set_header Connection "";
+                proxy_http_version 1.1;
+              '';
+            };
           };
         };
       };
+    };
+
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "thilo.hohlt@tutanota.com";
     };
   };
 }

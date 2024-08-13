@@ -27,8 +27,8 @@
     networkmanager.enable = true;
     firewall = {
       allowedTCPPorts = [
-        10000
-        15000
+        80
+        443
       ];
     };
   };
