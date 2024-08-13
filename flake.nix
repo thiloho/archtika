@@ -38,8 +38,8 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          module-test = self.nixosConfigurations.${system}.module-test.config.system.build.vm;
-          dev-vm = self.nixosConfigurations.${system}.dev-vm.config.system.build.vm;
+          module-test = self.nixosConfigurations.module-test.config.system.build.vm;
+          dev-vm = self.nixosConfigurations.dev-vm.config.system.build.vm;
 
           default = pkgs.callPackage ./nix/package.nix { };
         }

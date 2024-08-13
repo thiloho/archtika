@@ -41,6 +41,7 @@
         hashedPassword = "$y$j9T$Y0ffzVb7wrZSdCKbiYHin0$oahgfFqH/Eep6j6f4iKPETEfGZSOkgu74UT2eyG2uI1";
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBj6+r+vMXJyy5wvQTLyfd2rIw62WCg9eIpwsciHg4ym thiloho@pc"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIgfOa8N46PBUO2gj8UeyrV0R+MRZFnJqUzG132UjaFS thiloho@laptop"
         ];
       };
     };
