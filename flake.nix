@@ -89,7 +89,10 @@
         };
         demo-server = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
-          modules = [ ./nix/demo-server ];
+          modules = [
+            ./nix/demo-server
+            { _module.args.localArchtikaPackage = self.packages."aarch64-linux".default; }
+          ];
         };
       };
 

@@ -1,6 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, localArchtikaPackage, ... }:
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ../module.nix
+  ];
 
   boot = {
     loader = {
@@ -19,9 +22,16 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.networkmanager.enable = true;
-
-  networking.hostName = "archtika-demo-server";
+  networking = {
+    hostName = "archtika-demo-server";
+    networkmanager.enable = true;
+    firewall = {
+      allowedTCPPorts = [
+        10000
+        15000
+      ];
+    };
+  };
 
   security.pam = {
     sshAgentAuth.enable = true;
@@ -50,6 +60,12 @@
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
+  };
+
+  services.archtika = {
+    enable = true;
+    package = localArchtikaPackage;
+    jwtSecret = "a42kVyAhTImYxZeebZkApoAZLmf0VtDA";
   };
 
   system.stateVersion = "24.11";

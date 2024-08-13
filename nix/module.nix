@@ -35,8 +35,8 @@ in
     };
 
     jwtSecret = mkOption {
-      type = types.str;
-      description = "JWT secret for archtika.";
+      type = types.either types.str types.path;
+      description = "JWT secret for archtika. Can be a string or a path to a file containing the secret";
     };
 
     port = mkOption {
@@ -82,13 +82,19 @@ in
         Restart = "always";
       };
 
-      script = ''
-        ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '${cfg.jwtSecret}'"
+      script =
+        let
+          getSecret = if isPath cfg.jwtSecret then "cat ${cfg.jwtSecret}" else "echo -n '${cfg.jwtSecret}'";
+        in
+        ''
+          JWT_SECRET=$(${getSecret})
 
-        ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+          ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '$JWT_SECRET'"
 
-        PGRST_SERVER_PORT=${toString cfg.port} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="${cfg.jwtSecret}" ${pkgs.postgrest}/bin/postgrest
-      '';
+          ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+
+          PGRST_SERVER_PORT=${toString cfg.port} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
+        '';
     };
 
     systemd.services.archtika-web = {
