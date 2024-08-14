@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
   const baseFetchUrl = `${API_BASE_PREFIX}/website`;
 
   if (searchQuery) {
-    params.append("title", `ilike.*${searchQuery}*`);
+    params.append("title_search", `wfts(english).${searchQuery}`);
   }
 
   switch (sortBy) {

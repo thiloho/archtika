@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
 };
 
 export const actions: Actions = {
-  default: async ({ fetch, cookies, request, params, locals }) => {
+  default: async ({ fetch, cookies, request, params }) => {
     const data = await request.formData();
     const coverFile = data.get("cover-image") as File;
 

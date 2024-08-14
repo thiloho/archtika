@@ -11,7 +11,7 @@ DECLARE
   _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/svg+xml', 'image/jpeg', 'image/webp'];
   _max_file_size INT := 5 * 1024 * 1024;
 BEGIN
-  IF octet_length($1) = 0 THEN
+  IF OCTET_LENGTH($1) = 0 THEN
     RAISE invalid_parameter_value
     USING message = 'No file data was provided';
   END IF;
