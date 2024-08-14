@@ -1,7 +1,20 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
-  const globalSettingsData = await fetch(`/api/settings?website_id=eq.${params.websiteId}`, {
+  const globalSettingsData = await fetch(
+    `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json"
+      }
+    }
+  );
+
+  const headerData = await fetch(`${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -10,16 +23,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
     }
   });
 
-  const headerData = await fetch(`/api/header?website_id=eq.${params.websiteId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
-      Accept: "application/vnd.pgrst.object+json"
-    }
-  });
-
-  const footerData = await fetch(`/api/footer?website_id=eq.${params.websiteId}`, {
+  const footerData = await fetch(`${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +48,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const faviconFile = data.get("favicon") as File;
 
-    const uploadedImageData = await fetch(`/api/rpc/upload_file`, {
+    const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
@@ -63,7 +67,7 @@ export const actions: Actions = {
       return { success: false, message: uploadedImage.message };
     }
 
-    const res = await fetch(`/api/settings?website_id=eq.${params.websiteId}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +94,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const logoImage = data.get("logo-image") as File;
 
-    const uploadedImageData = await fetch(`/api/rpc/upload_file`, {
+    const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
@@ -109,7 +113,7 @@ export const actions: Actions = {
       return { success: false, message: uploadedImage.message };
     }
 
-    const res = await fetch(`/api/header?website_id=eq.${params.websiteId}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +139,7 @@ export const actions: Actions = {
   updateHome: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/home?website_id=eq.${params.websiteId}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/home?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -156,7 +160,7 @@ export const actions: Actions = {
   updateFooter: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/footer?website_id=eq.${params.websiteId}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

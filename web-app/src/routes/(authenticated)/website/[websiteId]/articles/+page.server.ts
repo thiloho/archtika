@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent }) => {
   const searchQuery = url.searchParams.get("article_search_query");
@@ -6,7 +7,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 
   const parameters = new URLSearchParams();
 
-  const baseFetchUrl = `/api/article?website_id=eq.${params.websiteId}&select=id,title`;
+  const baseFetchUrl = `${API_BASE_PREFIX}/article?website_id=eq.${params.websiteId}&select=id,title`;
 
   if (searchQuery) {
     parameters.append("title", `ilike.*${searchQuery}*`);
@@ -66,7 +67,7 @@ export const actions: Actions = {
   createArticle: async ({ request, fetch, cookies, params, locals }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/article`, {
+    const res = await fetch(`${API_BASE_PREFIX}/article`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +90,7 @@ export const actions: Actions = {
   deleteArticle: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/article?id=eq.${data.get("id")}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/article?id=eq.${data.get("id")}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

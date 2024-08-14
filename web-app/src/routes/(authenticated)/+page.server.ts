@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
   const searchQuery = url.searchParams.get("website_search_query");
@@ -6,7 +7,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 
   const params = new URLSearchParams();
 
-  const baseFetchUrl = `/api/website`;
+  const baseFetchUrl = `${API_BASE_PREFIX}/website`;
 
   if (searchQuery) {
     params.append("title", `ilike.*${searchQuery}*`);
@@ -63,7 +64,7 @@ export const actions: Actions = {
   createWebsite: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/rpc/create_website`, {
+    const res = await fetch(`${API_BASE_PREFIX}/rpc/create_website`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +86,7 @@ export const actions: Actions = {
   updateWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/website?id=eq.${data.get("id")}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +107,7 @@ export const actions: Actions = {
   deleteWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/website?id=eq.${data.get("id")}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import markdownit from "markdown-it";
 import hljs from "highlight.js";
+import { dev } from "$app/environment";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -23,3 +24,6 @@ export const md = markdownit({
     return "";
   }
 });
+
+export const API_BASE_PREFIX = dev ? "http://localhost:3000" : "/api";
+export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "/user-websites";

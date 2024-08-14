@@ -1,10 +1,11 @@
 import type { Actions } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const actions: Actions = {
   default: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/rpc/register`, {
+    const res = await fetch(`${API_BASE_PREFIX}/rpc/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

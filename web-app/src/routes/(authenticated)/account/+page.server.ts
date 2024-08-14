@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ locals }) => {
   return {
@@ -15,7 +16,7 @@ export const actions: Actions = {
   deleteAccount: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/rpc/delete_account`, {
+    const res = await fetch(`${API_BASE_PREFIX}/rpc/delete_account`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

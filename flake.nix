@@ -38,7 +38,6 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          module-test = self.nixosConfigurations.module-test.config.system.build.vm;
           dev-vm = self.nixosConfigurations.dev-vm.config.system.build.vm;
 
           default = pkgs.callPackage ./nix/package.nix { };
@@ -56,33 +55,17 @@
             program = "${pkgs.writeShellScriptBin "api-setup" ''
               ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO 'a42kVyAhTImYxZeebZkApoAZLmf0VtDA'"
 
-              ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${
-                self.packages.${system}.default
-              }/rest-api/db/migrations up
+              echo "OUT PATH: ${self.outPath}"
+
+              ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${self.outPath}/rest-api/db/migrations up
 
               PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:15432/archtika" PGRST_JWT_SECRET="a42kVyAhTImYxZeebZkApoAZLmf0VtDA" ${pkgs.postgrest}/bin/postgrest
             ''}/bin/api-setup";
-          };
-
-          web = {
-            type = "app";
-            program = "${pkgs.writeShellScriptBin "web-wrapper" ''
-              ORIGIN=http://localhost:4000 HOST=127.0.0.1 PORT=4000 ${pkgs.nodejs_22}/bin/node ${
-                self.packages.${system}.default
-              }/web-app
-            ''}/bin/web-wrapper";
           };
         }
       );
 
       nixosConfigurations = {
-        module-test = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./nix/module-test.nix
-            { _module.args.localArchtikaPackage = self.packages."x86_64-linux".default; }
-          ];
-        };
         dev-vm = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./nix/dev-vm.nix ];

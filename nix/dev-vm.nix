@@ -39,8 +39,8 @@
       }
       {
         from = "host";
-        host.port = 80;
-        guest.port = 80;
+        host.port = 18000;
+        guest.port = 1800;
       }
     ];
   };
@@ -63,7 +63,7 @@
         listen = [
           {
             addr = "0.0.0.0";
-            port = 80;
+            port = 1800;
           }
         ];
         locations = {

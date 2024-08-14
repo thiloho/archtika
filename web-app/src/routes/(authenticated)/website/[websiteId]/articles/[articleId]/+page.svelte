@@ -5,6 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
+  import { API_BASE_PREFIX } from "$lib/utils";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
@@ -68,7 +69,10 @@
         </label>
         {#if data.article.cover_image}
           <Modal id="preview-cover-article-{data.article.id}" text="Preview">
-            <img src={`/api/rpc/retrieve_file?id=${data.article.cover_image}`} alt="" />
+            <img
+              src={`${API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
+              alt=""
+            />
           </Modal>
         {/if}
       </div>

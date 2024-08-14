@@ -5,6 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
+  import { API_BASE_PREFIX } from "$lib/utils";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 </script>
@@ -55,7 +56,10 @@
         </label>
         {#if data.globalSettings.favicon_image}
           <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
-            <img src={`/api/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`} alt="" />
+            <img
+              src={`${API_BASE_PREFIX}/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
+              alt=""
+            />
           </Modal>
         {/if}
       </div>
@@ -106,7 +110,7 @@
         </label>
         {#if data.header.logo_image}
           <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
-            <img src={`/api/rpc/retrieve_file?id=${data.header.logo_image}`} alt="" />
+            <img src={`${API_BASE_PREFIX}/rpc/retrieve_file?id=${data.header.logo_image}`} alt="" />
           </Modal>
         {/if}
       </div>

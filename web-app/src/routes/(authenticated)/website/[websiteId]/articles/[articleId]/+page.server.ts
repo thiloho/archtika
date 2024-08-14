@@ -1,7 +1,8 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
-  const articleData = await fetch(`/api/article?id=eq.${params.articleId}`, {
+  const articleData = await fetch(`${API_BASE_PREFIX}/article?id=eq.${params.articleId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -21,7 +22,7 @@ export const actions: Actions = {
     const data = await request.formData();
     const coverFile = data.get("cover-image") as File;
 
-    const uploadedImageData = await fetch(`/api/rpc/upload_file`, {
+    const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
       headers: {
         "Content-Type": "application/octet-stream",
@@ -40,7 +41,7 @@ export const actions: Actions = {
       return { success: false, message: uploadedImage.message };
     }
 
-    const res = await fetch(`/api/article?id=eq.${params.articleId}`, {
+    const res = await fetch(`${API_BASE_PREFIX}/article?id=eq.${params.articleId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

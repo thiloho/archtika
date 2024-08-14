@@ -1,10 +1,11 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) => {
   const { website, home } = await parent();
 
   const collabData = await fetch(
-    `/api/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)`,
+    `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)`,
     {
       method: "GET",
       headers: {
@@ -27,7 +28,7 @@ export const actions: Actions = {
   addCollaborator: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`/api/collab`, {
+    const res = await fetch(`${API_BASE_PREFIX}/collab`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +52,7 @@ export const actions: Actions = {
     const data = await request.formData();
 
     const res = await fetch(
-      `/api/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
       {
         method: "PATCH",
         headers: {
@@ -75,7 +76,7 @@ export const actions: Actions = {
     const data = await request.formData();
 
     const res = await fetch(
-      `/api/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
       {
         method: "DELETE",
         headers: {

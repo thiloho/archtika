@@ -1,7 +1,8 @@
 import type { LayoutServerLoad } from "./$types";
+import { API_BASE_PREFIX } from "$lib/utils";
 
 export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
-  const websiteData = await fetch(`/api/website?id=eq.${params.websiteId}`, {
+  const websiteData = await fetch(`${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -10,7 +11,7 @@ export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
     }
   });
 
-  const homeData = await fetch(`/api/home?website_id=eq.${params.websiteId}`, {
+  const homeData = await fetch(`${API_BASE_PREFIX}/home?website_id=eq.${params.websiteId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

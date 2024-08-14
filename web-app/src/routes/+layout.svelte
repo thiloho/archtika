@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import type { LayoutServerData } from "./$types";
   import type { Snippet } from "svelte";
+  import { dev } from "$app/environment";
 
   const { data, children } = $props<{ data: LayoutServerData; children: Snippet }>();
 
