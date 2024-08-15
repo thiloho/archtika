@@ -54,61 +54,65 @@
     <section>
       <h2>All collaborators</h2>
 
-      {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
-        <article class="collaborator-card">
-          <h3>{username} ({permission_level})</h3>
+      <ul>
+        {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
+          <li class="collaborator-card">
+            <p>
+              <strong>{username} ({permission_level})</strong>
+            </p>
 
-          <div class="collaborator-card__actions">
-            <Modal id="update-collaborator-{user_id}" text="Update">
-              <h4>Update collaborator</h4>
+            <div class="collaborator-card__actions">
+              <Modal id="update-collaborator-{user_id}" text="Update">
+                <h4>Update collaborator</h4>
 
-              <form
-                method="POST"
-                action="?/updateCollaborator"
-                use:enhance={() => {
-                  return async ({ update }) => {
-                    await update({ reset: false });
-                    window.location.hash = "!";
-                  };
-                }}
-              >
-                <input type="hidden" name="user-id" value={user_id} />
+                <form
+                  method="POST"
+                  action="?/updateCollaborator"
+                  use:enhance={() => {
+                    return async ({ update }) => {
+                      await update({ reset: false });
+                      window.location.hash = "!";
+                    };
+                  }}
+                >
+                  <input type="hidden" name="user-id" value={user_id} />
 
-                <label>
-                  Permission level:
-                  <select name="permission-level">
-                    <option value="10" selected={10 === permission_level}>10 - View</option>
-                    <option value="20" selected={20 === permission_level}>20 - Edit</option>
-                    <option value="30" selected={30 === permission_level}>30 - Manage</option>
-                  </select>
-                </label>
+                  <label>
+                    Permission level:
+                    <select name="permission-level">
+                      <option value="10" selected={10 === permission_level}>10 - View</option>
+                      <option value="20" selected={20 === permission_level}>20 - Edit</option>
+                      <option value="30" selected={30 === permission_level}>30 - Manage</option>
+                    </select>
+                  </label>
 
-                <button type="submit">Update collaborator</button>
-              </form>
-            </Modal>
-            <Modal id="remove-collaborator-{user_id}" text="Remove">
-              <h4>Remove collaborator</h4>
+                  <button type="submit">Update collaborator</button>
+                </form>
+              </Modal>
+              <Modal id="remove-collaborator-{user_id}" text="Remove">
+                <h4>Remove collaborator</h4>
 
-              <p>Do you really want to remove the collaborator?</p>
+                <p>Do you really want to remove the collaborator?</p>
 
-              <form
-                method="POST"
-                action="?/removeCollaborator"
-                use:enhance={() => {
-                  return async ({ update }) => {
-                    await update();
-                    window.location.hash = "!";
-                  };
-                }}
-              >
-                <input type="hidden" name="user-id" value={user_id} />
+                <form
+                  method="POST"
+                  action="?/removeCollaborator"
+                  use:enhance={() => {
+                    return async ({ update }) => {
+                      await update();
+                      window.location.hash = "!";
+                    };
+                  }}
+                >
+                  <input type="hidden" name="user-id" value={user_id} />
 
-                <button type="submit">Remove collaborator</button>
-              </form>
-            </Modal>
-          </div>
-        </article>
-      {/each}
+                  <button type="submit">Remove collaborator</button>
+                </form>
+              </Modal>
+            </div>
+          </li>
+        {/each}
+      </ul>
     </section>
   {/if}
 </WebsiteEditor>
@@ -121,15 +125,12 @@
     row-gap: var(--space-2xs);
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-block-start: var(--space-xs);
   }
 
   .collaborator-card + .collaborator-card {
-    padding-block-start: var(--space-s);
+    padding-block-start: var(--space-xs);
     border-block-start: var(--border-primary);
-  }
-
-  .collaborator-card:nth-of-type(1) {
-    margin-block-start: var(--space-xs);
   }
 
   .collaborator-card__actions {

@@ -12,20 +12,20 @@
   --border-primary: 0.0625rem solid var(--bg-tertiary);
   --border-radius: 0.125rem;
 
-  /* Step -1: 14.9953px → 14.9953px */
-  --font-size--1: clamp(0.9372rem, 0.9372rem + 0cqi, 0.9372rem);
+  /* Step -1: 14.9953px → 14.2222px */
+  --font-size--1: clamp(0.8889rem, 0.9592rem + -0.1098cqi, 0.9372rem);
   /* Step 0: 16px → 16px */
   --font-size-0: clamp(1rem, 1rem + 0cqi, 1rem);
-  /* Step 1: 17.072px → 17.072px */
-  --font-size-1: clamp(1.067rem, 1.067rem + 0cqi, 1.067rem);
-  /* Step 2: 18.2158px → 18.2158px */
-  --font-size-2: clamp(1.1385rem, 1.1385rem + 0cqi, 1.1385rem);
-  /* Step 3: 19.4363px → 19.4363px */
-  --font-size-3: clamp(1.2148rem, 1.2148rem + 0cqi, 1.2148rem);
-  /* Step 4: 20.7385px → 20.7385px */
-  --font-size-4: clamp(1.2962rem, 1.2962rem + 0cqi, 1.2962rem);
-  /* Step 5: 22.128px → 22.128px */
-  --font-size-5: clamp(1.383rem, 1.383rem + 0cqi, 1.383rem);
+  /* Step 1: 17.072px → 18px */
+  --font-size-1: clamp(1.067rem, 1.0406rem + 0.1318cqi, 1.125rem);
+  /* Step 2: 18.2158px → 20.25px */
+  --font-size-2: clamp(1.1385rem, 1.0807rem + 0.2889cqi, 1.2656rem);
+  /* Step 3: 19.4363px → 22.7813px */
+  --font-size-3: clamp(1.2148rem, 1.1197rem + 0.4751cqi, 1.4238rem);
+  /* Step 4: 20.7385px → 25.6289px */
+  --font-size-4: clamp(1.2962rem, 1.1572rem + 0.6947cqi, 1.6018rem);
+  /* Step 5: 22.128px → 28.8325px */
+  --font-size-5: clamp(1.383rem, 1.1925rem + 0.9523cqi, 1.802rem);
 
   /* Space 3xs: 4px → 5px */
   --space-3xs: clamp(0.25rem, 0.2336rem + 0.0822cqi, 0.3125rem);
@@ -107,7 +107,8 @@ button,
 textarea,
 select,
 a[role="button"],
-label[for="toggle-mobile-preview"] {
+label[for="toggle-mobile-preview"],
+summary {
   font: inherit;
   color: inherit;
   border: var(--border-primary);
@@ -130,6 +131,10 @@ input[type="file"] {
   inline-size: 100%;
 }
 
+input[type="color"] {
+  padding: 0;
+}
+
 a {
   color: var(--color-accent);
 }
@@ -140,17 +145,26 @@ a[role="button"] {
   text-decoration: none;
 }
 
+summary {
+  max-inline-size: fit-content;
+}
+
+details[open] summary {
+  margin-block-end: var(--space-s);
+}
+
 button,
 a[role="button"],
-label[for="toggle-mobile-preview"] {
+label[for="toggle-mobile-preview"],
+summary {
   background-color: var(--bg-secondary);
 }
 
-:is(button, a[role="button"], label[for="toggle-mobile-preview"]):hover {
+:is(button, a[role="button"], label[for="toggle-mobile-preview"], summary):hover {
   background-color: var(--bg-tertiary);
 }
 
-:is(a, button, input, textarea, select):focus,
+:is(a, button, input, textarea, select, summary):focus,
 #toggle-mobile-preview:checked + label {
   outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;
@@ -198,7 +212,7 @@ h1 {
   font-size: var(--font-size-5);
 }
 
-form[method="POST"] {
+form {
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
@@ -206,17 +220,6 @@ form[method="POST"] {
 
 form > button[type="submit"] {
   max-inline-size: 30ch;
-}
-
-form[method="GET"] {
-  display: grid;
-  gap: var(--space-s);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20ch), 1fr));
-  align-items: start;
-}
-
-form[method="GET"] > button[type="submit"] {
-  align-self: end;
 }
 
 form label {

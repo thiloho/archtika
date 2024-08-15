@@ -47,68 +47,75 @@
     <section>
       <h2>All articles</h2>
 
-      <form method="GET">
-        <label>
-          Search:
-          <input
-            type="text"
-            name="article_search_query"
-            value={$page.url.searchParams.get("article_search_query")}
-          />
-        </label>
-        <label>
-          Sort:
-          <select name="article_sort">
-            {#each sortOptions as { value, text }}
-              <option {value} selected={value === $page.url.searchParams.get("article_sort")}
-                >{text}</option
-              >
-            {/each}
-          </select>
-        </label>
-        <label>
-          Filter:
-          <select name="article_filter">
-            <option value="all">Show all</option>
-            <option value="creations">Created by you</option>
-            <option value="shared">Created by others</option>
-          </select>
-        </label>
-        <button type="submit">Submit</button>
-      </form>
+      <details>
+        <summary>Search & Sort & Filter</summary>
+        <form method="GET">
+          <label>
+            Search:
+            <input
+              type="text"
+              name="article_search_query"
+              value={$page.url.searchParams.get("article_search_query")}
+            />
+          </label>
+          <label>
+            Sort:
+            <select name="article_sort">
+              {#each sortOptions as { value, text }}
+                <option {value} selected={value === $page.url.searchParams.get("article_sort")}
+                  >{text}</option
+                >
+              {/each}
+            </select>
+          </label>
+          <label>
+            Filter:
+            <select name="article_filter">
+              <option value="all">Show all</option>
+              <option value="creations">Created by you</option>
+              <option value="shared">Created by others</option>
+            </select>
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+      </details>
 
-      {#each data.articles as { id, title } (id)}
-        <article class="article-card">
-          <h3>{title}</h3>
+      <ul>
+        {#each data.articles as { id, title } (id)}
+          <li class="article-card">
+            <p>
+              <strong>{title}</strong>
+            </p>
 
-          <div class="article-card__actions">
-            <a href="/website/{data.website.id}/articles/{id}">Edit</a>
-            <Modal id="delete-article-{id}" text="Delete">
-              <h4>Delete article</h4>
+            <div class="article-card__actions">
+              <a href="/website/{data.website.id}/articles/{id}">Edit</a>
+              <Modal id="delete-article-{id}" text="Delete">
+                <h4>Delete article</h4>
 
-              <p>
-                <strong>Caution!</strong>
-                Deleting this article will irretrievably erase all data.
-              </p>
+                <p>
+                  <strong>Caution!</strong>
+                  Deleting this article will irretrievably erase all data.
+                </p>
 
-              <form
-                method="POST"
-                action="?/deleteArticle"
-                use:enhance={() => {
-                  return async ({ update }) => {
-                    await update();
-                    window.location.hash = "!";
-                  };
-                }}
-              >
-                <input type="hidden" name="id" value={id} />
+                <form
+                  method="POST"
+                  action="?/deleteArticle"
+                  use:enhance={() => {
+                    return async ({ update }) => {
+                      await update();
+                      window.location.hash = "!";
+                    };
+                  }}
+                >
+                  <input type="hidden" name="id" value={id} />
 
-                <button type="submit">Delete article</button>
-              </form>
-            </Modal>
-          </div>
-        </article>
-      {/each}
+                  <button type="submit">Delete article</button>
+                </form>
+              </Modal>
+            </div>
+          </li>
+        {/each}
+      </ul>
     </section>
   {/if}
 </WebsiteEditor>
@@ -121,15 +128,12 @@
     row-gap: var(--space-2xs);
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-block-start: var(--space-xs);
   }
 
   .article-card + .article-card {
-    padding-block-start: var(--space-s);
+    padding-block-start: var(--space-xs);
     border-block-start: var(--border-primary);
-  }
-
-  .article-card:nth-of-type(1) {
-    margin-block-start: var(--space-m);
   }
 
   .article-card__actions {

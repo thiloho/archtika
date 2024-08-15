@@ -49,42 +49,47 @@
   <section>
     <h2>All websites</h2>
 
-    <form method="GET">
-      <label>
-        Search:
-        <input
-          type="text"
-          name="website_search_query"
-          value={$page.url.searchParams.get("website_search_query")}
-        />
-      </label>
-      <label>
-        Sort:
-        <select name="website_sort">
-          {#each sortOptions as { value, text }}
-            <option {value} selected={value === $page.url.searchParams.get("website_sort")}
-              >{text}</option
-            >
-          {/each}
-        </select>
-      </label>
-      <label>
-        Filter:
-        <select name="website_filter">
-          <option value="all">Show all</option>
-          <option value="creations">Created by you</option>
-          <option value="shared">Shared with you</option>
-        </select>
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+    <details>
+      <summary>Search & Sort & Filter</summary>
+      <form method="GET">
+        <label>
+          Search:
+          <input
+            type="text"
+            name="website_search_query"
+            value={$page.url.searchParams.get("website_search_query")}
+          />
+        </label>
+        <label>
+          Sort:
+          <select name="website_sort">
+            {#each sortOptions as { value, text }}
+              <option {value} selected={value === $page.url.searchParams.get("website_sort")}
+                >{text}</option
+              >
+            {/each}
+          </select>
+        </label>
+        <label>
+          Filter:
+          <select name="website_filter">
+            <option value="all">Show all</option>
+            <option value="creations">Created by you</option>
+            <option value="shared">Shared with you</option>
+          </select>
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+    </details>
 
-    <div class="website-grid">
+    <ul class="website-grid">
       {#each data.websites as { id, content_type, title, created_at } (id)}
-        <article class="website-card">
-          <h3>
-            <a href="/website/{id}">{title}</a>
-          </h3>
+        <li class="website-card">
+          <p>
+            <strong>
+              <a href="/website/{id}">{title}</a>
+            </strong>
+          </p>
           <ul>
             <li>
               <strong>Type:</strong>
@@ -148,9 +153,9 @@
               </form>
             </Modal>
           </div>
-        </article>
+        </li>
       {/each}
-    </div>
+    </ul>
   </section>
 {/if}
 
@@ -159,7 +164,7 @@
     display: grid;
     gap: var(--space-s);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 1fr));
-    margin-block-start: var(--space-m);
+    margin-block-start: var(--space-xs);
   }
 
   .website-card {
