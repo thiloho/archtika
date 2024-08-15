@@ -23,6 +23,7 @@
         in
         {
           api = pkgs.mkShell {
+            packages = with pkgs; [ postgresql_16 ];
             shellHook = ''
               alias dbmate="${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"

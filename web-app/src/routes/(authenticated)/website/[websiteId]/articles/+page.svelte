@@ -66,6 +66,14 @@
             {/each}
           </select>
         </label>
+        <label>
+          Filter:
+          <select name="article_filter">
+            <option value="all">Show all</option>
+            <option value="creations">Created by you</option>
+            <option value="shared">Created by others</option>
+          </select>
+        </label>
         <button type="submit">Submit</button>
       </form>
 
@@ -109,19 +117,24 @@
   .article-card {
     display: flex;
     align-items: center;
-    column-gap: 2rem;
-    row-gap: 0.5rem;
+    column-gap: var(--space-s);
+    row-gap: var(--space-2xs);
     flex-wrap: wrap;
     justify-content: space-between;
   }
 
+  .article-card + .article-card {
+    padding-block-start: var(--space-s);
+    border-block-start: var(--border-primary);
+  }
+
   .article-card:nth-of-type(1) {
-    margin-block-start: 1rem;
+    margin-block-start: var(--space-m);
   }
 
   .article-card__actions {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-s);
     align-items: center;
   }
 </style>

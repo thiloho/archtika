@@ -25,7 +25,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem;
+    padding: var(--space-s);
   }
 
   .modal__closeoverlay {
@@ -38,15 +38,15 @@
   .modal__content {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding-inline: 1rem;
-    padding-block: 2rem;
+    gap: var(--space-s);
+    padding-inline: var(--space-s);
+    padding-block: var(--space-m);
     background-color: var(--bg-primary);
     border-radius: var(--border-radius);
     border: var(--border-primary);
     inline-size: 300px;
     max-inline-size: 100%;
-    max-block-size: calc(100vh - 2rem);
+    max-block-size: calc(100vh - var(--space-m));
     overflow-y: auto;
     z-index: 20;
   }

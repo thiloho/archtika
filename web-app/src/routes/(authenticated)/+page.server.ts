@@ -1,9 +1,10 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/utils";
 
-export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
+export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
   const searchQuery = url.searchParams.get("website_search_query");
   const sortBy = url.searchParams.get("website_sort");
+  const filterBy = url.searchParams.get("website_filter");
 
   const params = new URLSearchParams();
 
@@ -26,6 +27,15 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
       break;
     case "title-z-to-a":
       params.append("order", "title.desc");
+      break;
+  }
+
+  switch (filterBy) {
+    case "creations":
+      params.append("user_id", `eq.${locals.user.id}`);
+      break;
+    case "shared":
+      params.append("user_id", `not.eq.${locals.user.id}`);
       break;
   }
 

@@ -157,24 +157,24 @@
 <style>
   .website-grid {
     display: grid;
-    gap: 1rem;
+    gap: var(--space-s);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 1fr));
-    margin-block-start: 1rem;
+    margin-block-start: var(--space-m);
   }
 
   .website-card {
     border: var(--border-primary);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding-inline: 1rem;
-    padding-block: 2rem;
+    gap: var(--space-s);
+    padding-inline: var(--space-s);
+    padding-block: var(--space-m);
   }
 
   .website-card__actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2xs);
     flex-wrap: wrap;
   }
 </style>

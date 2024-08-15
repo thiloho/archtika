@@ -16,10 +16,12 @@
 <style>
   .toast {
     position: fixed;
-    inset-block-end: 1rem;
-    inset-inline-end: 1rem;
-    padding-inline: 1rem;
-    padding-block: 0.5rem;
+    inset-block-end: var(--space-s);
+    inset-inline-end: var(--space-s);
+    margin-inline-start: var(--space-s);
+    padding-inline: var(--space-xs);
+    padding-block: var(--space-2xs);
+    text-align: center;
     border-radius: var(--border-radius);
     color: var(--color-text-invert);
     z-index: 30;

@@ -117,19 +117,24 @@
   .collaborator-card {
     display: flex;
     align-items: center;
-    column-gap: 2rem;
-    row-gap: 0.5rem;
+    column-gap: var(--space-s);
+    row-gap: var(--space-2xs);
     flex-wrap: wrap;
     justify-content: space-between;
   }
 
+  .collaborator-card + .collaborator-card {
+    padding-block-start: var(--space-s);
+    border-block-start: var(--border-primary);
+  }
+
   .collaborator-card:nth-of-type(1) {
-    margin-block-start: 1rem;
+    margin-block-start: var(--space-xs);
   }
 
   .collaborator-card__actions {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2xs);
     align-items: center;
   }
 </style>
