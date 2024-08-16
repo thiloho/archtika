@@ -1,0 +1,38 @@
+name: "Deploy app to demo server (demo.archtika.com)"
+
+on:
+  pull_request:
+  push:
+
+env:
+  SERVER_USER: thiloho
+  SERVER_IP: 128.140.75.240
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@v27
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.DEMO_SERVER_SSH_KEY }}
+
+    - name: Add server to known hosts
+      run: ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to demo server
+      run: |
+        nix run nixpkgs#nixos-rebuild -- switch \
+          --flake .#demo-server \
+          --build-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
+          --target-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
+          --use-remote-sudo
+      env:
+        GIT_SSH_COMMAND: "ssh -o ForwardAgent=yes"

@@ -14,8 +14,12 @@
   );
 </script>
 
+<svelte:head>
+  <title>archtika | {routeName.replaceAll("/", " - ")}</title>
+</svelte:head>
+
 <nav>
-  <strong>archtika</strong>
+  <img src="/favicon.svg" width="24" height="24" alt="" />
   <ul class="link-wrapper">
     {#if data.user}
       <li>
