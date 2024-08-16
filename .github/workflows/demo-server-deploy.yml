@@ -34,5 +34,6 @@ jobs:
           --build-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
           --target-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
           --use-remote-sudo
+          --max-jobs 0
       env:
         GIT_SSH_COMMAND: "ssh -o ForwardAgent=yes"
