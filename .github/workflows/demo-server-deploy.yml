@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  SERVER_USER: thiloho
+  SERVER_USER: root
   SERVER_IP: 128.140.75.240
 
 jobs:
@@ -35,5 +35,3 @@ jobs:
           --build-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
           --target-host ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} \
           --use-remote-sudo
-      env:
-        GIT_SSH_COMMAND: "ssh -o ForwardAgent=yes"
