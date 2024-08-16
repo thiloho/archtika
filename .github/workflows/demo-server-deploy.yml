@@ -1,8 +1,9 @@
 name: "Deploy app to demo server (demo.archtika.com)"
 
 on:
-  pull_request:
   push:
+    branches:
+      - main
 
 env:
   SERVER_USER: root
