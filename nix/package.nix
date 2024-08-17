@@ -20,6 +20,7 @@ let
       cp package.json $out/web-app
       cp -r node_modules $out/web-app
       cp -r build/* $out/web-app
+      cp -r template-styles $out/web-app
     '';
   };
 

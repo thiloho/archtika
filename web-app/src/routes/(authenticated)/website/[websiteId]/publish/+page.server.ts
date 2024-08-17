@@ -99,7 +99,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }
 
-  const styles = await readFile(`${process.cwd()}/src/lib/templates/blog/styles.css`, {
+  const styles = await readFile(`${process.cwd()}/template-styles/blog-styles.css`, {
     encoding: "utf-8"
   });
   await writeFile(join(uploadDir, "styles.css"), styles);
