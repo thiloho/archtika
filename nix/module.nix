@@ -156,9 +156,10 @@ in
             };
           };
         };
-        "~^(?<subdomain>.+)\.demo\.archtika\.com$;" = {
+        "*.demo.archtika.com" = {
           enableACME = true;
           forceSSL = true;
+          serverName = "~^(?<subdomain>.+)\.demo\.archtika\.com$;";
           locations = {
             "/" = {
               alias = "/var/www/archtika-websites/$subdomain/";
