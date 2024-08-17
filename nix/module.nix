@@ -156,18 +156,6 @@ in
             };
           };
         };
-        "*.demo.archtika.com" = {
-          enableACME = true;
-          forceSSL = true;
-          serverName = "~^(?<subdomain>.+)\\.demo\\.archtika\\.com$";
-          locations = {
-            "/" = {
-              alias = "/var/www/archtika-websites/$subdomain/";
-              index = "index.html";
-              tryFiles = "$uri $uri/ $uri/index.html =404";
-            };
-          };
-        };
       };
     };
 
