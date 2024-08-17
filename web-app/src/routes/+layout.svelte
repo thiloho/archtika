@@ -6,7 +6,7 @@
 
   const { data, children } = $props<{ data: LayoutServerData; children: Snippet }>();
 
-  const isProjectRoute = $derived($page.url.pathname.startsWith("/website"));
+  const isProjectRoute = $derived($page.url.pathname.startsWith("/website") && !$page.error);
   const routeName = $derived(
     $page.url.pathname === "/"
       ? "Dashboard"
@@ -39,7 +39,7 @@
   </ul>
 </nav>
 
-{#if !isProjectRoute}
+{#if !isProjectRoute && !$page.error}
   <header>
     <h1>{routeName}</h1>
   </header>
