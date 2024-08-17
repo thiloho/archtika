@@ -230,7 +230,7 @@ form label {
 }
 
 form label:has(textarea) {
-  max-inline-size: 65ch;
+  max-inline-size: 75ch;
 }
 
 form .file-field {

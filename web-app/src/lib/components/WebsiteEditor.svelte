@@ -7,14 +7,23 @@
     title,
     children,
     fullPreview = false,
-    previewContent
+    previewContent,
+    previewScrollTop = 0
   } = $props<{
     id: string;
     title: string;
     children: Snippet;
     fullPreview?: boolean;
     previewContent: string;
+    previewScrollTop?: number;
   }>();
+
+  let previewElement: HTMLDivElement;
+
+  $effect(() => {
+    const scrollHeight = previewElement.scrollHeight - previewElement.clientHeight;
+    previewElement.scrollTop = (previewScrollTop / 100) * scrollHeight;
+  });
 </script>
 
 <input type="checkbox" id="toggle-mobile-preview" hidden />
@@ -43,7 +52,7 @@
   {@render children()}
 </div>
 
-<div class="preview">
+<div class="preview" bind:this={previewElement}>
   {#if fullPreview}
     <iframe src={previewContent} title="Preview"></iframe>
   {:else}

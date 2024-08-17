@@ -8,6 +8,15 @@
   import { API_BASE_PREFIX } from "$lib/utils";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
+
+  let previewContent = $state(data.home.main_content);
+  let mainContentTextarea: HTMLTextAreaElement;
+  let textareaScrollTop = $state(0);
+
+  const updateScrollPercentage = () => {
+    const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
+    textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
+  };
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -15,7 +24,8 @@
 <WebsiteEditor
   id={data.website.id}
   title={data.website.title}
-  previewContent={data.home.main_content}
+  {previewContent}
+  previewScrollTop={textareaScrollTop}
 >
   <section>
     <h2>Global</h2>
@@ -133,7 +143,14 @@
     >
       <label>
         Main content:
-        <textarea name="main-content" rows="20" required>{data.home.main_content}</textarea>
+        <textarea
+          name="main-content"
+          rows="20"
+          bind:value={previewContent}
+          bind:this={mainContentTextarea}
+          onscroll={updateScrollPercentage}
+          required>{data.home.main_content}</textarea
+        >
       </label>
 
       <button type="submit">Submit</button>
