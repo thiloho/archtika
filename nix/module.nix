@@ -160,7 +160,6 @@ in
           serverName = "~^(?<subdomain>[^.]+)\\.demo\\.archtika\\.com$";
           enableACME = true;
           forceSSL = true;
-          useACMEHost = "demo.archtika.com";
           locations = {
             "/" = {
               root = "/var/www/archtika-websites";
