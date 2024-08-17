@@ -174,11 +174,6 @@ in
     security.acme = {
       acceptTerms = true;
       defaults.email = "thilo.hohlt@tutanota.com";
-      certs."demo.archtika.com" = {
-        domain = "*.demo.archtika.com";
-        extraDomainNames = ["demo.archtika.com"];
-        dnsProvider = "porkbun";
-      };
     };
   };
 }
