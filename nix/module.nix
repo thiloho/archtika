@@ -136,8 +136,8 @@ in
             "/" = {
               proxyPass = "http://localhost:${toString cfg.webAppPort}";
             };
-            "/user-websites/" = {
-              alias = "/var/www/archtika-websites/";
+            "/previews/" = {
+              alias = "/var/www/archtika-websites/previews/";
               index = "index.html";
               tryFiles = "$uri $uri/ $uri/index.html =404";
               extraConfig = ''
@@ -153,6 +153,17 @@ in
                 proxy_set_header Connection "";
                 proxy_http_version 1.1;
               '';
+            };
+          };
+        };
+        "~^(?<subdomain>[^.]+)\.demo\.archtika\.com$" = {
+          enableACME = true;
+          forceSSL = true;
+          locations = {
+            "/" = {
+              alias = "/var/www/archtika-websites/$subdomain/";
+              index = "index.html";
+              tryFiles = "$uri $uri/ $uri/index.html =404";
             };
           };
         };

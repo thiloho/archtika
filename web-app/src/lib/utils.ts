@@ -26,4 +26,4 @@ export const md = markdownit({
 });
 
 export const API_BASE_PREFIX = dev ? "http://localhost:3000" : "/api";
-export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "/user-websites";
+export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "";
