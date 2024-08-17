@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { md } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
@@ -85,7 +85,9 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
         title: article.title,
         logoType: websiteData.logo_type,
         logo: websiteData.logo_text,
-        coverImage: `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`,
+        coverImage: article.cover_image
+          ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+          : "",
         publicationDate: article.publication_date,
         mainContent: md.render(article.main_content ?? ""),
         footerAdditionalText: websiteData.additional_text ?? ""
@@ -96,4 +98,9 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }
+
+  const styles = await readFile(`${process.cwd()}/src/lib/templates/blog/styles.css`, {
+    encoding: "utf-8"
+  });
+  await writeFile(join(uploadDir, "styles.css"), styles);
 };

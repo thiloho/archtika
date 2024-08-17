@@ -100,6 +100,7 @@ in
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
+        WorkingDirectory = "${cfg.package}/web-app";
       };
 
       script = ''

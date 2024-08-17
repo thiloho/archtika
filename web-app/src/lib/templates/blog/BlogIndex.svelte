@@ -12,6 +12,7 @@
 <svelte:head>
   <head>
     <title>{title}</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
 </svelte:head>
 
@@ -45,7 +46,9 @@
           <h3>
             <a href="./articles/{articleFileName}.html">{article.title}</a>
           </h3>
-          <p>{article.meta_description ?? "No description provided"}</p>
+          {#if article.meta_description}
+            <p>{article.meta_description}</p>
+          {/if}
         </article>
       {/each}
     </section>

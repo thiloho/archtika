@@ -14,6 +14,7 @@
 <svelte:head>
   <head>
     <title>{title}</title>
+    <link rel="stylesheet" href="../styles.css" />
   </head>
 </svelte:head>
 
@@ -28,7 +29,9 @@
 </nav>
 
 <header>
-  <img src={coverImage} alt="" />
+  {#if coverImage}
+    <img src={coverImage} alt="" />
+  {/if}
   <h1>{title}</h1>
   <p>{publicationDate}</p>
 </header>
