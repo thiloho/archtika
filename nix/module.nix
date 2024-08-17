@@ -156,14 +156,19 @@ in
             };
           };
         };
-        "~^(?<subdomain>[^.]+)\.demo\.archtika\.com$" = {
+        "archtika-wildcard" = {
+          serverName = "~^(?<subdomain>[^.]+)\\.demo\\.archtika\\.com$";
           enableACME = true;
           forceSSL = true;
+          useACMEHost = "demo.archtika.com";
           locations = {
             "/" = {
-              alias = "/var/www/archtika-websites/$subdomain/";
+              root = "/var/www/archtika-websites";
               index = "index.html";
               tryFiles = "$uri $uri/ $uri/index.html =404";
+              extraConfig = ''
+                alias /var/www/archtika-websites/$subdomain/;
+              '';
             };
           };
         };
