@@ -50,6 +50,30 @@ in
       default = 10000;
       description = "Port on which the web application runs.";
     };
+
+    domain = mkOption {
+      type = types.str;
+      default = null;
+      description = "Domain to use for the application.";
+    };
+
+    acmeEmail = mkOption {
+      type = types.str;
+      default = null;
+      description = "Email to notify for the SSL certificate renewal process.";
+    };
+
+    dnsProvider = mkOption {
+      type = types.str;
+      default = null;
+      description = "DNS provider for the DNS-01 challenge (required for wildcard domains).";
+    };
+
+    dnsEnvironmentFile = mkOption {
+      type = types.path;
+      default = null;
+      description = "API secrets for the DNS-01 challenge (required for wildcard domains).";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -104,7 +128,7 @@ in
       };
 
       script = ''
-        ORIGIN=https://demo.archtika.com PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -129,8 +153,8 @@ in
       recommendedTlsSettings = true;
 
       virtualHosts = {
-        "demo.archtika.com" = {
-          useACMEHost = "demo.archtika.com";
+        "${cfg.domain}" = {
+          useACMEHost = cfg.domain;
           forceSSL = true;
           locations = {
             "/" = {
@@ -156,8 +180,8 @@ in
             };
           };
         };
-        "~^(?<subdomain>.+)\\.demo\\.archtika\\.com$" = {
-          useACMEHost = "demo.archtika.com";
+        "~^(?<subdomain>.+)\\.${lib.strings.escapeRegex cfg.domain}$" = {
+          useACMEHost = cfg.domain;
           forceSSL = true;
           locations = {
             "/" = {
@@ -172,12 +196,12 @@ in
 
     security.acme = {
       acceptTerms = true;
-      defaults.email = "thilo.hohlt@tutanota.com";
-      certs."demo.archtika.com" = {
-        domain = "demo.archtika.com";
-        extraDomainNames = ["*.demo.archtika.com"];
-        dnsProvider = "porkbun";
-        environmentFile = /var/lib/porkbun.env;
+      defaults.email = cfg.acmeEmail;
+      certs."${cfg.domain}" = {
+        domain = cfg.domain;
+        extraDomainNames = [ "*.${cfg.domain}" ];
+        dnsProvider = cfg.dnsProvider;
+        environmentFile = cfg.dnsEnvironmentFile;
         group = config.services.nginx.group;
       };
     };
