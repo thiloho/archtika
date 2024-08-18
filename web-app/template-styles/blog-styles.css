@@ -2,11 +2,22 @@
   color-scheme: light dark;
 }
 
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  margin-inline: auto;
-  inline-size: min(100% - 2rem, 75ch);
   line-height: 1.5;
   font-family: system-ui, sans-serif;
+}
+
+.container {
+  margin-inline: auto;
+  inline-size: min(100% - 2rem, 75ch);
 }
 
 img,
@@ -15,4 +26,15 @@ svg,
 video {
   max-inline-size: 100%;
   block-size: auto;
+}
+
+nav,
+header,
+main,
+footer {
+  padding-block: 1rem;
+}
+
+section + section {
+  margin-block-start: 1rem;
 }

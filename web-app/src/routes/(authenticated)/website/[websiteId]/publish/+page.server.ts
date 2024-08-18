@@ -6,6 +6,8 @@ import { API_BASE_PREFIX, NGINX_BASE_PREFIX } from "$lib/utils";
 import { render } from "svelte/server";
 import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
 import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
+import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
+import DocsEntry from "$lib/templates/docs/DocsEntry.svelte";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const websiteOverviewData = await fetch(
@@ -44,16 +46,39 @@ export const actions: Actions = {
 };
 
 const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) => {
-  const { head, body } = render(BlogIndex, {
-    props: {
-      title: websiteData.title,
-      logoType: websiteData.logo_type,
-      logo: websiteData.logo_text,
-      mainContent: md.render(websiteData.main_content ?? ""),
-      articles: websiteData.articles ?? [],
-      footerAdditionalText: websiteData.additional_text ?? ""
-    }
-  });
+  let head = "";
+  let body = "";
+
+  switch (websiteData.content_type) {
+    case "Blog":
+      {
+        ({ head, body } = render(BlogIndex, {
+          props: {
+            title: websiteData.title,
+            logoType: websiteData.logo_type,
+            logo: websiteData.logo_text,
+            mainContent: md.render(websiteData.main_content ?? ""),
+            articles: websiteData.articles ?? [],
+            footerAdditionalText: websiteData.additional_text ?? ""
+          }
+        }));
+      }
+      break;
+    case "Docs":
+      {
+        ({ head, body } = render(DocsIndex, {
+          props: {
+            title: websiteData.title,
+            logoType: websiteData.logo_type,
+            logo: websiteData.logo_text,
+            mainContent: md.render(websiteData.main_content ?? ""),
+            articles: websiteData.articles ?? [],
+            footerAdditionalText: websiteData.additional_text ?? ""
+          }
+        }));
+      }
+      break;
+  }
 
   const indexFileContents = head.concat(body);
 
@@ -67,28 +92,63 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
 
   await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, "index.html"), indexFileContents);
-  await mkdir(join(uploadDir, "articles"), { recursive: true });
+  await mkdir(join(uploadDir, websiteData.content_type === "Blog" ? "articles" : "documents"), {
+    recursive: true
+  });
 
   for (const article of websiteData.articles ?? []) {
     const articleFileName = article.title.toLowerCase().split(" ").join("-");
 
-    const { head, body } = render(BlogArticle, {
-      props: {
-        title: article.title,
-        logoType: websiteData.logo_type,
-        logo: websiteData.logo_text,
-        coverImage: article.cover_image
-          ? `${API_BASE_PREFIX === "/api" ? `${process.env.ORIGIN}/api` : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
-          : "",
-        publicationDate: article.publication_date,
-        mainContent: md.render(article.main_content ?? ""),
-        footerAdditionalText: websiteData.additional_text ?? ""
-      }
-    });
+    let head = "";
+    let body = "";
+
+    switch (websiteData.content_type) {
+      case "Blog":
+        {
+          ({ head, body } = render(BlogArticle, {
+            props: {
+              title: article.title,
+              logoType: websiteData.logo_type,
+              logo: websiteData.logo_text,
+              coverImage: article.cover_image
+                ? `${API_BASE_PREFIX === "/api" ? `${process.env.ORIGIN}/api` : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+                : "",
+              publicationDate: article.publication_date,
+              mainContent: md.render(article.main_content ?? ""),
+              footerAdditionalText: websiteData.additional_text ?? ""
+            }
+          }));
+        }
+        break;
+      case "Docs":
+        {
+          ({ head, body } = render(DocsEntry, {
+            props: {
+              title: article.title,
+              logoType: websiteData.logo_type,
+              logo: websiteData.logo_text,
+              coverImage: article.cover_image
+                ? `${API_BASE_PREFIX === "/api" ? `${process.env.ORIGIN}/api` : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+                : "",
+              publicationDate: article.publication_date,
+              mainContent: md.render(article.main_content ?? ""),
+              footerAdditionalText: websiteData.additional_text ?? ""
+            }
+          }));
+        }
+        break;
+    }
 
     const articleFileContents = head.concat(body);
 
-    await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
+    await writeFile(
+      join(
+        uploadDir,
+        websiteData.content_type === "Blog" ? "articles" : "documents",
+        `${articleFileName}.html`
+      ),
+      articleFileContents
+    );
   }
 
   const styles = await readFile(`${process.cwd()}/template-styles/blog-styles.css`, {

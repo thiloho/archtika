@@ -98,7 +98,7 @@
 
   @media (min-width: 640px) {
     .editor {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 2fr;
     }
   }
 </style>
