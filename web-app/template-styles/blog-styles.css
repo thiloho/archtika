@@ -35,6 +35,12 @@ footer {
   padding-block: 1rem;
 }
 
-section + section {
-  margin-block-start: 1rem;
+section:has(> h2) + section:has(> h2) {
+  margin-block-start: 2rem;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }

@@ -30,10 +30,21 @@ export const md = markdownit({
     const sections: { header: number; nesting: number }[] = [];
     let nestedLevel = 0;
 
-    const openSection = (attrs: [string, string][] | null) => {
+    const slugify = (text: string) => {
+      return text
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "")
+        .replace(/--+/g, "-")
+        .replace(/^-+/, "")
+        .replace(/-+$/, "");
+    };
+
+    const openSection = (attrs: [string, string][] | null, headingText: string) => {
       const t = new Token("section_open", "section", 1);
       t.block = true;
-      t.attrs = attrs ? attrs.map((attr) => [attr[0], attr[1]]) : null;
+      t.attrs = attrs ? attrs.map((attr) => [attr[0], attr[1]]) : [];
+      t.attrs.push(["id", slugify(headingText)]);
       return t;
     };
 
@@ -63,7 +74,8 @@ export const md = markdownit({
       }
     };
 
-    for (const token of state.tokens) {
+    for (let i = 0; i < state.tokens.length; i++) {
+      const token = state.tokens[i];
       if (token.type.search("heading") !== 0) {
         nestedLevel += token.nesting;
       }
@@ -79,7 +91,11 @@ export const md = markdownit({
         if (sections.length && section.header <= sections[sections.length - 1].header) {
           closeSections(section);
         }
-        tokens.push(openSection(token.attrs));
+
+        const headingTextToken = state.tokens[i + 1];
+        const headingText = headingTextToken.content;
+
+        tokens.push(openSection(token.attrs, headingText));
         const idIndex = token.attrIndex("id");
         if (idIndex !== -1) {
           token.attrs?.splice(idIndex, 1);

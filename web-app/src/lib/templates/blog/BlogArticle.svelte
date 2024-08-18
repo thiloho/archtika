@@ -13,33 +13,43 @@
 
 <svelte:head>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <link rel="stylesheet" href="../styles.css" />
   </head>
 </svelte:head>
 
 <nav>
-  {#if logoType === "text"}
-    <p>
-      <strong>{logo}</strong>
-    </p>
-  {:else}
-    <img src={logo} alt="" />
-  {/if}
+  <div class="container">
+    {#if logoType === "text"}
+      <p>
+        <strong>{logo}</strong>
+      </p>
+    {:else}
+      <img src={logo} alt="" />
+    {/if}
+  </div>
 </nav>
 
 <header>
-  {#if coverImage}
-    <img src={coverImage} alt="" />
-  {/if}
-  <h1>{title}</h1>
-  <p>{publicationDate}</p>
+  <div class="container">
+    {#if coverImage}
+      <img src={coverImage} alt="" />
+    {/if}
+    <h1>{title}</h1>
+    <p>{publicationDate}</p>
+  </div>
 </header>
 
 <main>
-  {@html mainContent}
+  <div class="container">
+    {@html mainContent}
+  </div>
 </main>
 
 <footer>
-  {footerAdditionalText}
+  <div class="container">
+    {footerAdditionalText}
+  </div>
 </footer>
