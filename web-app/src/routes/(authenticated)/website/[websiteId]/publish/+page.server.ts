@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 
   generateStaticFiles(websiteOverview);
 
-  const websitePreviewUrl = `${NGINX_BASE_PREFIX}/previews/${websiteOverview.user_id}/${websiteOverview.id}/index.html`;
+  const websitePreviewUrl = `${NGINX_BASE_PREFIX}/previews/${websiteOverview.id}/index.html`;
 
   return {
     websiteOverview,
@@ -60,17 +60,9 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
   let uploadDir = "";
 
   if (isPreview) {
-    uploadDir = join(
-      "/",
-      "var",
-      "www",
-      "archtika-websites",
-      "previews",
-      websiteData.user_id,
-      websiteData.id
-    );
+    uploadDir = join("/", "var", "www", "archtika-websites", "previews", websiteData.id);
   } else {
-    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.user_id, websiteData.id);
+    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.id);
   }
 
   await mkdir(uploadDir, { recursive: true });
@@ -86,7 +78,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
         logoType: websiteData.logo_type,
         logo: websiteData.logo_text,
         coverImage: article.cover_image
-          ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+          ? `${API_BASE_PREFIX === "/api" ? "https://demo.archtika.com/api" : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
           : "",
         publicationDate: article.publication_date,
         mainContent: md.render(article.main_content ?? ""),

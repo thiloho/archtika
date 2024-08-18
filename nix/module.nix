@@ -130,7 +130,7 @@ in
 
       virtualHosts = {
         "demo.archtika.com" = {
-          enableACME = true;
+          useACMEHost = "demo.archtika.com";
           forceSSL = true;
           locations = {
             "/" = {
@@ -156,12 +156,30 @@ in
             };
           };
         };
+        "~^(?<subdomain>.+)\\.demo\\.archtika\\.com$" = {
+          useACMEHost = "demo.archtika.com";
+          forceSSL = true;
+          locations = {
+            "/" = {
+              alias = "/var/www/archtika-websites/$subdomain/";
+              index = "index.html";
+              tryFiles = "$uri $uri/ $uri/index.html =404";
+            };
+          };
+        };
       };
     };
 
     security.acme = {
       acceptTerms = true;
       defaults.email = "thilo.hohlt@tutanota.com";
+      certs."demo.archtika.com" = {
+        domain = "demo.archtika.com";
+        extraDomainNames = ["*.demo.archtika.com"];
+        dnsProvider = "porkbun";
+        environmentFile = /var/lib/porkbun.env;
+        group = config.services.nginx.group;
+      };
     };
   };
 }
