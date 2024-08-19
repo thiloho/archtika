@@ -180,5 +180,30 @@ export const actions: Actions = {
       success: true,
       message: "Successfully updated footer"
     };
+  },
+  pasteImage: async ({ request, fetch, cookies, params }) => {
+    const data = await request.formData();
+    const file = data.get("file") as File;
+
+    const fileData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": file.type,
+        "X-Original-Filename": file.name
+      },
+      body: await file.arrayBuffer()
+    });
+
+    const fileJSON = await fileData.json();
+
+    if (!fileData.ok) {
+      return { success: false, message: fileJSON.message };
+    }
+
+    return { fileId: fileJSON.file_id };
   }
 };

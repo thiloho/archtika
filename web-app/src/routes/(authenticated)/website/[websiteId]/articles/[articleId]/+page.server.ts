@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
 };
 
 export const actions: Actions = {
-  default: async ({ fetch, cookies, request, params }) => {
+  editArticle: async ({ fetch, cookies, request, params }) => {
     const data = await request.formData();
     const coverFile = data.get("cover-image") as File;
 
@@ -63,5 +63,30 @@ export const actions: Actions = {
     }
 
     return { success: true, message: "Successfully updated article" };
+  },
+  pasteImage: async ({ request, fetch, cookies, params }) => {
+    const data = await request.formData();
+    const file = data.get("file") as File;
+
+    const fileData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": file.type,
+        "X-Original-Filename": file.name
+      },
+      body: await file.arrayBuffer()
+    });
+
+    const fileJSON = await fileData.json();
+
+    if (!fileData.ok) {
+      return { success: false, message: fileJSON.message };
+    }
+
+    return { fileId: fileJSON.file_id };
   }
 };

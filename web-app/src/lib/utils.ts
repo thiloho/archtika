@@ -113,5 +113,38 @@ export const md = markdownit({
   md.core.ruler.push("header_sections", addSections);
 });
 
+export const handleImagePaste = async (event: ClipboardEvent) => {
+  const clipboardItems = Array.from(event.clipboardData?.items || []);
+  const file = clipboardItems.find((item) => item.type.startsWith("image/"));
+
+  if (!file) return;
+
+  event.preventDefault();
+
+  const fileObject = file.getAsFile();
+
+  if (!fileObject) return;
+
+  const formData = new FormData();
+  formData.append("file", fileObject);
+
+  const request = await fetch("?/pasteImage", {
+    method: "POST",
+    body: formData
+  });
+
+  const response = await request.json();
+  const fileId = JSON.parse(response.data)[1];
+  const fileUrl = `${API_BASE_PREFIX}/rpc/retrieve_file?id=${fileId}`;
+
+  const target = event.target as HTMLTextAreaElement;
+  const newContent =
+    target.value.slice(0, target.selectionStart) +
+    `![](${fileUrl})` +
+    target.value.slice(target.selectionStart);
+
+  return newContent;
+};
+
 export const API_BASE_PREFIX = dev ? "http://localhost:3000" : "/api";
 export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "";

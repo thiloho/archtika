@@ -5,7 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
-  import { API_BASE_PREFIX } from "$lib/utils";
+  import { API_BASE_PREFIX, handleImagePaste } from "$lib/utils";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 
@@ -16,6 +16,11 @@
   const updateScrollPercentage = () => {
     const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
     textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
+  };
+
+  const handlePaste = async (event: ClipboardEvent) => {
+    const newContent = await handleImagePaste(event);
+    previewContent = newContent;
   };
 </script>
 
@@ -33,6 +38,7 @@
 
     <form
       method="POST"
+      action="?/editArticle"
       enctype="multipart/form-data"
       use:enhance={() => {
         return async ({ update }) => {
@@ -94,6 +100,7 @@
           bind:value={previewContent}
           bind:this={mainContentTextarea}
           onscroll={updateScrollPercentage}
+          onpaste={handlePaste}
           required>{data.article.main_content}</textarea
         >
       </label>

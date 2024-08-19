@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
-  import { ALLOWED_MIME_TYPES } from "$lib/utils";
+  import { ALLOWED_MIME_TYPES, handleImagePaste } from "$lib/utils";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
@@ -16,6 +16,11 @@
   const updateScrollPercentage = () => {
     const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
     textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
+  };
+
+  const handlePaste = async (event: ClipboardEvent) => {
+    const newContent = await handleImagePaste(event);
+    previewContent = newContent;
   };
 </script>
 
@@ -149,6 +154,7 @@
           bind:value={previewContent}
           bind:this={mainContentTextarea}
           onscroll={updateScrollPercentage}
+          onpaste={handlePaste}
           required>{data.home.main_content}</textarea
         >
       </label>
