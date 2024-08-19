@@ -128,7 +128,7 @@ in
       };
 
       script = ''
-        ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        PUBLIC_ORIGIN=https://${cfg.domain} ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 

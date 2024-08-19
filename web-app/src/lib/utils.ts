@@ -146,5 +146,5 @@ export const handleImagePaste = async (event: ClipboardEvent) => {
   return newContent;
 };
 
-export const API_BASE_PREFIX = dev ? "http://localhost:3000" : `${process.env.ORIGIN}/api`;
+export const API_BASE_PREFIX = dev ? "http://localhost:3000" : `${import.meta.env.PUBLIC_ORIGIN}/api`;
 export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "";
