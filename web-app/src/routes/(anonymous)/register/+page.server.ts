@@ -1,5 +1,5 @@
 import type { Actions } from "./$types";
-import { API_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 
 export const actions: Actions = {
   default: async ({ request, fetch }) => {

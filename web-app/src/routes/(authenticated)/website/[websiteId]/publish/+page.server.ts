@@ -2,12 +2,13 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { md } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX, NGINX_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 import { render } from "svelte/server";
 import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
 import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
 import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsEntry from "$lib/templates/docs/DocsEntry.svelte";
+import { dev } from "$app/environment";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const websiteOverviewData = await fetch(
@@ -26,7 +27,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 
   generateStaticFiles(websiteOverview);
 
-  const websitePreviewUrl = `${NGINX_BASE_PREFIX}/previews/${websiteOverview.id}/index.html`;
+  const websitePreviewUrl = `${dev ? "http://localhost:18000" : ""}/previews/${websiteOverview.id}/index.html`;
 
   return {
     websiteOverview,

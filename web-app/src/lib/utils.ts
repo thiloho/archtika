@@ -113,7 +113,7 @@ export const md = markdownit({
   md.core.ruler.push("header_sections", addSections);
 });
 
-export const handleImagePaste = async (event: ClipboardEvent) => {
+export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {
   const clipboardItems = Array.from(event.clipboardData?.items || []);
   const file = clipboardItems.find((item) => item.type.startsWith("image/"));
 
@@ -145,6 +145,3 @@ export const handleImagePaste = async (event: ClipboardEvent) => {
 
   return newContent;
 };
-
-export const API_BASE_PREFIX = dev ? "http://localhost:3000" : `${import.meta.env.PUBLIC_ORIGIN}/api`;
-export const NGINX_BASE_PREFIX = dev ? "http://localhost:18000" : "";

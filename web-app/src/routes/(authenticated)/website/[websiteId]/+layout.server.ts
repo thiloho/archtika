@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 import { error } from "@sveltejs/kit";
 
 export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {

@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent, locals }) => {
   const searchQuery = url.searchParams.get("article_search_query");

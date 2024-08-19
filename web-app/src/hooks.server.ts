@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { API_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 
 export const handle = async ({ event, resolve }) => {
   if (!event.url.pathname.startsWith("/api/")) {

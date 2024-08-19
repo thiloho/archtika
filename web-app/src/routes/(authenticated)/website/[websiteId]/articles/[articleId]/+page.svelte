@@ -5,7 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
-  import { API_BASE_PREFIX, handleImagePaste } from "$lib/utils";
+  import { handleImagePaste } from "$lib/utils";
 
   const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
 
@@ -19,7 +19,7 @@
   };
 
   const handlePaste = async (event: ClipboardEvent) => {
-    const newContent = await handleImagePaste(event);
+    const newContent = await handleImagePaste(event, data.API_BASE_PREFIX);
     previewContent = newContent;
   };
 </script>
@@ -86,7 +86,7 @@
         {#if data.article.cover_image}
           <Modal id="preview-cover-article-{data.article.id}" text="Preview">
             <img
-              src={`${API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
+              src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
               alt=""
             />
           </Modal>

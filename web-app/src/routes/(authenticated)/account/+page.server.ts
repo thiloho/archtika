@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/utils";
+import { API_BASE_PREFIX } from "$lib/server/utils";
 
 export const load: PageServerLoad = async ({ locals }) => {
   return {
