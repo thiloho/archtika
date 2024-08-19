@@ -111,7 +111,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
               logoType: websiteData.logo_type,
               logo: websiteData.logo_text,
               coverImage: article.cover_image
-                ? `${API_BASE_PREFIX === "/api" ? `${process.env.ORIGIN}/api` : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
                 : "",
               publicationDate: article.publication_date,
               mainContent: md.render(article.main_content ?? ""),
@@ -128,7 +128,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
               logoType: websiteData.logo_type,
               logo: websiteData.logo_text,
               coverImage: article.cover_image
-                ? `${API_BASE_PREFIX === "/api" ? `${process.env.ORIGIN}/api` : API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
+                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
                 : "",
               publicationDate: article.publication_date,
               mainContent: md.render(article.main_content ?? ""),
