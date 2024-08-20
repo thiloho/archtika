@@ -8,7 +8,7 @@ DECLARE
   _website_id UUID := (_headers ->> 'x-website-id')::UUID;
   _mimetype TEXT := _headers ->> 'x-mimetype';
   _original_filename TEXT := _headers ->> 'x-original-filename';
-  _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/svg+xml', 'image/jpeg', 'image/webp'];
+  _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/jpeg', 'image/webp'];
   _max_file_size INT := 5 * 1024 * 1024;
 BEGIN
   IF OCTET_LENGTH($1) = 0 THEN
