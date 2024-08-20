@@ -7,7 +7,7 @@
   import Modal from "$lib/components/Modal.svelte";
   import { handleImagePaste } from "$lib/utils";
 
-  const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
+  const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
   let previewContent = $state(data.article.main_content);
   let mainContentTextarea: HTMLTextAreaElement;
@@ -20,7 +20,9 @@
 
   const handlePaste = async (event: ClipboardEvent) => {
     const newContent = await handleImagePaste(event, data.API_BASE_PREFIX);
-    previewContent = newContent;
+    if (newContent) {
+      previewContent = newContent;
+    }
   };
 </script>
 

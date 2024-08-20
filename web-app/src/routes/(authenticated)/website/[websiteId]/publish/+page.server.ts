@@ -10,7 +10,7 @@ import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsEntry from "$lib/templates/docs/DocsEntry.svelte";
 import { dev } from "$app/environment";
 
-export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) => {
   const websiteOverviewData = await fetch(
     `${API_BASE_PREFIX}/website_overview?id=eq.${params.websiteId}`,
     {
@@ -24,6 +24,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   );
 
   const websiteOverview = await websiteOverviewData.json();
+  const { website } = await parent();
 
   generateStaticFiles(websiteOverview);
 
@@ -31,7 +32,8 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 
   return {
     websiteOverview,
-    websitePreviewUrl
+    websitePreviewUrl,
+    website
   };
 };
 
@@ -152,8 +154,11 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
     );
   }
 
-  const styles = await readFile(`${process.cwd()}/template-styles/blog-styles.css`, {
+  const commonStyles = await readFile(`${process.cwd()}/template-styles/common-styles.css`, {
     encoding: "utf-8"
   });
-  await writeFile(join(uploadDir, "styles.css"), styles);
+  const specificStyles = await readFile(`${process.cwd()}/template-styles/blog-styles.css`, {
+    encoding: "utf-8"
+  });
+  await writeFile(join(uploadDir, "styles.css"), commonStyles.concat(specificStyles));
 };

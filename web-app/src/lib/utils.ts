@@ -1,7 +1,6 @@
 import markdownit from "markdown-it";
 import hljs from "highlight.js";
 import type { StateCore } from "markdown-it/index.js";
-import { dev } from "$app/environment";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -117,7 +116,7 @@ export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: s
   const clipboardItems = Array.from(event.clipboardData?.items || []);
   const file = clipboardItems.find((item) => item.type.startsWith("image/"));
 
-  if (!file) return;
+  if (!file) return null;
 
   event.preventDefault();
 

@@ -1,8 +1,6 @@
 <script lang="ts">
-  const { success, message } = $props<{
-    success: boolean | undefined;
-    message: string;
-  }>();
+  const { success, message }: { success: boolean | undefined; message: string | undefined } =
+    $props();
 </script>
 
 {#if success}

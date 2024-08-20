@@ -1,12 +1,19 @@
 <script lang="ts">
-  const { title, logoType, logo, mainContent, articles, footerAdditionalText } = $props<{
+  const {
+    title,
+    logoType,
+    logo,
+    mainContent,
+    articles,
+    footerAdditionalText
+  }: {
     title: string;
     logoType: "text" | "image";
     logo: string;
     mainContent: string;
-    articles: any[];
+    articles: { title: string; publication_date: string; meta_description: string }[];
     footerAdditionalText: string;
-  }>();
+  } = $props();
 </script>
 
 <svelte:head>

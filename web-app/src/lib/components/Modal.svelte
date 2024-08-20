@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  const { children, id, text } = $props<{ children: Snippet; id: string; text: string }>();
+  const { children, id, text }: { children: Snippet; id: string; text: string } = $props();
 </script>
 
 <a href={`#${id}`} role="button">{text}</a>

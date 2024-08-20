@@ -7,7 +7,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
 
-  const { form, data } = $props<{ form: ActionData; data: PageServerData }>();
+  const { form, data }: { form: ActionData; data: PageServerData } = $props();
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />

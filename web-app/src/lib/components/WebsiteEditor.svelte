@@ -9,14 +9,14 @@
     fullPreview = false,
     previewContent,
     previewScrollTop = 0
-  } = $props<{
+  }: {
     id: string;
     title: string;
     children: Snippet;
     fullPreview?: boolean;
     previewContent: string;
     previewScrollTop?: number;
-  }>();
+  } = $props();
 
   let previewElement: HTMLDivElement;
 

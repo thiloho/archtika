@@ -5,7 +5,7 @@
   import Modal from "$lib/components/Modal.svelte";
   import type { ActionData, PageServerData } from "./$types";
 
-  const { data, form } = $props<{ data: PageServerData; form: ActionData }>();
+  const { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
