@@ -82,7 +82,7 @@
       </form>
     </details>
 
-    <ul class="website-grid">
+    <ul class="website-grid unpadded">
       {#each data.websites as { id, content_type, title, created_at } (id)}
         <li class="website-card">
           <p>

@@ -108,6 +108,10 @@ section {
   gap: var(--space-s);
 }
 
+section:has(> h2) + section:has(> h2) {
+  margin-block-start: var(--space-l);
+}
+
 a {
   color: var(--color-accent);
 }
@@ -172,4 +176,36 @@ code {
   background-color: var(--bg-secondary);
   border: var(--border-primary);
   padding-inline: var(--space-3xs);
+}
+
+:is(ul, ol):not(.unpadded) {
+  padding-inline-start: var(--space-s);
+}
+
+.unpadded {
+  list-style: none;
+}
+
+hr {
+  block-size: 0.125rem;
+  background-color: var(--bg-tertiary);
+  border: none;
+}
+
+.scroll-container {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  border: var(--border-primary);
+}
+
+th,
+td {
+  text-align: start;
+  padding-inline: var(--space-2xs);
+  padding-block: var(--space-3xs);
+  border: var(--border-primary);
 }

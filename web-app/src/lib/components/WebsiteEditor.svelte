@@ -33,7 +33,7 @@
   <h1>{title}</h1>
 
   <nav class="operations__nav">
-    <ul>
+    <ul class="unpadded">
       <li>
         <a href="/website/{id}">Settings</a>
       </li>
@@ -56,7 +56,11 @@
   {#if fullPreview}
     <iframe src={previewContent} title="Preview"></iframe>
   {:else}
-    {@html md.render(previewContent)}
+    {#await md(previewContent)}
+      <p>Loading preview...</p>
+    {:then content}
+      {@html content}
+    {/await}
   {/if}
 </div>
 

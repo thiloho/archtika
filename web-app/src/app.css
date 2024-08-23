@@ -1,7 +1,3 @@
-section + section {
-  margin-block-start: var(--space-l);
-}
-
 button,
 label,
 select,
@@ -70,11 +66,6 @@ summary {
 #toggle-mobile-preview:checked + label {
   outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;
-}
-
-ul,
-ol {
-  list-style: none;
 }
 
 form {

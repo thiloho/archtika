@@ -21,7 +21,7 @@
 
 <nav>
   <img src="/favicon.svg" width="24" height="24" alt="" />
-  <ul class="link-wrapper">
+  <ul class="link-wrapper unpadded">
     {#if data.user}
       <li>
         <a href="/">Dashboard</a>

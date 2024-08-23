@@ -37,7 +37,7 @@
       <section class="articles">
         <h2>Articles</h2>
 
-        <ul>
+        <ul class="unpadded">
           {#each articles as article}
             {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
             <li>

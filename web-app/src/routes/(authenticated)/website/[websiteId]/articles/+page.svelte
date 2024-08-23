@@ -80,7 +80,7 @@
         </form>
       </details>
 
-      <ul>
+      <ul class="unpadded">
         {#each data.articles as { id, title } (id)}
           <li class="article-card">
             <p>

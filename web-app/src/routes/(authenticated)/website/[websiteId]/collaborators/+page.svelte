@@ -54,7 +54,7 @@
     <section>
       <h2>All collaborators</h2>
 
-      <ul>
+      <ul class="unpadded">
         {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
           <li class="collaborator-card">
             <p>
