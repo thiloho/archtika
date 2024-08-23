@@ -13,7 +13,7 @@ let
     inherit pname version;
     name = "archtika-web-app";
     src = ../web-app;
-    npmDepsHash = "sha256-FHmDvKyfQ33MWABmqL59PxIL47MMvevaiJhGTwXivFI=";
+    npmDepsHash = "sha256-lO+4r/9jEbjkl6e2Dg84WJNin9zYgR7bmdPiBlHFxf0=";
     npmFlags = [ "--legacy-peer-deps" ];
     installPhase = ''
       mkdir -p $out/web-app
