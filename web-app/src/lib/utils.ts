@@ -1,6 +1,6 @@
 import { Marked } from "marked";
-import hljs from "highlight.js";
 import { markedHighlight } from "marked-highlight";
+import hljs from "highlight.js";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -12,21 +12,24 @@ export const sortOptions = [
 export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/svg+xml", "image/webp"];
 
 const createMarkdownParser = () => {
-  const marked = new Marked(
-    markedHighlight({
-      langPrefix: "hljs language-",
-      highlight(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : "plaintext";
-        return hljs.highlight(code, { language }).value;
-      }
-    })
-  );
+  const marked = new Marked();
 
   marked.use({
     async: true,
     pedantic: false,
     gfm: true
   });
+
+  marked.use(
+    markedHighlight({
+      async: true,
+      langPrefix: "language-",
+      highlight(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : "plaintext";
+        return hljs.highlight(code, { language }).value;
+      }
+    })
+  );
 
   return marked;
 };
@@ -38,6 +41,8 @@ export const md = async (markdownContent: string) => {
 
   return html;
 };
+
+// test
 
 export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {
   const clipboardItems = Array.from(event.clipboardData?.items || []);
