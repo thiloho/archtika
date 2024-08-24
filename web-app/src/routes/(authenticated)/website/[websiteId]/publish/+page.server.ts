@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) =
 
   generateStaticFiles(websiteOverview);
 
-  const websitePreviewUrl = `${dev ? "http://localhost:18000" : ""}/previews/${websiteOverview.id}/index.html`;
+  const websitePreviewUrl = `${dev ? "http://localhost:18000" : process.env.ORIGIN}/previews/${websiteOverview.id}/index.html`;
 
   return {
     websiteOverview,

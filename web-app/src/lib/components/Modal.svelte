@@ -3,7 +3,7 @@
 
   const { children, id, text }: { children: Snippet; id: string; text: string } = $props();
 
-  const modalId = `${id}-modal`
+  const modalId = `${id}-modal`;
 </script>
 
 <a href={`#${modalId}`} role="button">{text}</a>
