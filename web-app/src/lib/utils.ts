@@ -1,6 +1,8 @@
 import { Marked } from "marked";
+import type { Renderer, Token } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
+import GithubSlugger from "github-slugger";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -31,6 +33,98 @@ const createMarkdownParser = () => {
     })
   );
 
+  const unescapeTest = /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi;
+
+  function unescape(html: string) {
+    return html.replace(unescapeTest, (_, n) => {
+      n = n.toLowerCase();
+      if (n === "colon") return ":";
+      if (n.charAt(0) === "#") {
+        return n.charAt(1) === "x"
+          ? String.fromCharCode(parseInt(n.substring(2), 16))
+          : String.fromCharCode(+n.substring(1));
+      }
+      return "";
+    });
+  }
+
+  let slugger = new GithubSlugger();
+  let headings: { text: string; raw: string; level: number; id: string }[] = [];
+  let sectionStack: { level: number; id: string }[] = [];
+
+  function gfmHeadingId({ prefix = "" } = {}) {
+    return {
+      renderer: {
+        heading(this: Renderer, { tokens, depth }: { tokens: Token[]; depth: number }) {
+          const text = this.parser.parseInline(tokens);
+          const raw = unescape(this.parser.parseInline(tokens, this.parser.textRenderer))
+            .trim()
+            .replace(/<[!\/a-z].*?>/gi, "");
+          const level = depth;
+          const id = `${prefix}${slugger.slug(raw.toLowerCase())}`;
+          const heading = { level, text, id, raw };
+          headings.push(heading);
+
+          // Close any sections that are at a higher level than the current heading
+          let closingSections = "";
+          while (sectionStack.length > 0 && sectionStack[sectionStack.length - 1].level >= level) {
+            sectionStack.pop();
+            closingSections += "</section>";
+          }
+
+          // Open a new section for this heading
+          sectionStack.push({ level, id });
+          const openingSection = `<section id="${id}">`;
+
+          return `
+            ${closingSections}
+            ${openingSection}
+            <h${level}>
+              <a href="#${id}">${text}</a>
+            </h${level}>
+          `;
+        }
+      },
+      hooks: {
+        preprocess(src: string) {
+          headings = [];
+          sectionStack = [];
+          slugger = new GithubSlugger();
+
+          return src;
+        },
+        postprocess(html: string) {
+          // Close any remaining open sections
+          const closingRemainingSection = "</section>".repeat(sectionStack.length);
+
+          // Generate table of contents
+          const tableOfContents =
+            headings.length > 0
+              ? `<details>
+                <summary>Table of contents</summary>
+                <ul>
+                  ${headings
+                    .map(
+                      ({ id, text, level }) => `
+                      <li><a href="#${id}" class="h${level}">${text}</a></li>`
+                    )
+                    .join("")}
+                </ul>
+              </details>`
+              : "";
+
+          return `
+            ${tableOfContents}
+            ${html}
+            ${closingRemainingSection}
+          `;
+        }
+      }
+    };
+  }
+
+  marked.use(gfmHeadingId());
+
   return marked;
 };
 
@@ -41,8 +135,6 @@ export const md = async (markdownContent: string) => {
 
   return html;
 };
-
-// test
 
 export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {
   const clipboardItems = Array.from(event.clipboardData?.items || []);
