@@ -68,7 +68,7 @@ label[for="toggle-mobile-preview"],
 
 :is(button, input, textarea, select):focus,
 #toggle-mobile-preview:checked + label {
-  outline: 0.125rem solid currentColor;
+  outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;
 }
 

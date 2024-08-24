@@ -24,7 +24,7 @@ footer {
 }
 
 .articles li {
-  border: 1px solid hsl(0 0% 50%);
+  border: var(--border-primary);
   padding: var(--space-s);
   display: flex;
   flex-direction: column;

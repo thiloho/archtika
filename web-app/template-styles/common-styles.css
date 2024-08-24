@@ -123,6 +123,7 @@ a {
 
 :is(h1, h2, h3, h4, h5, h6) > a:hover {
   text-decoration: underline;
+  text-decoration-color: var(--color-accent);
 }
 
 details[open] summary {
@@ -225,6 +226,6 @@ summary {
 }
 
 :is(a, summary):focus {
-  outline: 0.125rem solid currentColor;
+  outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;
 }

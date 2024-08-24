@@ -2,11 +2,13 @@
   import type { Snippet } from "svelte";
 
   const { children, id, text }: { children: Snippet; id: string; text: string } = $props();
+
+  const modalId = `${id}-modal`
 </script>
 
-<a href={`#${id}`} role="button">{text}</a>
+<a href={`#${modalId}`} role="button">{text}</a>
 
-<div {id} class="modal">
+<div id={modalId} class="modal">
   <div class="modal__content">
     {@render children()}
     <a href="#!" role="button">Close</a>
