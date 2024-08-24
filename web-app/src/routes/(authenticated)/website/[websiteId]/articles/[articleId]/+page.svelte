@@ -35,8 +35,10 @@
     "Put some markdown content in main content to see a live preview here"}
   previewScrollTop={textareaScrollTop}
 >
-  <section>
-    <h2>Edit article</h2>
+  <section id="edit-article">
+    <h2>
+      <a href="#edit-article">Edit article</a>
+    </h2>
 
     <form
       method="POST"

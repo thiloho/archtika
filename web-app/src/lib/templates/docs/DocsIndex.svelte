@@ -38,11 +38,9 @@
 </header>
 
 <main>
-  <section>
-    {@html mainContent}
-  </section>
+  {@html mainContent}
   {#if articles.length > 0}
-    <section>
+    <section class="articles" id="articles">
       <h2>Articles</h2>
 
       {#each articles as article}

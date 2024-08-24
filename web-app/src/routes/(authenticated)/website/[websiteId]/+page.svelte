@@ -34,8 +34,10 @@
   {previewContent}
   previewScrollTop={textareaScrollTop}
 >
-  <section>
-    <h2>Global</h2>
+  <section id="global">
+    <h2>
+      <a href="#global">Global</a>
+    </h2>
     <form
       action="?/updateGlobal"
       method="POST"
@@ -85,8 +87,10 @@
     </form>
   </section>
 
-  <section>
-    <h2>Header</h2>
+  <section id="header">
+    <h2>
+      <a href="#header">Header</a>
+    </h2>
 
     <form
       action="?/updateHeader"
@@ -139,8 +143,10 @@
     </form>
   </section>
 
-  <section>
-    <h2>Home</h2>
+  <section id="home">
+    <h2>
+      <a href="#home">Home</a>
+    </h2>
 
     <form
       action="?/updateHome"
@@ -168,8 +174,10 @@
     </form>
   </section>
 
-  <section>
-    <h2>Footer</h2>
+  <section id="footer">
+    <h2>
+      <a href="#footer">Footer</a>
+    </h2>
 
     <form
       action="?/updateFooter"

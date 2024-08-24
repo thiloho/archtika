@@ -17,8 +17,10 @@
   title={data.website.title}
   previewContent={data.home.main_content}
 >
-  <section>
-    <h2>Create article</h2>
+  <section id="create-article">
+    <h2>
+      <a href="#create-article">Create article</a>
+    </h2>
 
     <Modal id="create-article" text="Create article">
       <h3>Create article</h3>
@@ -44,8 +46,10 @@
   </section>
 
   {#if data.totalArticleCount > 0}
-    <section>
-      <h2>All articles</h2>
+    <section id="all-articles">
+      <h2>
+        <a href="#all-articles">All articles</a>
+      </h2>
 
       <details>
         <summary>Search & Sort & Filter</summary>

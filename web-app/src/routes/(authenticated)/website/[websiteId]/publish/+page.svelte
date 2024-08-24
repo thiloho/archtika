@@ -15,8 +15,10 @@
   previewContent={data.websitePreviewUrl}
   fullPreview={true}
 >
-  <section>
-    <h2>Publish website</h2>
+  <section id="publish-website">
+    <h2>
+      <a href="#publish-website">Publish website</a>
+    </h2>
 
     <p>
       The preview area on this page allows you to see exactly how your website will look when it is

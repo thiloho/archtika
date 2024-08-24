@@ -116,6 +116,15 @@ a {
   color: var(--color-accent);
 }
 
+:is(h1, h2, h3, h4, h5, h6) > a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+:is(h1, h2, h3, h4, h5, h6) > a:hover {
+  text-decoration: underline;
+}
+
 details[open] summary {
   margin-block-end: var(--space-s);
 }
@@ -216,6 +225,6 @@ summary {
 }
 
 :is(a, summary):focus {
-  outline: 0.125rem solid var(--color-accent);
+  outline: 0.125rem solid currentColor;
   outline-offset: 0.25rem;
 }

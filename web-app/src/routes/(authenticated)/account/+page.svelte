@@ -9,8 +9,10 @@
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-<section>
-  <h2>Overview</h2>
+<section id="overview">
+  <h2>
+    <a href="#overview">Overview</a>
+  </h2>
 
   <ul>
     <li>
@@ -24,16 +26,20 @@
   </ul>
 </section>
 
-<section>
-  <h2>Logout</h2>
+<section id="logout">
+  <h2>
+    <a href="#logout">Logout</a>
+  </h2>
 
   <form method="POST" action="?/logout" use:enhance>
     <button type="submit">Logout</button>
   </form>
 </section>
 
-<section>
-  <h2>Delete account</h2>
+<section id="delete-account">
+  <h2>
+    <a href="#delete-account">Delete account</a>
+  </h2>
 
   <Modal id="delete-account" text="Delete account">
     <h3>Delete account</h3>

@@ -12,8 +12,10 @@
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-<section>
-  <h2>Create website</h2>
+<section id="create-website">
+  <h2>
+    <a href="#create-website">Create website</a>
+  </h2>
 
   <Modal id="create-website" text="Create website">
     <h3>Create website</h3>
@@ -46,8 +48,10 @@
 </section>
 
 {#if data.totalWebsiteCount > 0}
-  <section>
-    <h2>All websites</h2>
+  <section id="all-websites">
+    <h2>
+      <a href="#all-websites">All websites</a>
+    </h2>
 
     <details>
       <summary>Search & Sort & Filter</summary>

@@ -15,8 +15,10 @@
   title={data.website.title}
   previewContent={data.home.main_content}
 >
-  <section>
-    <h2>Add collaborator</h2>
+  <section id="add-collaborator">
+    <h2>
+      <a href="#add-collaborator">Add collaborator</a>
+    </h2>
 
     <Modal id="add-collaborator" text="Add collaborator">
       <h3>Add collaborator</h3>
@@ -51,8 +53,10 @@
   </section>
 
   {#if data.collaborators.length > 0}
-    <section>
-      <h2>All collaborators</h2>
+    <section id="all-collaborators">
+      <h2>
+        <a href="#all-collaborators">All collaborators</a>
+      </h2>
 
       <ul class="unpadded">
         {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}

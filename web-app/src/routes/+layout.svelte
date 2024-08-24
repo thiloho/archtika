@@ -53,7 +53,8 @@
 <footer>
   <p>
     <small
-      >&copy; {new Date().getFullYear()} &mdash; <a href="https://archtika.com">archtika</a></small
+      >Copyright &copy; {new Date().getFullYear()} &mdash;
+      <a href="https://archtika.com">archtika</a></small
     >
   </p>
 </footer>
