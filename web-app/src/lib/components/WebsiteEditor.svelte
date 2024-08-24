@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { md } from "$lib/utils";
+  import { page } from "$app/stores";
 
   const {
     id,
@@ -56,7 +57,7 @@
   {#if fullPreview}
     <iframe src={previewContent} title="Preview"></iframe>
   {:else}
-    {@html md(previewContent)}
+    {@html md(previewContent, Object.keys($page.params).length > 1 ? true : false)}
   {/if}
 </div>
 
