@@ -13,18 +13,18 @@ export const sortOptions = [
 
 export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/svg+xml", "image/webp"];
 
-const createMarkdownParser = () => {
+const createMarkdownParser = (showToc = true) => {
   const marked = new Marked();
 
   marked.use({
-    async: true,
+    async: false,
     pedantic: false,
     gfm: true
   });
 
   marked.use(
     markedHighlight({
-      async: true,
+      async: false,
       langPrefix: "language-",
       highlight(code, lang) {
         const language = hljs.getLanguage(lang) ? lang : "plaintext";
@@ -52,7 +52,7 @@ const createMarkdownParser = () => {
   let headings: { text: string; raw: string; level: number; id: string }[] = [];
   let sectionStack: { level: number; id: string }[] = [];
 
-  function gfmHeadingId({ prefix = "" } = {}) {
+  function gfmHeadingId({ prefix = "", showToc = true } = {}) {
     return {
       renderer: {
         heading(this: Renderer, { tokens, depth }: { tokens: Token[]; depth: number }) {
@@ -65,14 +65,12 @@ const createMarkdownParser = () => {
           const heading = { level, text, id, raw };
           headings.push(heading);
 
-          // Close any sections that are at a higher level than the current heading
           let closingSections = "";
           while (sectionStack.length > 0 && sectionStack[sectionStack.length - 1].level >= level) {
             sectionStack.pop();
             closingSections += "</section>";
           }
 
-          // Open a new section for this heading
           sectionStack.push({ level, id });
           const openingSection = `<section id="${id}">`;
 
@@ -94,13 +92,11 @@ const createMarkdownParser = () => {
           return src;
         },
         postprocess(html: string) {
-          // Close any remaining open sections
           const closingRemainingSection = "</section>".repeat(sectionStack.length);
 
-          // Generate table of contents
           const tableOfContents =
-            headings.length > 0
-              ? `<details>
+            showToc && headings.length > 0
+              ? `<details class="table-of-contents">
                 <summary>Table of contents</summary>
                 <ul>
                   ${headings
@@ -123,17 +119,16 @@ const createMarkdownParser = () => {
     };
   }
 
-  marked.use(gfmHeadingId());
+  marked.use(gfmHeadingId({ showToc: showToc }));
 
   return marked;
 };
 
-const marked = createMarkdownParser();
+export const md = (markdownContent: string, showToc = true) => {
+  const marked = createMarkdownParser(showToc);
+  const html = marked.parse(markdownContent);
 
-export const md = async (markdownContent: string) => {
-  const html = await marked.parse(markdownContent);
-
-  return html;
+  return html as string;
 };
 
 export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {

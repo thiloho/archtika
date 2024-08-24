@@ -60,7 +60,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             title: websiteData.title,
             logoType: websiteData.logo_type,
             logo: websiteData.logo_text,
-            mainContent: await md(websiteData.main_content ?? ""),
+            mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
             footerAdditionalText: websiteData.additional_text ?? ""
           }
@@ -74,7 +74,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             title: websiteData.title,
             logoType: websiteData.logo_type,
             logo: websiteData.logo_text,
-            mainContent: await md(websiteData.main_content ?? ""),
+            mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
             footerAdditionalText: websiteData.additional_text ?? ""
           }
@@ -117,7 +117,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
                 : "",
               publicationDate: article.publication_date,
-              mainContent: await md(article.main_content ?? ""),
+              mainContent: md(article.main_content ?? ""),
               footerAdditionalText: websiteData.additional_text ?? ""
             }
           }));
@@ -134,7 +134,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
                 : "",
               publicationDate: article.publication_date,
-              mainContent: await md(article.main_content ?? ""),
+              mainContent: md(article.main_content ?? ""),
               footerAdditionalText: websiteData.additional_text ?? ""
             }
           }));

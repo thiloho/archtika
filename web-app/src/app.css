@@ -1,7 +1,6 @@
 button,
 label,
 select,
-summary,
 [role="button"],
 [role="option"],
 label[for="toggle-mobile-preview"] {
@@ -14,7 +13,7 @@ textarea,
 select,
 a[role="button"],
 label[for="toggle-mobile-preview"],
-summary {
+:not(.table-of-contents) > summary {
   font: inherit;
   color: inherit;
   border: var(--border-primary);
@@ -47,22 +46,27 @@ a[role="button"] {
   text-decoration: none;
 }
 
-summary {
+:not(.table-of-contents) > summary {
   max-inline-size: fit-content;
 }
 
 button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
-summary {
+:not(.table-of-contents) > summary {
   background-color: var(--bg-secondary);
 }
 
-:is(button, a[role="button"], label[for="toggle-mobile-preview"], summary):hover {
+:is(
+    button,
+    a[role="button"],
+    label[for="toggle-mobile-preview"],
+    :not(.table-of-contents) > summary
+  ):hover {
   background-color: var(--bg-tertiary);
 }
 
-:is(a, button, input, textarea, select, summary):focus,
+:is(button, input, textarea, select):focus,
 #toggle-mobile-preview:checked + label {
   outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;

@@ -56,11 +56,7 @@
   {#if fullPreview}
     <iframe src={previewContent} title="Preview"></iframe>
   {:else}
-    {#await md(previewContent)}
-      <p>Loading preview...</p>
-    {:then content}
-      {@html content}
-    {/await}
+    {@html md(previewContent)}
   {/if}
 </div>
 

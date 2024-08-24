@@ -34,8 +34,10 @@
   <div class="container">
     {@html mainContent}
     {#if articles.length > 0}
-      <section class="articles">
-        <h2>Articles</h2>
+      <section class="articles" id="articles">
+        <h2>
+          <a href="#articles">Articles</a>
+        </h2>
 
         <ul class="unpadded">
           {#each articles as article}

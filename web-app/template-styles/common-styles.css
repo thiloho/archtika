@@ -210,3 +210,12 @@ td {
   padding-block: var(--space-3xs);
   border: var(--border-primary);
 }
+
+summary {
+  cursor: pointer;
+}
+
+:is(a, summary):focus {
+  outline: 0.125rem solid var(--color-accent);
+  outline-offset: 0.25rem;
+}

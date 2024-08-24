@@ -30,3 +30,7 @@ footer {
   flex-direction: column;
   gap: var(--space-xs);
 }
+
+.table-of-contents {
+  margin-block-end: var(--space-s);
+}
