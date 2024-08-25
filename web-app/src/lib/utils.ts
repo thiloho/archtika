@@ -3,6 +3,7 @@ import type { Renderer, Token } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import GithubSlugger from "github-slugger";
+import DOMPurify from "isomorphic-dompurify";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -147,9 +148,9 @@ const createMarkdownParser = (showToc = true) => {
 
 export const md = (markdownContent: string, showToc = true) => {
   const marked = createMarkdownParser(showToc);
-  const html = marked.parse(markdownContent);
+  const html = DOMPurify.sanitize(marked.parse(markdownContent) as string);
 
-  return html as string;
+  return html;
 };
 
 export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {

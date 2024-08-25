@@ -62,7 +62,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             logo: websiteData.logo_text,
             mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
-            footerAdditionalText: websiteData.additional_text ?? ""
+            footerAdditionalText: md(websiteData.additional_text ?? "")
           }
         }));
       }
@@ -76,7 +76,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             logo: websiteData.logo_text,
             mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
-            footerAdditionalText: websiteData.additional_text ?? ""
+            footerAdditionalText: md(websiteData.additional_text ?? "")
           }
         }));
       }
@@ -118,7 +118,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 : "",
               publicationDate: article.publication_date,
               mainContent: md(article.main_content ?? ""),
-              footerAdditionalText: websiteData.additional_text ?? ""
+              footerAdditionalText: md(websiteData.additional_text ?? "")
             }
           }));
         }
@@ -135,7 +135,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 : "",
               publicationDate: article.publication_date,
               mainContent: md(article.main_content ?? ""),
-              footerAdditionalText: websiteData.additional_text ?? ""
+              footerAdditionalText: md(websiteData.additional_text ?? "")
             }
           }));
         }

@@ -28,6 +28,7 @@
   "dependencies": {
     "github-slugger": "2.0.0",
     "highlight.js": "11.10.0",
+    "isomorphic-dompurify": "2.14.0",
     "marked": "14.0.0",
     "marked-highlight": "2.1.4"
   }

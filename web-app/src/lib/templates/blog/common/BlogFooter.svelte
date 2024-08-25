@@ -5,7 +5,7 @@
 <footer>
   <div class="container">
     <small>
-      {text}
+      {@html text}
     </small>
   </div>
 </footer>
