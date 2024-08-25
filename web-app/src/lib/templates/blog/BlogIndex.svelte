@@ -4,6 +4,7 @@
   import BlogFooter from "./common/BlogFooter.svelte";
 
   const {
+    favicon,
     title,
     logoType,
     logo,
@@ -11,6 +12,7 @@
     articles,
     footerAdditionalText
   }: {
+    favicon: string;
     title: string;
     logoType: "text" | "image";
     logo: string;
@@ -20,7 +22,7 @@
   } = $props();
 </script>
 
-<BlogHead {title} />
+<BlogHead {title} {favicon} />
 
 <BlogNav {logoType} {logo} />
 

@@ -166,7 +166,7 @@ summary {
   background-color: var(--bg-tertiary);
 }
 
-:is(button, input, textarea, select, a, summary):focus,
+:is(button, input, textarea, select, a, summary, pre):focus,
 #toggle-mobile-preview:checked + label {
   outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;

@@ -57,9 +57,15 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
       {
         ({ head, body } = render(BlogIndex, {
           props: {
+            favicon: websiteData.favicon_image
+              ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
+              : "",
             title: websiteData.title,
             logoType: websiteData.logo_type,
-            logo: websiteData.logo_text,
+            logo:
+              websiteData.logo_type === "text"
+                ? websiteData.logo_text
+                : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
             mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
             footerAdditionalText: md(websiteData.additional_text ?? "")
@@ -110,9 +116,15 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
         {
           ({ head, body } = render(BlogArticle, {
             props: {
+              favicon: websiteData.favicon_image
+                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
+                : "",
               title: article.title,
               logoType: websiteData.logo_type,
-              logo: websiteData.logo_text,
+              logo:
+                websiteData.logo_type === "text"
+                  ? websiteData.logo_text
+                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
               coverImage: article.cover_image
                 ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
                 : "",
@@ -160,5 +172,21 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
   const specificStyles = await readFile(`${process.cwd()}/template-styles/blog-styles.css`, {
     encoding: "utf-8"
   });
-  await writeFile(join(uploadDir, "styles.css"), commonStyles.concat(specificStyles));
+  await writeFile(
+    join(uploadDir, "styles.css"),
+    commonStyles
+      .concat(specificStyles)
+      .replace(
+        /--color-accent:\s*(.*?);/,
+        `--color-accent: ${websiteData.accent_color_dark_theme};`
+      )
+      .replace(
+        /@media\s*\(prefers-color-scheme:\s*dark\)\s*{[^}]*--color-accent:\s*(.*?);/,
+        (match) =>
+          match.replace(
+            /--color-accent:\s*(.*?);/,
+            `--color-accent: ${websiteData.accent_color_light_theme};`
+          )
+      )
+  );
 };

@@ -10,7 +10,7 @@
           <strong>{logo}</strong>
         </p>
       {:else}
-        <img src={logo} alt="" />
+        <img src={logo} width="24" height="24" alt="" />
       {/if}
     </a>
   </div>
