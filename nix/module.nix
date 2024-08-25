@@ -164,9 +164,6 @@ in
               alias = "/var/www/archtika-websites/previews/";
               index = "index.html";
               tryFiles = "$uri $uri/ $uri/index.html =404";
-              extraConfig = ''
-                autoindex on;
-              '';
             };
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.port}/";

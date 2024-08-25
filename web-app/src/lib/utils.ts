@@ -94,20 +94,41 @@ const createMarkdownParser = (showToc = true) => {
         postprocess(html: string) {
           const closingRemainingSection = "</section>".repeat(sectionStack.length);
 
-          const tableOfContents =
-            showToc && headings.length > 0
-              ? `<details class="table-of-contents">
+          let tableOfContents = "";
+          if (showToc && headings.length > 0) {
+            const tocItems = [];
+            let currentLevel = 0;
+
+            for (const { id, text, level } of headings) {
+              while (currentLevel < level - 1) {
+                tocItems.push("<ul>");
+                currentLevel++;
+              }
+              while (currentLevel > level - 1) {
+                tocItems.push("</ul>");
+                currentLevel--;
+              }
+              tocItems.push(`<li><a href="#${id}">${text}</a>`);
+              if (level > currentLevel) {
+                tocItems.push("<ul>");
+                currentLevel = level;
+              } else {
+                tocItems.push("</li>");
+              }
+            }
+
+            while (currentLevel > 0) {
+              tocItems.push("</ul></li>");
+              currentLevel--;
+            }
+
+            tableOfContents = `
+              <details class="table-of-contents">
                 <summary>Table of contents</summary>
-                <ul>
-                  ${headings
-                    .map(
-                      ({ id, text, level }) => `
-                      <li><a href="#${id}" class="h${level}">${text}</a></li>`
-                    )
-                    .join("")}
-                </ul>
-              </details>`
-              : "";
+                ${tocItems.join("")}
+              </details>
+            `;
+          }
 
           return `
             ${tableOfContents}
