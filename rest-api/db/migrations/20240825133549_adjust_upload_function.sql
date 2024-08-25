@@ -35,8 +35,7 @@ SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION api.upload_file (BYTEA) TO authenticated_user;
 
 -- migrate:down
-
-DROP FUNCTION api.upload_file(BYTEA);
+DROP FUNCTION api.upload_file (BYTEA);
 
 CREATE FUNCTION api.upload_file (BYTEA, OUT file_id UUID)
 AS $$
@@ -72,3 +71,4 @@ LANGUAGE plpgsql
 SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION api.upload_file (BYTEA) TO authenticated_user;
+

@@ -3,10 +3,27 @@
   inline-size: min(100% - var(--space-m), 75ch);
 }
 
+nav {
+  position: sticky;
+  block-size: var(--space-xl);
+  display: flex;
+  align-items: center;
+  inset-block-start: 0;
+  background-color: var(--bg-primary);
+  border-block-end: var(--border-primary);
+}
+
 header > .container {
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
+}
+
+header img {
+  inline-size: 100%;
+  block-size: 300px;
+  object-fit: cover;
+  object-position: center;
 }
 
 nav,
@@ -33,4 +50,8 @@ footer {
 
 .table-of-contents {
   margin-block-end: var(--space-s);
+}
+
+section {
+  scroll-margin-block-start: var(--space-xl);
 }
