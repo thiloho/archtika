@@ -124,10 +124,12 @@ const createMarkdownParser = (showToc = true) => {
             }
 
             tableOfContents = `
-              <details class="table-of-contents">
-                <summary>Table of contents</summary>
+              <section id="table-of-contents">
+                <h2>
+                  <a href="#table-of-contents">Table of contents</a>
+                </h2>
                 ${tocItems.join("")}
-              </details>
+              </section>
             `;
           }
 

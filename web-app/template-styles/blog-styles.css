@@ -34,10 +34,10 @@ footer {
 }
 
 .articles ul {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   list-style: none;
   gap: var(--space-s);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30ch), 1fr));
 }
 
 .articles li {
@@ -48,10 +48,22 @@ footer {
   gap: var(--space-xs);
 }
 
-.table-of-contents {
-  margin-block-end: var(--space-s);
-}
-
 section {
   scroll-margin-block-start: var(--space-xl);
+}
+
+@media (min-width: 1525px) {
+  #table-of-contents {
+    position: fixed;
+    inset-inline-start: calc(50% + 37.5ch + var(--space-m));
+    inset-block-start: calc(var(--space-xl) + var(--space-s));
+    max-inline-size: 35ch;
+    padding: var(--space-s);
+    background-color: var(--bg-primary);
+    border: var(--border-primary);
+  }
+
+  #table-of-contents + section {
+    margin-block-start: 0;
+  }
 }
