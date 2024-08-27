@@ -108,6 +108,7 @@ select,
 [role="button"],
 [role="option"],
 label[for="toggle-mobile-preview"],
+label[for="toggle-sidebar"],
 summary {
   cursor: pointer;
 }
@@ -118,6 +119,7 @@ textarea,
 select,
 a[role="button"],
 label[for="toggle-mobile-preview"],
+label[for="toggle-sidebar"],
 summary {
   font: inherit;
   color: inherit;
@@ -146,7 +148,6 @@ input[type="color"] {
 }
 
 a[role="button"] {
-  display: inline-block;
   max-inline-size: fit-content;
   text-decoration: none;
 }
@@ -158,16 +159,23 @@ summary {
 button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
+label[for="toggle-sidebar"],
 summary {
   background-color: var(--bg-secondary);
 }
 
-:is(button, a[role="button"], label[for="toggle-mobile-preview"], summary):hover {
+:is(
+    button,
+    a[role="button"],
+    label[for="toggle-mobile-preview"],
+    label[for="toggle-sidebar"],
+    summary
+  ):hover {
   background-color: var(--bg-tertiary);
 }
 
 :is(button, input, textarea, select, a, summary, pre):focus,
-#toggle-mobile-preview:checked + label {
+:is(#toggle-mobile-preview, #toggle-sidebar):checked + label {
   outline: 0.125rem solid var(--color-accent);
   outline-offset: 0.25rem;
 }
@@ -314,7 +322,6 @@ table {
 th,
 td {
   text-align: start;
-  padding-inline: var(--space-2xs);
-  padding-block: var(--space-3xs);
+  padding: var(--space-2xs);
   border: var(--border-primary);
 }

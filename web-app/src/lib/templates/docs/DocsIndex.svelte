@@ -1,5 +1,10 @@
 <script lang="ts">
+  import Head from "../common/Head.svelte";
+  import Nav from "../common/Nav.svelte";
+  import Footer from "../common/Footer.svelte";
+
   const {
+    favicon,
     title,
     logoType,
     logo,
@@ -7,6 +12,7 @@
     articles,
     footerAdditionalText
   }: {
+    favicon: string;
     title: string;
     logoType: "text" | "image";
     logo: string;
@@ -16,50 +22,44 @@
   } = $props();
 </script>
 
-<svelte:head>
-  <head>
-    <title>{title}</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-</svelte:head>
+<Head {title} {favicon} />
 
-<nav>
-  {#if logoType === "text"}
-    <p>
-      <strong>{logo}</strong>
-    </p>
-  {:else}
-    <img src={logo} alt="" />
-  {/if}
-</nav>
+<Nav {logoType} {logo} isDocsTemplate={true} />
 
 <header>
-  <h1>{title}</h1>
+  <div class="container">
+    <h1>{title}</h1>
+  </div>
 </header>
 
 <main>
-  {@html mainContent}
-  {#if articles.length > 0}
-    <section class="articles" id="articles">
-      <h2>Articles</h2>
+  <div class="container">
+    {@html mainContent}
+    {#if articles.length > 0}
+      <section class="articles" id="articles">
+        <h2>
+          <a href="#articles">Articles</a>
+        </h2>
 
-      {#each articles as article}
-        {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
-
-        <article>
-          <p>{article.publication_date}</p>
-          <h3>
-            <a href="./documents/{articleFileName}.html">{article.title}</a>
-          </h3>
-          {#if article.meta_description}
-            <p>{article.meta_description}</p>
-          {/if}
-        </article>
-      {/each}
-    </section>
-  {/if}
+        <ul class="unpadded">
+          {#each articles as article}
+            {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
+            <li>
+              <p>{article.publication_date}</p>
+              <p>
+                <strong>
+                  <a href="./articles/{articleFileName}.html">{article.title}</a>
+                </strong>
+              </p>
+              {#if article.meta_description}
+                <p>{article.meta_description}</p>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+  </div>
 </main>
 
-<footer>
-  {footerAdditionalText}
-</footer>
+<Footer text={footerAdditionalText} />

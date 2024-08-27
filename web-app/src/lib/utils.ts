@@ -36,7 +36,7 @@ const createMarkdownParser = (showToc = true) => {
 
   const unescapeTest = /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi;
 
-  function unescape(html: string) {
+  const unescape = (html: string) => {
     return html.replace(unescapeTest, (_, n) => {
       n = n.toLowerCase();
       if (n === "colon") return ":";
@@ -47,13 +47,13 @@ const createMarkdownParser = (showToc = true) => {
       }
       return "";
     });
-  }
+  };
 
   let slugger = new GithubSlugger();
   let headings: { text: string; raw: string; level: number; id: string }[] = [];
   let sectionStack: { level: number; id: string }[] = [];
 
-  function gfmHeadingId({ prefix = "", showToc = true } = {}) {
+  const gfmHeadingId = ({ prefix = "", showToc = true } = {}) => {
     return {
       renderer: {
         heading(this: Renderer, { tokens, depth }: { tokens: Token[]; depth: number }) {
@@ -141,7 +141,7 @@ const createMarkdownParser = (showToc = true) => {
         }
       }
     };
-  }
+  };
 
   marked.use(gfmHeadingId({ showToc: showToc }));
 

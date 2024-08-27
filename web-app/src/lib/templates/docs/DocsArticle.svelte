@@ -26,7 +26,7 @@
 
 <Head {title} {favicon} nestingLevel={1} />
 
-<Nav {logoType} {logo} />
+<Nav {logoType} {logo} isDocsTemplate={true} />
 
 <header>
   <div class="container">

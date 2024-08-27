@@ -85,7 +85,6 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        user_id: locals.user.id,
         title: data.get("title")
       })
     });

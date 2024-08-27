@@ -30,6 +30,7 @@
 
 <WebsiteEditor
   id={data.website.id}
+  contentType={data.website.content_type}
   title={data.website.title}
   previewContent={previewContent ||
     "Put some markdown content in main content to see a live preview here"}
@@ -50,6 +51,17 @@
         };
       }}
     >
+      {#if data.website.content_type === "Docs"}
+        <label>
+          Category:
+          <select name="category">
+            {#each data.categories as { id, category_name }}
+              <option value={id} selected={id === data.article.category}>{category_name}</option>
+            {/each}
+          </select>
+        </label>
+      {/if}
+
       <label>
         Title:
         <input

@@ -5,6 +5,7 @@
 
   const {
     id,
+    contentType,
     title,
     children,
     fullPreview = false,
@@ -12,6 +13,7 @@
     previewScrollTop = 0
   }: {
     id: string;
+    contentType: string;
     title: string;
     children: Snippet;
     fullPreview?: boolean;
@@ -41,6 +43,9 @@
       <li>
         <a href="/website/{id}/articles">Articles</a>
       </li>
+      {#if contentType === "Docs"}
+        <a href="/website/{id}/categories">Categories</a>
+      {/if}
       <li>
         <a href="/website/{id}/collaborators">Collaborators</a>
       </li>

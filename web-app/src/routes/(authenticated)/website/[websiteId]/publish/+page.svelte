@@ -11,6 +11,7 @@
 
 <WebsiteEditor
   id={data.website.id}
+  contentType={data.website.content_type}
   title={data.website.title}
   previewContent={data.websitePreviewUrl}
   fullPreview={true}
@@ -19,15 +20,13 @@
     <h2>
       <a href="#publish-website">Publish website</a>
     </h2>
-
+    {JSON.stringify(data.websiteOverview.articles)}
     <p>
       The preview area on this page allows you to see exactly how your website will look when it is
       is published. If you are happy with the results, click the button below and your website will
       be published on the Internet.
     </p>
-
     <form method="POST" action="?/publishWebsite" use:enhance>
-      <input type="hidden" name="website-overview" value={JSON.stringify(data.websiteOverview)} />
       <button type="submit">Publish</button>
     </form>
   </section>

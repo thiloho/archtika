@@ -30,6 +30,7 @@
 
 <WebsiteEditor
   id={data.website.id}
+  contentType={data.website.content_type}
   title={data.website.title}
   {previewContent}
   previewScrollTop={textareaScrollTop}

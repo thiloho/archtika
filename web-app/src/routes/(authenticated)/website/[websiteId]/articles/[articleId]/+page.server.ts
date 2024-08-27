@@ -11,10 +11,22 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
     }
   });
 
+  const categoryData = await fetch(
+    `${API_BASE_PREFIX}/docs_category?website_id=eq.${params.websiteId}&order=category_weight.desc`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
+      }
+    }
+  );
+
   const article = await articleData.json();
+  const categories = await categoryData.json();
   const { website } = await parent();
 
-  return { website, article, API_BASE_PREFIX };
+  return { website, article, categories, API_BASE_PREFIX };
 };
 
 export const actions: Actions = {
@@ -53,7 +65,8 @@ export const actions: Actions = {
         meta_author: data.get("author"),
         cover_image: uploadedImage.file_id,
         publication_date: data.get("publication-date"),
-        main_content: data.get("main-content")
+        main_content: data.get("main-content"),
+        category: data.get("category")
       })
     });
 

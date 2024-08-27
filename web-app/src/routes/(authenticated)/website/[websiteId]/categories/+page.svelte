@@ -16,17 +16,17 @@
   title={data.website.title}
   previewContent={data.home.main_content}
 >
-  <section id="add-collaborator">
+  <section id="create-category">
     <h2>
-      <a href="#add-collaborator">Add collaborator</a>
+      <a href="#create-category">Create category</a>
     </h2>
 
-    <Modal id="add-collaborator" text="Add collaborator">
-      <h3>Add collaborator</h3>
+    <Modal id="create-category" text="Create category">
+      <h3>Create category</h3>
 
       <form
         method="POST"
-        action="?/addCollaborator"
+        action="?/createCategory"
         use:enhance={() => {
           return async ({ update }) => {
             await update();
@@ -35,24 +35,13 @@
         }}
       >
         <label>
-          User id:
-          <input
-            type="text"
-            name="user-id"
-            minlength="36"
-            maxlength="36"
-            placeholder="00000000-0000-0000-0000-000000000000"
-            required
-          />
+          Name:
+          <input type="text" name="category-name" maxlength="50" required />
         </label>
 
         <label>
-          Permission level:
-          <select name="permission-level">
-            <option value="10">10 - View</option>
-            <option value="20">20 - Edit</option>
-            <option value="30">30 - Manage</option>
-          </select>
+          Weight:
+          <input name="category-weight" type="number" min="0" required />
         </label>
 
         <button type="submit">Submit</button>
@@ -60,26 +49,26 @@
     </Modal>
   </section>
 
-  {#if data.collaborators.length > 0}
-    <section id="all-collaborators">
+  {#if data.categories.length > 0}
+    <section id="all-categories">
       <h2>
-        <a href="#all-collaborators">All collaborators</a>
+        <a href="#all-categories">All categories</a>
       </h2>
 
       <ul class="unpadded">
-        {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
-          <li class="collaborator-card">
+        {#each data.categories as { id, website_id, category_name, category_weight } (`${website_id}-${id}`)}
+          <li class="category-card">
             <p>
-              <strong>{username} ({permission_level})</strong>
+              <strong>{category_name} ({category_weight})</strong>
             </p>
 
-            <div class="collaborator-card__actions">
-              <Modal id="update-collaborator-{user_id}" text="Update">
-                <h4>Update collaborator</h4>
+            <div class="category-card__actions">
+              <Modal id="update-category-{id}" text="Update">
+                <h4>Update category</h4>
 
                 <form
                   method="POST"
-                  action="?/updateCollaborator"
+                  action="?/updateCategory"
                   use:enhance={() => {
                     return async ({ update }) => {
                       await update({ reset: false });
@@ -87,28 +76,24 @@
                     };
                   }}
                 >
-                  <input type="hidden" name="user-id" value={user_id} />
+                  <input type="hidden" name="category-id" value={id} />
 
                   <label>
-                    Permission level:
-                    <select name="permission-level">
-                      <option value="10" selected={10 === permission_level}>10 - View</option>
-                      <option value="20" selected={20 === permission_level}>20 - Edit</option>
-                      <option value="30" selected={30 === permission_level}>30 - Manage</option>
-                    </select>
+                    Weight:
+                    <input type="number" name="category-weight" value={category_weight} min="0" />
                   </label>
 
-                  <button type="submit">Update collaborator</button>
+                  <button type="submit">Update category</button>
                 </form>
               </Modal>
-              <Modal id="remove-collaborator-{user_id}" text="Remove">
-                <h4>Remove collaborator</h4>
+              <Modal id="delete-category-{id}" text="Delete">
+                <h4>Delete category</h4>
 
-                <p>Do you really want to remove the collaborator?</p>
+                <p>Do you really want to delete the category?</p>
 
                 <form
                   method="POST"
-                  action="?/removeCollaborator"
+                  action="?/deleteCategory"
                   use:enhance={() => {
                     return async ({ update }) => {
                       await update();
@@ -116,9 +101,9 @@
                     };
                   }}
                 >
-                  <input type="hidden" name="user-id" value={user_id} />
+                  <input type="hidden" name="category-id" value={id} />
 
-                  <button type="submit">Remove collaborator</button>
+                  <button type="submit">Delete category</button>
                 </form>
               </Modal>
             </div>
@@ -130,7 +115,7 @@
 </WebsiteEditor>
 
 <style>
-  .collaborator-card {
+  .category-card {
     display: flex;
     align-items: center;
     column-gap: var(--space-s);
@@ -140,12 +125,12 @@
     margin-block-start: var(--space-xs);
   }
 
-  .collaborator-card + .collaborator-card {
+  .category-card + .category-card {
     padding-block-start: var(--space-xs);
     border-block-start: var(--border-primary);
   }
 
-  .collaborator-card__actions {
+  .category-card__actions {
     display: flex;
     gap: var(--space-2xs);
     align-items: center;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import BlogHead from "./common/BlogHead.svelte";
-  import BlogNav from "./common/BlogNav.svelte";
-  import BlogFooter from "./common/BlogFooter.svelte";
+  import Head from "../common/Head.svelte";
+  import Nav from "../common/Nav.svelte";
+  import Footer from "../common/Footer.svelte";
 
   const {
     favicon,
@@ -22,9 +22,9 @@
   } = $props();
 </script>
 
-<BlogHead {title} {favicon} />
+<Head {title} {favicon} />
 
-<BlogNav {logoType} {logo} />
+<Nav {logoType} {logo} />
 
 <header>
   <div class="container">
@@ -62,4 +62,4 @@
   </div>
 </main>
 
-<BlogFooter text={footerAdditionalText} />
+<Footer text={footerAdditionalText} />
