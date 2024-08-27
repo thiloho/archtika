@@ -62,6 +62,7 @@ SELECT
   created_at,
   last_modified_at,
   last_modified_by,
+  title_description_search,
   category -- New column
 FROM
   internal.article;
@@ -97,7 +98,8 @@ SELECT
   main_content,
   created_at,
   last_modified_at,
-  last_modified_by
+  last_modified_by,
+  title_description_search
 FROM
   internal.article;
 
