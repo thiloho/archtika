@@ -9,6 +9,7 @@
     logoType,
     logo,
     mainContent,
+    categorizedArticles,
     coverImage,
     publicationDate,
     footerAdditionalText
@@ -18,6 +19,7 @@
     logoType: "text" | "image";
     logo: string;
     mainContent: string;
+    categorizedArticles: { [key: string]: { title: string }[] };
     coverImage: string;
     publicationDate: string;
     footerAdditionalText: string;
@@ -26,7 +28,7 @@
 
 <Head {title} {favicon} nestingLevel={1} />
 
-<Nav {logoType} {logo} isDocsTemplate={true} />
+<Nav {logoType} {logo} isDocsTemplate={true} {categorizedArticles} isIndexPage={false} />
 
 <header>
   <div class="container">

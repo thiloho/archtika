@@ -41,6 +41,40 @@ label[for="toggle-sidebar"] {
   place-content: center;
 }
 
+.docs-navigation {
+  display: none;
+  position: fixed;
+  inset-block-start: var(--space-xl);
+  padding: var(--space-s);
+  padding-inline-start: 0;
+  inline-size: 15rem;
+  block-size: calc(100vh - var(--space-xl));
+  background-color: var(--bg-primary);
+  border-inline-end: var(--border-primary);
+}
+
+.docs-navigation > ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+#toggle-sidebar:checked ~ .docs-navigation {
+  display: unset;
+}
+
+@media (min-width: 1300px) {
+  .docs-navigation {
+    display: unset;
+    inset-inline-start: calc(50% - 37.5ch - var(--space-m));
+    transform: translateX(-100%);
+  }
+
+  #toggle-sidebar:checked ~ .docs-navigation {
+    display: none;
+  }
+}
+
 @media (min-width: 1525px) {
   #table-of-contents {
     position: fixed;

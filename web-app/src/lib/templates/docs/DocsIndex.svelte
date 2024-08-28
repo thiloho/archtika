@@ -10,6 +10,7 @@
     logo,
     mainContent,
     articles,
+    categorizedArticles,
     footerAdditionalText
   }: {
     favicon: string;
@@ -18,13 +19,14 @@
     logo: string;
     mainContent: string;
     articles: { title: string; publication_date: string; meta_description: string }[];
+    categorizedArticles: { [key: string]: { title: string }[] };
     footerAdditionalText: string;
   } = $props();
 </script>
 
 <Head {title} {favicon} />
 
-<Nav {logoType} {logo} isDocsTemplate={true} />
+<Nav {logoType} {logo} isDocsTemplate={true} {categorizedArticles} />
 
 <header>
   <div class="container">
@@ -35,30 +37,6 @@
 <main>
   <div class="container">
     {@html mainContent}
-    {#if articles.length > 0}
-      <section class="articles" id="articles">
-        <h2>
-          <a href="#articles">Articles</a>
-        </h2>
-
-        <ul class="unpadded">
-          {#each articles as article}
-            {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
-            <li>
-              <p>{article.publication_date}</p>
-              <p>
-                <strong>
-                  <a href="./articles/{articleFileName}.html">{article.title}</a>
-                </strong>
-              </p>
-              {#if article.meta_description}
-                <p>{article.meta_description}</p>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
   </div>
 </main>
 

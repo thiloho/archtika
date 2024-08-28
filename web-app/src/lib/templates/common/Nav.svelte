@@ -2,11 +2,15 @@
   const {
     logoType,
     logo,
-    isDocsTemplate = false
+    isDocsTemplate = false,
+    categorizedArticles = {},
+    isIndexPage = true
   }: {
     logoType: "text" | "image";
     logo: string;
     isDocsTemplate?: boolean;
+    categorizedArticles?: { [key: string]: { title: string }[] };
+    isIndexPage?: boolean;
   } = $props();
 </script>
 
@@ -30,9 +34,23 @@
         </svg>
       </label>
 
-      <ul class="docs-navigation">
-        <li>nav comes here</li>
-      </ul>
+      <section id="docs-navigation" class="docs-navigation">
+        <ul>
+          {#each Object.keys(categorizedArticles) as key}
+            <li>
+              <strong>{key}</strong>
+              <ul>
+                {#each categorizedArticles[key] as { title }}
+                  {@const articleFileName = title.toLowerCase().split(" ").join("-")}
+                  <li>
+                    <a href="{isIndexPage ? './articles' : '.'}/{articleFileName}.html">{title}</a>
+                  </li>
+                {/each}
+              </ul>
+            </li>
+          {/each}
+        </ul>
+      </section>
     {/if}
     <a href="../">
       {#if logoType === "text"}
