@@ -58,6 +58,8 @@ section {
     inset-inline-start: calc(50% + 37.5ch + var(--space-m));
     inset-block-start: calc(var(--space-xl) + var(--space-s));
     max-inline-size: 35ch;
+    max-block-size: calc(100vh - (var(--space-xl) + 2 * var(--space-s)));
+    overflow-y: auto;
     padding: var(--space-s);
     background-color: var(--bg-primary);
     border: var(--border-primary);

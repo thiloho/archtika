@@ -51,6 +51,7 @@ label[for="toggle-sidebar"] {
   block-size: calc(100vh - var(--space-xl));
   background-color: var(--bg-primary);
   border-inline-end: var(--border-primary);
+  overflow-y: auto;
 }
 
 .docs-navigation > ul {
@@ -80,6 +81,8 @@ label[for="toggle-sidebar"] {
     position: fixed;
     inset-inline-start: calc(50% + 37.5ch + var(--space-m));
     inset-block-start: calc(var(--space-xl) + var(--space-s));
+    max-block-size: calc(100vh - (var(--space-xl) + 2 * var(--space-s)));
+    overflow-y: auto;
     max-inline-size: 35ch;
     padding: var(--space-s);
     background-color: var(--bg-primary);
