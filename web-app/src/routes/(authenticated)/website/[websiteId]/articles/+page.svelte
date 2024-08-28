@@ -86,10 +86,31 @@
       </details>
 
       <ul class="unpadded">
-        {#each data.articles as { id, title } (id)}
+        {#each data.articles as { id, title, docs_category } (id)}
           <li class="article-card">
             <p>
               <strong>{title}</strong>
+              {#if docs_category?.category_name}
+                <br />
+                <small>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    width="16"
+                    height="16"
+                    style="vertical-align: middle"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.5 2A2.5 2.5 0 0 0 2 4.5v2.879a2.5 2.5 0 0 0 .732 1.767l4.5 4.5a2.5 2.5 0 0 0 3.536 0l2.878-2.878a2.5 2.5 0 0 0 0-3.536l-4.5-4.5A2.5 2.5 0 0 0 7.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+
+                  {docs_category.category_name}
+                </small>
+              {/if}
             </p>
 
             <div class="article-card__actions">
