@@ -9,7 +9,6 @@
     logoType,
     logo,
     mainContent,
-    articles,
     categorizedArticles,
     footerAdditionalText
   }: {
@@ -18,7 +17,6 @@
     logoType: "text" | "image";
     logo: string;
     mainContent: string;
-    articles: { title: string; publication_date: string; meta_description: string }[];
     categorizedArticles: { [key: string]: { title: string }[] };
     footerAdditionalText: string;
   } = $props();

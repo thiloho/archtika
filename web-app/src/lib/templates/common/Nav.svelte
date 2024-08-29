@@ -16,7 +16,7 @@
 
 <nav>
   <div class="container">
-    {#if isDocsTemplate}
+    {#if isDocsTemplate && Object.keys(categorizedArticles).length > 0}
       <input type="checkbox" id="toggle-sidebar" hidden />
       <label for="toggle-sidebar">
         <svg

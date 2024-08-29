@@ -97,7 +97,6 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 ? websiteData.logo_text
                 : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
             mainContent: md(websiteData.main_content ?? "", false),
-            articles: websiteData.articles ?? [],
             categorizedArticles: websiteData.categorized_articles ?? [],
             footerAdditionalText: md(websiteData.additional_text ?? "")
           }
@@ -165,10 +164,6 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
                 websiteData.logo_type === "text"
                   ? websiteData.logo_text
                   : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-              coverImage: article.cover_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
-                : "",
-              publicationDate: article.publication_date,
               mainContent: md(article.main_content ?? ""),
               categorizedArticles: websiteData.categorized_articles ?? [],
               footerAdditionalText: md(websiteData.additional_text ?? "")

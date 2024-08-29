@@ -41,7 +41,7 @@ SELECT
         JSON_AGG(
           JSON_BUILD_OBJECT(
             'id', a.id, 'title', a.title, 'meta_description', a.meta_description, 'meta_author', a.meta_author, 'cover_image', a.cover_image, 'publication_date', a.publication_date, 'main_content', a.main_content, 'created_at', a.created_at, 'last_modified_at', a.last_modified_at
-)
+) ORDER BY a.article_weight DESC NULLS LAST
 ) AS articles
       FROM
         internal.article a
@@ -124,7 +124,7 @@ SELECT
       dc.category_name,
       dc.category_weight
     ORDER BY
-      category_weight DESC
+      category_weight DESC NULLS LAST
 ) AS categorized_articles)
 ELSE
   NULL

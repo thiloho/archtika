@@ -95,24 +95,34 @@
           required
         />
       </label>
-      <label>
-        Publication date:
-        <input type="date" name="publication-date" value={data.article.publication_date} required />
-      </label>
-      <div class="file-field">
+
+      {#if data.website.content_type === "Blog"}
         <label>
-          Cover image:
-          <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
+          Publication date:
+          <input
+            type="date"
+            name="publication-date"
+            value={data.article.publication_date}
+            required
+          />
         </label>
-        {#if data.article.cover_image}
-          <Modal id="preview-cover-article-{data.article.id}" text="Preview">
-            <img
-              src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
-              alt=""
-            />
-          </Modal>
-        {/if}
-      </div>
+
+        <div class="file-field">
+          <label>
+            Cover image:
+            <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
+          </label>
+          {#if data.article.cover_image}
+            <Modal id="preview-cover-article-{data.article.id}" text="Preview">
+              <img
+                src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
+                alt=""
+              />
+            </Modal>
+          {/if}
+        </div>
+      {/if}
+
       <label>
         Main content:
         <textarea

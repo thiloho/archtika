@@ -10,8 +10,6 @@
     logo,
     mainContent,
     categorizedArticles,
-    coverImage,
-    publicationDate,
     footerAdditionalText
   }: {
     favicon: string;
@@ -20,8 +18,6 @@
     logo: string;
     mainContent: string;
     categorizedArticles: { [key: string]: { title: string }[] };
-    coverImage: string;
-    publicationDate: string;
     footerAdditionalText: string;
   } = $props();
 </script>
@@ -32,13 +28,7 @@
 
 <header>
   <div class="container">
-    <hgroup>
-      <p>{publicationDate}</p>
-      <h1>{title}</h1>
-    </hgroup>
-    {#if coverImage}
-      <img src={coverImage} alt="" />
-    {/if}
+    <h1>{title}</h1>
   </div>
 </header>
 

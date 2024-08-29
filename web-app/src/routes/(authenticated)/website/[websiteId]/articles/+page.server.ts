@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
   let baseFetchUrl = `${API_BASE_PREFIX}/article?website_id=eq.${params.websiteId}&select=id,title`;
   if (website.content_type === "Docs") {
     baseFetchUrl +=
-      ",docs_category(category_name,category_weight)&order=docs_category(category_weight).desc.nullslast,article_weight.desc.nullslast";
+      ",article_weight,docs_category(category_name,category_weight)&order=docs_category(category_weight).desc.nullslast,article_weight.desc.nullslast";
   }
 
   const parameters = new URLSearchParams();

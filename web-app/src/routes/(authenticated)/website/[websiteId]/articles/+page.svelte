@@ -76,10 +76,10 @@
       </details>
 
       <ul class="unpadded">
-        {#each data.articles as { id, title, docs_category } (id)}
+        {#each data.articles as { id, title, article_weight, docs_category } (id)}
           <li class="article-card">
             <p>
-              <strong>{title}</strong>
+              <strong>{title} {article_weight ? `(${article_weight})` : ""}</strong>
               {#if docs_category?.category_name}
                 <br />
                 <small>
