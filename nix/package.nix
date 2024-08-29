@@ -11,6 +11,7 @@ let
   version = "1.0.0";
 
   web = buildNpmPackage {
+    name = "web-app";
     src = ../web-app;
     npmDeps = importNpmLock {
       npmRoot = ../web-app;
@@ -27,6 +28,7 @@ let
   };
 
   api = stdenv.mkDerivation {
+    name = "api";
     src = ../rest-api;
     installPhase = ''
       mkdir -p $out/rest-api/db/migrations
