@@ -3,38 +3,20 @@ import { API_BASE_PREFIX } from "$lib/server/utils";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent, locals }) => {
   const searchQuery = url.searchParams.get("article_search_query");
-  const sortBy = url.searchParams.get("article_sort");
   const filterBy = url.searchParams.get("article_filter");
 
   const { website, home } = await parent();
 
   let baseFetchUrl = `${API_BASE_PREFIX}/article?website_id=eq.${params.websiteId}&select=id,title`;
-  let docsSortString = "";
   if (website.content_type === "Docs") {
-    baseFetchUrl += ",docs_category(category_name,category_weight)";
-    docsSortString = "docs_category(category_weight).desc,";
+    baseFetchUrl +=
+      ",docs_category(category_name,category_weight)&order=docs_category(category_weight).desc.nullslast,article_weight.desc.nullslast";
   }
 
   const parameters = new URLSearchParams();
 
   if (searchQuery) {
     parameters.append("title_description_search", `wfts(english).${searchQuery}`);
-  }
-
-  switch (sortBy) {
-    case null:
-    case "creation-time":
-      parameters.append("order", `${docsSortString}created_at.desc`);
-      break;
-    case "last-modified":
-      parameters.append("order", `${docsSortString}last_modified_at.desc`);
-      break;
-    case "title-a-to-z":
-      parameters.append("order", `${docsSortString}title.asc`);
-      break;
-    case "title-z-to-a":
-      parameters.append("order", `${docsSortString}title.desc`);
-      break;
   }
 
   switch (filterBy) {

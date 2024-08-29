@@ -53,7 +53,7 @@
       </h2>
 
       <details>
-        <summary>Search & Sort & Filter</summary>
+        <summary>Search & Filter</summary>
         <form method="GET">
           <label>
             Search:
@@ -62,16 +62,6 @@
               name="article_search_query"
               value={$page.url.searchParams.get("article_search_query")}
             />
-          </label>
-          <label>
-            Sort:
-            <select name="article_sort">
-              {#each sortOptions as { value, text }}
-                <option {value} selected={value === $page.url.searchParams.get("article_sort")}
-                  >{text}</option
-                >
-              {/each}
-            </select>
           </label>
           <label>
             Filter:

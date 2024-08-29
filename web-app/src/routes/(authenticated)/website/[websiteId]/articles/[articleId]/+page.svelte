@@ -53,6 +53,11 @@
     >
       {#if data.website.content_type === "Docs"}
         <label>
+          Weight:
+          <input type="number" name="article-weight" value={data.article.article_weight} min="0" />
+        </label>
+
+        <label>
           Category:
           <select name="category">
             {#each data.categories as { id, category_name }}

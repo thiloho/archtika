@@ -66,7 +66,8 @@ export const actions: Actions = {
         cover_image: uploadedImage.file_id,
         publication_date: data.get("publication-date"),
         main_content: data.get("main-content"),
-        category: data.get("category")
+        category: data.get("category"),
+        article_weight: data.get("article-weight") ? data.get("article-weight") : null
       })
     });
 
