@@ -11,8 +11,6 @@ let
   version = "1.0.0";
 
   web = buildNpmPackage {
-    inherit pname version;
-    name = "archtika-web-app";
     src = ../web-app;
     npmDeps = importNpmLock {
       npmRoot = ../web-app;
@@ -29,8 +27,6 @@ let
   };
 
   api = stdenv.mkDerivation {
-    inherit pname version;
-    name = "archtika-api";
     src = ../rest-api;
     installPhase = ''
       mkdir -p $out/rest-api/db/migrations
