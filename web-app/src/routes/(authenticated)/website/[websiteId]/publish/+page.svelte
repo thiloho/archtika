@@ -5,6 +5,8 @@
   import type { ActionData, PageServerData } from "./$types";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
+
+  const prodWebsiteUrl = data.websitePreviewUrl.replace("/previews", "");
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -28,5 +30,18 @@
     <form method="POST" action="?/publishWebsite" use:enhance>
       <button type="submit">Publish</button>
     </form>
+
+    {#if data.website.is_published}
+      <section>
+        <h3>
+          <a href="#publication-status">Publication status</a>
+        </h3>
+        <p>
+          Your website is published at:
+          <br />
+          <a href={prodWebsiteUrl}>{prodWebsiteUrl}</a>
+        </p>
+      </section>
+    {/if}
   </section>
 </WebsiteEditor>

@@ -1,5 +1,7 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import { rm } from "node:fs/promises";
+import { join } from "node:path";
 
 export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
   const searchQuery = url.searchParams.get("website_search_query");
@@ -129,6 +131,11 @@ export const actions: Actions = {
       const response = await res.json();
       return { success: false, message: response.message };
     }
+
+    await rm(join("/", "var", "www", "archtika-websites", data.get("id") as string), {
+      recursive: true,
+      force: true
+    });
 
     return { success: true, message: "Successfully deleted website" };
   }

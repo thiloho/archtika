@@ -34,22 +34,27 @@ export const actions: Actions = {
     const data = await request.formData();
     const coverFile = data.get("cover-image") as File;
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/octet-stream",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json",
+      "X-Website-Id": params.websiteId
+    };
+
+    if (coverFile) {
+      headers["X-Mimetype"] = coverFile.type;
+      headers["X-Original-Filename"] = coverFile.name;
+    }
+
     const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json",
-        "X-Website-Id": params.websiteId,
-        "X-Mimetype": coverFile.type,
-        "X-Original-Filename": coverFile.name
-      },
-      body: await coverFile.arrayBuffer()
+      headers,
+      body: coverFile ? await coverFile.arrayBuffer() : null
     });
 
     const uploadedImage = await uploadedImageData.json();
 
-    if (!uploadedImageData.ok && coverFile.size > 0) {
+    if (!uploadedImageData.ok && (coverFile?.size ?? 0 > 0)) {
       return { success: false, message: uploadedImage.message };
     }
 

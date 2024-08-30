@@ -29,7 +29,13 @@
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
             '';
           };
-          web = pkgs.mkShell { packages = with pkgs; [ nodejs_22 ]; };
+          web = pkgs.mkShell {
+            packages = with pkgs; [ nodejs_22 ];
+            shellHook = ''
+              export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
+              export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+            '';
+          };
         }
       );
 

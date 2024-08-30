@@ -123,12 +123,7 @@
       <div class="file-field">
         <label>
           Logo image:
-          <input
-            type="file"
-            name="logo-image"
-            accept={ALLOWED_MIME_TYPES.join(", ")}
-            required={data.header.logo_type === "image"}
-          />
+          <input type="file" name="logo-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.header.logo_image}
           <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">

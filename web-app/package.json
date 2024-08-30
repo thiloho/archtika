@@ -6,12 +6,14 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@playwright/test": "1.40.0",
     "@sveltejs/adapter-auto": "3.2.4",
     "@sveltejs/adapter-node": "5.2.2",
     "@sveltejs/kit": "2.5.22",

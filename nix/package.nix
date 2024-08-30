@@ -13,9 +13,7 @@ let
   web = buildNpmPackage {
     name = "web-app";
     src = ../web-app;
-    npmDeps = importNpmLock {
-      npmRoot = ../web-app;
-    };
+    npmDeps = importNpmLock { npmRoot = ../web-app; };
     npmConfigHook = importNpmLock.npmConfigHook;
     npmFlags = [ "--legacy-peer-deps" ];
     installPhase = ''

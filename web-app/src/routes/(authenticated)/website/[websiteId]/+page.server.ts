@@ -49,22 +49,27 @@ export const actions: Actions = {
     const data = await request.formData();
     const faviconFile = data.get("favicon") as File;
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/octet-stream",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json",
+      "X-Website-Id": params.websiteId
+    };
+
+    if (faviconFile) {
+      headers["X-Mimetype"] = faviconFile.type;
+      headers["X-Original-Filename"] = faviconFile.name;
+    }
+
     const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json",
-        "X-Website-Id": params.websiteId,
-        "X-Mimetype": faviconFile.type,
-        "X-Original-Filename": faviconFile.name
-      },
-      body: await faviconFile.arrayBuffer()
+      headers,
+      body: faviconFile ? await faviconFile.arrayBuffer() : null
     });
 
     const uploadedImage = await uploadedImageData.json();
 
-    if (!uploadedImageData.ok && faviconFile.size > 0) {
+    if (!uploadedImageData.ok && (faviconFile?.size ?? 0 > 0)) {
       return { success: false, message: uploadedImage.message };
     }
 
@@ -95,22 +100,27 @@ export const actions: Actions = {
     const data = await request.formData();
     const logoImage = data.get("logo-image") as File;
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/octet-stream",
+      Authorization: `Bearer ${cookies.get("session_token")}`,
+      Accept: "application/vnd.pgrst.object+json",
+      "X-Website-Id": params.websiteId
+    };
+
+    if (logoImage) {
+      headers["X-Mimetype"] = logoImage.type;
+      headers["X-Original-Filename"] = logoImage.name;
+    }
+
     const uploadedImageData = await fetch(`${API_BASE_PREFIX}/rpc/upload_file`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json",
-        "X-Website-Id": params.websiteId,
-        "X-Mimetype": logoImage.type,
-        "X-Original-Filename": logoImage.name
-      },
-      body: await logoImage.arrayBuffer()
+      headers,
+      body: logoImage ? await logoImage.arrayBuffer() : null
     });
 
     const uploadedImage = await uploadedImageData.json();
 
-    if (!uploadedImageData.ok && logoImage.size > 0) {
+    if (!uploadedImageData.ok && (logoImage?.size ?? 0 > 0)) {
       return { success: false, message: uploadedImage.message };
     }
 

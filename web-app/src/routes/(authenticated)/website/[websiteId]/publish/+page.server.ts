@@ -54,6 +54,22 @@ export const actions: Actions = {
     const websiteOverview = await websiteOverviewData.json();
     generateStaticFiles(websiteOverview, false);
 
+    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`
+      },
+      body: JSON.stringify({
+        is_published: true
+      })
+    });
+
+    if (!res.ok) {
+      const response = await res.json();
+      return { success: false, message: response.message };
+    }
+
     return { success: true, message: "Successfully published website" };
   }
 };
