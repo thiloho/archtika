@@ -172,11 +172,32 @@ test.describe("Update website", () => {
   });
 
   test.describe("Collaborators", () => {
-    test("Add collaborator", async ({ authenticatedPage: page }) => {});
+    test("Add collaborator", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Blog" }).click();
+      await page.getByRole("link", { name: "Collaborators" }).click();
+      await page.getByRole("button", { name: "Add collaborator" }).click();
+      await page.getByLabel("Username:").click();
+      await page.getByLabel("Username:").fill(collabUsername);
+      await page.getByRole("button", { name: "Submit" }).click();
+      await expect(page.getByText("Successfully added")).toBeVisible();
+    });
 
-    test("Update collaborator", async ({ authenticatedPage: page }) => {});
+    test("Update collaborator", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Blog" }).click();
+      await page.getByRole("link", { name: "Collaborators" }).click();
+      await page.getByRole("button", { name: "Update" }).click();
+      await page.getByRole("combobox").selectOption("20");
+      await page.getByRole("button", { name: "Update collaborator" }).click();
+      await expect(page.getByText("Successfully updated")).toBeVisible();
+    });
 
-    test("Delete collaborator", async ({ authenticatedPage: page }) => {});
+    test("Remove collaborator", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Blog" }).click();
+      await page.getByRole("link", { name: "Collaborators" }).click();
+      await page.getByRole("button", { name: "Remove" }).click();
+      await page.getByRole("button", { name: "Remove collaborator" }).click();
+      await expect(page.getByText("Successfully removed")).toBeVisible();
+    });
   });
 });
 

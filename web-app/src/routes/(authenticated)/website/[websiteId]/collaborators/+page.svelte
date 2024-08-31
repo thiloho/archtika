@@ -35,15 +35,8 @@
         }}
       >
         <label>
-          User id:
-          <input
-            type="text"
-            name="user-id"
-            minlength="36"
-            maxlength="36"
-            placeholder="00000000-0000-0000-0000-000000000000"
-            required
-          />
+          Username:
+          <input type="text" name="username" minlength="3" maxlength="16" required />
         </label>
 
         <label>

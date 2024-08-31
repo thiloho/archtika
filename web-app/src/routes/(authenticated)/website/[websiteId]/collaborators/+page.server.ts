@@ -28,6 +28,15 @@ export const actions: Actions = {
   addCollaborator: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
+    const userData = await fetch(`${API_BASE_PREFIX}/user?username=eq.${data.get("username")}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Accept: "application/vnd.pgrst.object+json"
+      }
+    });
+
     const res = await fetch(`${API_BASE_PREFIX}/collab`, {
       method: "POST",
       headers: {
@@ -36,7 +45,7 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        user_id: data.get("user-id"),
+        user_id: (await userData.json()).id,
         permission_level: data.get("permission-level")
       })
     });
