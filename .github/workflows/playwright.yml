@@ -16,11 +16,20 @@ jobs:
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Setup dev vm
+    - name: Setup and run dev vm
       run: |
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
-        nix run .#dev-vm
+        nix run .#dev-vm &
+        VM_PID=$!
+        echo "VM_PID=$VM_PID" >> $GITHUB_ENV
+        
+        # Wait for the PostgreSQL and nginx ports to be open
+        while ! nc -z localhost 15432 || ! nc -z localhost 18000; do
+          sleep 1
+        done
+        
+        echo "VM is ready"
 
     - name: Run playwright tests
       run: |
@@ -28,3 +37,10 @@ jobs:
         nix develop .#web
         npm install
         npm run test
+
+    - name: Cleanup
+      if: always()
+      run: |
+        if [ -n "$VM_PID" ]; then
+          kill $VM_PID
+        fi
