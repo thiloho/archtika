@@ -201,6 +201,14 @@ test.describe("Update website", () => {
   });
 });
 
+test("Publish website", async ({ authenticatedPage: page }) => {
+  await page.getByRole("link", { name: "Blog" }).click();
+  await page.getByRole("link", { name: "Publish" }).click();
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page.getByText("Successfully published website")).toBeVisible();
+  await expect(page.getByText("Your website is published at")).toBeVisible();
+});
+
 test("Delete websites", async ({ authenticatedPage: page }) => {
   await page.getByRole("button", { name: "Delete" }).nth(1).click();
   await page.getByRole("button", { name: "Delete website" }).click();
@@ -222,5 +230,16 @@ test("Delete account", async ({ authenticatedPage: page }) => {
     .locator("#delete-account-modal")
     .getByRole("button", { name: "Delete account" })
     .click();
-  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+
+  await page.getByLabel("Username:").fill(collabUsername);
+  await page.getByLabel("Password:").fill(password);
+  await page.getByRole("button", { name: "Submit" }).click();
+  await page.getByRole("link", { name: "Account" }).click();
+  await page.getByRole("button", { name: "Delete account" }).click();
+  await page.getByLabel("Password:").click();
+  await page.getByLabel("Password:").fill(password);
+  await page
+    .locator("#delete-account-modal")
+    .getByRole("button", { name: "Delete account" })
+    .click();
 });
