@@ -55,21 +55,21 @@ test("Create websites", async ({ authenticatedPage: page }) => {
   await expect(page.getByText("Documentation Type: Docs")).toBeVisible();
 });
 
-test.describe("Update website", () => {
-  test("Update websites", async ({ authenticatedPage: page }) => {
-    await page.getByRole("button", { name: "Update" }).nth(1).click();
-    await page.getByRole("textbox", { name: "Title" }).click();
-    await page.getByRole("textbox", { name: "Title" }).fill("Blog updated");
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByRole("link", { name: "Blog updated" })).toBeVisible();
+test("Update websites", async ({ authenticatedPage: page }) => {
+  await page.getByRole("button", { name: "Update" }).nth(1).click();
+  await page.getByRole("textbox", { name: "Title" }).click();
+  await page.getByRole("textbox", { name: "Title" }).fill("Blog updated");
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByRole("link", { name: "Blog updated" })).toBeVisible();
 
-    await page.getByRole("button", { name: "Update" }).first().click();
-    await page.getByRole("textbox", { name: "Title" }).click();
-    await page.getByRole("textbox", { name: "Title" }).fill("Documentation updated");
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByRole("link", { name: "Documentation updated" })).toBeVisible();
-  });
+  await page.getByRole("button", { name: "Update" }).first().click();
+  await page.getByRole("textbox", { name: "Title" }).click();
+  await page.getByRole("textbox", { name: "Title" }).fill("Documentation updated");
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByRole("link", { name: "Documentation updated" })).toBeVisible();
+});
 
+test.describe("Blog", () => {
   test.describe("Update settings", () => {
     test("Global", async ({ authenticatedPage: page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
@@ -201,8 +201,86 @@ test.describe("Update website", () => {
   });
 });
 
-test("Publish website", async ({ authenticatedPage: page }) => {
+test.describe("Docs", () => {
+  test.describe("Categories", () => {
+    test("Create category", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Documentation" }).click();
+      await page.getByRole("link", { name: "Categories" }).click();
+      await page.getByRole("button", { name: "Create category" }).click();
+      await page.getByLabel("Name:").click();
+      await page.getByLabel("Name:").fill("Category");
+      await page.getByLabel("Weight:").click();
+      await page.getByLabel("Weight:").fill("1000");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await expect(page.getByText("Successfully created category")).toBeVisible();
+      await expect(page.getByRole("link", { name: "All categories" })).toBeVisible();
+      await expect(page.getByText("Category (1000)")).toBeVisible();
+    });
+    test("Update category", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Documentation" }).click();
+      await page.getByRole("link", { name: "Categories" }).click();
+      await page.getByRole("button", { name: "Update" }).click();
+      await page.getByRole("spinbutton", { name: "Weight:" }).click();
+      await page.getByRole("spinbutton", { name: "Weight:" }).fill("500");
+      await page.getByRole("button", { name: "Update category" }).click();
+      await expect(page.getByText("Successfully updated category")).toBeVisible();
+      await expect(page.getByText("Category (500)")).toBeVisible();
+    });
+    test("Delete category", async ({ authenticatedPage: page }) => {
+      await page.getByRole("link", { name: "Documentation" }).click();
+      await page.getByRole("link", { name: "Categories" }).click();
+      await page.getByRole("button", { name: "Delete" }).click();
+      await page.getByRole("button", { name: "Delete category" }).click();
+      await expect(page.getByText("Successfully deleted category")).toBeVisible();
+      await expect(page.getByRole("link", { name: "All categories" })).toBeHidden();
+    });
+  });
+
+  test("Article", async ({ authenticatedPage: page }) => {
+    await page.getByRole("link", { name: "Documentation" }).click();
+    await page.getByRole("link", { name: "Categories" }).click();
+    await page.getByRole("button", { name: "Create category" }).click();
+    await page.getByLabel("Name:").click();
+    await page.getByLabel("Name:").fill("Category");
+    await page.getByLabel("Weight:").click();
+    await page.getByLabel("Weight:").fill("1000");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await page.getByRole("link", { name: "Articles" }).click();
+    await page.getByRole("button", { name: "Create article" }).click();
+    await page.getByLabel("Title:").click();
+    await page.getByLabel("Title:").fill("Article");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await page.getByRole("link", { name: "Edit" }).click();
+    await page.getByLabel("Weight:").click();
+    await page.getByLabel("Weight:").fill("1000");
+    await page.getByLabel("Title:").click();
+    await page.getByLabel("Title:").fill("Article");
+    await page.getByLabel("Description:").click();
+    await page.getByLabel("Description:").fill("Testing out this article");
+    await page.getByLabel("Author:").click();
+    await page.getByLabel("Author:").fill("John Doe");
+    await page.getByLabel("Main content:").click();
+    await page
+      .getByLabel("Main content:")
+      .fill("## Main content comes in here\n\n### First section\n\n### Second section\n\n## More");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Successfully updated article")).toBeVisible();
+    await expect(page.getByText("Table of contents Main")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Main content comes in here" }).getByRole("link")
+    ).toBeVisible();
+  });
+});
+
+test("Publish websites", async ({ authenticatedPage: page }) => {
   await page.getByRole("link", { name: "Blog" }).click();
+  await page.getByRole("link", { name: "Publish" }).click();
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page.getByText("Successfully published website")).toBeVisible();
+  await expect(page.getByText("Your website is published at")).toBeVisible();
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Documentation" }).click();
   await page.getByRole("link", { name: "Publish" }).click();
   await page.getByRole("button", { name: "Publish" }).click();
   await expect(page.getByText("Successfully published website")).toBeVisible();
