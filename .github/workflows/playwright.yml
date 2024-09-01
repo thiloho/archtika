@@ -20,12 +20,12 @@ jobs:
       run: |
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
-        nix run .#dev-vm
+        nix run .#dev-vm &
 
     - name: Start PostgREST API
       run: |
         cd rest-api
-        nix run .#api
+        nix run .#api &
 
     - name: Run playwright tests
       run: |
