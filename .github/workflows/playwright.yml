@@ -1,0 +1,23 @@
+name: "Playwright tests"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@v27
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Enter Nix development environment
+      run: nix develop .#web
+
+    - name: Run playwright tests
+      run: npm run test

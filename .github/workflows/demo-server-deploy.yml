@@ -1,9 +1,10 @@
 name: "Deploy app to demo server (demo.archtika.com)"
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Playwright tests"]
+    types:
+      - completed
 
 env:
   SERVER_USER: root
