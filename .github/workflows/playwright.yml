@@ -16,6 +16,9 @@ jobs:
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Enter web app directory
+      run: cd web-app
+
     - name: Enter Nix development environment
       run: nix develop .#web
 
