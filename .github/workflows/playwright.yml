@@ -21,11 +21,15 @@ jobs:
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
         nix run .#dev-vm &
+        # Wait for PostgreSQL to be available
+        nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 15432; do sleep 1; done'
 
     - name: Start PostgREST API
       run: |
         cd rest-api
         nix run .#api &
+        # Wait for the API to be available
+        nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 3000; do sleep 1; done'
 
     - name: Run playwright tests
       run: |
@@ -33,10 +37,3 @@ jobs:
         nix develop .#web
         npm install
         npm run test
-
-    - name: Cleanup
-      if: always()
-      run: |
-        if [ -n "$VM_PID" ]; then
-          kill $VM_PID
-        fi
