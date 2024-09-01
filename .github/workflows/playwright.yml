@@ -31,6 +31,11 @@ jobs:
         
         echo "VM is ready"
 
+    - name: Start PostgREST API
+      run: |
+        cd rest-api
+        nix run .#api
+
     - name: Run playwright tests
       run: |
         cd web-app
