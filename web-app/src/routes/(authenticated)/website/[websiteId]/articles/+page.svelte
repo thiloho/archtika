@@ -66,9 +66,19 @@
           <label>
             Filter:
             <select name="article_filter">
-              <option value="all">Show all</option>
-              <option value="creations">Created by you</option>
-              <option value="shared">Created by others</option>
+              <option value="all" selected={"all" === $page.url.searchParams.get("article_filter")}
+                >Show all</option
+              >
+              <option
+                value="creations"
+                selected={"creations" === $page.url.searchParams.get("article_filter")}
+                >Created by you</option
+              >
+              <option
+                value="shared"
+                selected={"shared" === $page.url.searchParams.get("article_filter")}
+                >Created by others</option
+              >
             </select>
           </label>
           <button type="submit">Submit</button>

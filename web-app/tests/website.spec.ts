@@ -125,7 +125,7 @@ test.describe("Blog", () => {
     });
   });
 
-  test.describe("Articles", () => {
+  test.describe.serial("Articles", () => {
     test("Create article", async ({ authenticatedPage: page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Articles" }).click();
@@ -171,7 +171,7 @@ test.describe("Blog", () => {
     });
   });
 
-  test.describe("Collaborators", () => {
+  test.describe.serial("Collaborators", () => {
     test("Add collaborator", async ({ authenticatedPage: page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Collaborators" }).click();
@@ -202,7 +202,7 @@ test.describe("Blog", () => {
 });
 
 test.describe("Docs", () => {
-  test.describe("Categories", () => {
+  test.describe.serial("Categories", () => {
     test("Create category", async ({ authenticatedPage: page }) => {
       await page.getByRole("link", { name: "Documentation" }).click();
       await page.getByRole("link", { name: "Categories" }).click();
@@ -299,7 +299,7 @@ test("Delete websites", async ({ authenticatedPage: page }) => {
   await expect(page.getByRole("link", { name: "All websites" })).toBeHidden();
 });
 
-test("Delete account", async ({ authenticatedPage: page }) => {
+test("Delete accounts", async ({ authenticatedPage: page }) => {
   await page.getByRole("link", { name: "Account" }).click();
   await page.getByRole("button", { name: "Delete account" }).click();
   await page.getByLabel("Password:").click();
