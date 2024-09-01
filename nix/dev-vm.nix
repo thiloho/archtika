@@ -80,5 +80,7 @@
     };
   };
 
+  services.getty.autologinUser = "dev";
+
   system.stateVersion = "24.05";
 }
