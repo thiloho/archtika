@@ -20,16 +20,7 @@ jobs:
       run: |
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
-        nix run .#dev-vm &
-        VM_PID=$!
-        echo "VM_PID=$VM_PID" >> $GITHUB_ENV
-        
-        # Wait for the PostgreSQL and nginx ports to be open
-        while ! nc -z localhost 15432 || ! nc -z localhost 18000; do
-          sleep 1
-        done
-        
-        echo "VM is ready"
+        nix run .#dev-vm
 
     - name: Start PostgREST API
       run: |
