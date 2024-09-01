@@ -19,4 +19,4 @@ jobs:
     - name: Run playwright tests
       run: |
         cd web-app
-        nix develop .#web --command bash -c "npm run test"
+        nix develop .#web --command bash -c "npm install && npm run test"
