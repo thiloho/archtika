@@ -1,4 +1,4 @@
-name: "Playwright tests"
+name: Playwright tests
 
 on:
   push:
@@ -26,9 +26,5 @@ jobs:
         nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 3000; do sleep 1; done'
         cd web-app
         nix develop .#web --command bash -c 'npm install && npm run test'
-
-    - name: Cleanup
-      if: always()
-      run: |
         pkill -f "nix run .#dev-vm" || echo "No dev-vm processes found"
         pkill -f "nix run .#api" || echo "No api processes found"
