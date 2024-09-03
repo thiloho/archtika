@@ -2,6 +2,7 @@ import { test as base, expect, type Page } from "@playwright/test";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
+import { platform } from "node:os";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -160,6 +161,28 @@ test.describe("Blog", () => {
       ).toBeVisible();
       await page.getByRole("button", { name: "Submit" }).click();
       await expect(page.getByText("Successfully updated article")).toBeVisible();
+    });
+
+    test("Paste image", async ({ authenticatedPage: page, context }) => {
+      await page.getByRole("link", { name: "Blog" }).click();
+      await page.getByRole("link", { name: "Articles" }).click();
+      await page.getByRole("link", { name: "Edit" }).click();
+      await page.getByLabel("Main content:").click();
+
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+      const isMac = platform() === "darwin";
+      const modifier = isMac ? "Meta" : "Control";
+
+      const clipPage = await context.newPage();
+      await clipPage.goto("https://picsum.photos/400/400.jpg");
+      await clipPage.keyboard.press(`${modifier}+KeyC`);
+
+      await page.bringToFront();
+      await page.keyboard.press("Enter");
+      await page.keyboard.press("Enter");
+      await page.keyboard.press(`${modifier}+KeyV`);
+
+      await expect(page.getByText("Successfully uploaded image")).toBeVisible();
     });
 
     test("Delete article", async ({ authenticatedPage: page }) => {

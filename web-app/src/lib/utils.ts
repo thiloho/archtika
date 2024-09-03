@@ -4,6 +4,7 @@ import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import GithubSlugger from "github-slugger";
 import DOMPurify from "isomorphic-dompurify";
+import { applyAction, deserialize } from "$app/forms";
 
 export const sortOptions = [
   { value: "creation-time", text: "Creation time" },
@@ -175,15 +176,23 @@ export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: s
     body: formData
   });
 
+  const result = deserialize(await request.clone().text());
+  applyAction(result);
+
   const response = await request.json();
-  const fileId = JSON.parse(response.data)[1];
-  const fileUrl = `${API_BASE_PREFIX}/rpc/retrieve_file?id=${fileId}`;
 
-  const target = event.target as HTMLTextAreaElement;
-  const newContent =
-    target.value.slice(0, target.selectionStart) +
-    `![](${fileUrl})` +
-    target.value.slice(target.selectionStart);
+  if (JSON.parse(response.data)[1]) {
+    const fileId = JSON.parse(response.data)[3];
+    const fileUrl = `${API_BASE_PREFIX}/rpc/retrieve_file?id=${fileId}`;
 
-  return newContent;
+    const target = event.target as HTMLTextAreaElement;
+    const newContent =
+      target.value.slice(0, target.selectionStart) +
+      `![](${fileUrl})` +
+      target.value.slice(target.selectionStart);
+
+    return newContent;
+  } else {
+    return "";
+  }
 };

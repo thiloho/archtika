@@ -215,6 +215,6 @@ export const actions: Actions = {
       return { success: false, message: fileJSON.message };
     }
 
-    return { fileId: fileJSON.file_id };
+    return { success: true, message: "Successfully uploaded image", fileId: fileJSON.file_id };
   }
 };
