@@ -16,24 +16,19 @@ jobs:
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Setup and run dev vm
+    - name: Run playwright tests
       run: |
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
         nix run .#dev-vm &
-        # Wait for PostgreSQL to be available
         nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 15432; do sleep 1; done'
-
-    - name: Start PostgREST API
-      run: |
-        cd rest-api
         nix run .#api &
-        # Wait for the API to be available
         nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 3000; do sleep 1; done'
-
-    - name: Run playwright tests
-      run: |
         cd web-app
-        nix develop .#web
-        npm install
-        npm run test
+        nix develop .#web --command bash -c 'npm install && npm run test'
+
+    - name: Cleanup
+      if: always()
+      run: |
+        pkill -f "nix run .#dev-vm" 2>/dev/null
+        pkill -f "nix run .#api" 2>/dev/null
