@@ -5,6 +5,7 @@ const username = randomBytes(8).toString("hex");
 const collabUsername = randomBytes(8).toString("hex");
 const collabUsername2 = randomBytes(8).toString("hex");
 const collabUsername3 = randomBytes(8).toString("hex");
+const collaborators = [collabUsername, collabUsername2, collabUsername3];
 const password = "T3stuser??!!";
 
 const permissionLevels = [10, 20, 30];
@@ -111,14 +112,11 @@ for (const permissionLevel of permissionLevels) {
         await expect(page.getByText("You do not have the required")).toBeVisible();
       }
     });
-    /* test("Delete website", async ({ page }) => {
-      await page.getByRole("button", { name: "Delete" }).click();
+    test("Delete website", async ({ page }) => {
+      await page.getByRole("button", { name: "Delete" }).nth(0).click();
       await page.getByRole("button", { name: "Delete website" }).click();
-
-      if (permissionLevel === 10) {
-        await expect(page.getByText("You do not have the required")).toBeVisible();
-      }
-    }); */
+      await expect(page.getByText("You do not have the required")).toBeVisible();
+    });
     test("Update Global", async ({ page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.locator("#global").getByRole("button", { name: "Submit" }).click();
@@ -166,10 +164,7 @@ for (const permissionLevel of permissionLevels) {
     test("Update article", async ({ page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Articles" }).click();
-      await page
-        .getByRole("link", { name: "Edit" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("link", { name: "Edit" }).nth(0).click();
       await page.getByLabel("Description:").click();
       await page.getByLabel("Description:").fill("Description");
       await page.getByLabel("Author:").click();
@@ -185,10 +180,7 @@ for (const permissionLevel of permissionLevels) {
     test("Delete article", async ({ page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Articles" }).click();
-      await page
-        .getByRole("button", { name: "Delete" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("button", { name: "Delete" }).nth(0).click();
       await page.getByRole("button", { name: "Delete article" }).click();
 
       if (permissionLevel === 10) {
@@ -202,7 +194,7 @@ for (const permissionLevel of permissionLevels) {
       await page.getByLabel("Username:").click();
       await page
         .getByLabel("Username:")
-        .fill(permissionLevel === 10 || permissionLevel === 20 ? collabUsername2 : collabUsername3);
+        .fill(collaborators[permissionLevels.indexOf(permissionLevel)]);
       await page.getByRole("button", { name: "Submit" }).click();
 
       if (permissionLevel === 10) {
@@ -212,10 +204,7 @@ for (const permissionLevel of permissionLevels) {
     test("Update collaborator", async ({ page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Collaborators" }).click();
-      await page
-        .getByRole("button", { name: "Update" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("button", { name: "Update" }).nth(0).click();
       await page.getByRole("combobox").selectOption("20");
       await page.getByRole("button", { name: "Update collaborator" }).click();
 
@@ -226,10 +215,7 @@ for (const permissionLevel of permissionLevels) {
     test("Remove collaborator", async ({ page }) => {
       await page.getByRole("link", { name: "Blog" }).click();
       await page.getByRole("link", { name: "Collaborators" }).click();
-      await page
-        .getByRole("button", { name: "Remove" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("button", { name: "Remove" }).nth(0).click();
       await page.getByRole("button", { name: "Remove collaborator" }).click();
 
       if (permissionLevel === 10) {
@@ -253,10 +239,7 @@ for (const permissionLevel of permissionLevels) {
     test("Update category", async ({ page }) => {
       await page.getByRole("link", { name: "Documentation" }).click();
       await page.getByRole("link", { name: "Categories" }).click();
-      await page
-        .getByRole("button", { name: "Update" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("button", { name: "Update" }).nth(0).click();
       await page.getByRole("spinbutton", { name: "Weight:" }).click();
       await page.getByRole("spinbutton", { name: "Weight:" }).fill("500");
       await page.getByRole("button", { name: "Update category" }).click();
@@ -268,10 +251,7 @@ for (const permissionLevel of permissionLevels) {
     test("Delete category", async ({ page }) => {
       await page.getByRole("link", { name: "Documentation" }).click();
       await page.getByRole("link", { name: "Categories" }).click();
-      await page
-        .getByRole("button", { name: "Delete" })
-        .nth(permissionLevels.indexOf(permissionLevel))
-        .click();
+      await page.getByRole("button", { name: "Delete" }).nth(0).click();
       await page.getByRole("button", { name: "Delete category" }).click();
 
       if (permissionLevel === 10) {
@@ -289,3 +269,25 @@ for (const permissionLevel of permissionLevels) {
     });
   });
 }
+
+test.describe("Delete all accounts", () => {
+  const allUsers = collaborators.concat(username);
+
+  for (const user of allUsers) {
+    test(`Delete account ${allUsers.indexOf(user)}`, async ({ page }) => {
+      await page.goto("/login");
+      await page.getByLabel("Username:").fill(user);
+      await page.getByLabel("Password:").fill(password);
+      await page.getByRole("button", { name: "Submit" }).click();
+
+      await page.getByRole("link", { name: "Account" }).click();
+      await page.getByRole("button", { name: "Delete account" }).click();
+      await page.getByLabel("Password:").click();
+      await page.getByLabel("Password:").fill(password);
+      await page
+        .locator("#delete-account-modal")
+        .getByRole("button", { name: "Delete account" })
+        .click();
+    });
+  }
+});
