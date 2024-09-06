@@ -18,13 +18,37 @@ jobs:
 
     - name: Run playwright tests
       run: |
+        wait_for_postgres() {
+          echo "Waiting for PostgreSQL to be ready..."
+          while ! nix shell nixpkgs#postgresql_16 -c pg_isready -h localhost -p 15432 -U postgres; do
+            sleep 1
+          done
+          echo "PostgreSQL is ready."
+        }
+
+        wait_for_postgrest() {
+          echo "Waiting for PostgREST to be live and ready..."
+          while ! curl -s -I "http://localhost:3001/live" | grep "OK"; do
+            sleep 1
+          done
+          while ! curl -s -I "http://localhost:3001/ready" | grep "OK"; do
+            sleep 1
+          done
+          echo "PostgREST is live and ready."
+        }
+
         sudo mkdir -p /var/www/archtika-websites
         sudo chown $USER:$(id -gn) /var/www/archtika-websites
+
         nix run .#dev-vm &
-        nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 15432; do sleep 1; done'
+        DEV_VM_PID=$!
+        wait_for_postgres
+
         nix run .#api &
-        nix shell nixpkgs#netcat -c bash -c 'until nc -z localhost 3000; do sleep 1; done'
+        wait_for_postgrest
+
         cd web-app
         nix develop .#web --command bash -c 'npm install && npm run test'
-        pkill -f "nix run .#dev-vm" || echo "No dev-vm processes found"
-        pkill -f "nix run .#api" || echo "No api processes found"
+
+        pkill -e postgrest || echo "No api process found"
+        kill $DEV_VM_PID || echo "No dev-vm process found"
