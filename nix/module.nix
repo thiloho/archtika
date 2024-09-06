@@ -39,10 +39,16 @@ in
       description = "JWT secret for archtika. Can be a string or a path to a file containing the secret";
     };
 
-    port = mkOption {
+    apiPort = mkOption {
       type = types.port;
       default = 5000;
       description = "Port on which the API runs.";
+    };
+
+    apiAdminPort = mkOption {
+      type = types.port;
+      default = 7500;
+      description = "Port on which the API admin server runs.";
     };
 
     webAppPort = mkOption {
@@ -111,7 +117,7 @@ in
 
           ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
-          PGRST_SERVER_PORT=${toString cfg.port} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
+          PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} PGRST_SERVER_PORT=${toString cfg.apiPort} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
         '';
     };
 
@@ -166,7 +172,7 @@ in
               tryFiles = "$uri $uri/ $uri/index.html =404";
             };
             "/api/" = {
-              proxyPass = "http://localhost:${toString cfg.port}/";
+              proxyPass = "http://localhost:${toString cfg.apiPort}/";
               extraConfig = ''
                 default_type  application/json;
                 proxy_hide_header Content-Location;
