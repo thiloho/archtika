@@ -33,3 +33,5 @@ SELECT
 FROM
   internal.website;
 
+GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
+

@@ -84,3 +84,7 @@ FROM
 ALTER TABLE internal.website
   DROP COLUMN title_search;
 
+GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON api.article TO authenticated_user;
+

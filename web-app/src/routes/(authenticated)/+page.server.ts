@@ -5,31 +5,14 @@ import { join } from "node:path";
 
 export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
   const searchQuery = url.searchParams.get("website_search_query");
-  const sortBy = url.searchParams.get("website_sort");
   const filterBy = url.searchParams.get("website_filter");
 
   const params = new URLSearchParams();
 
-  const baseFetchUrl = `${API_BASE_PREFIX}/website`;
+  const baseFetchUrl = `${API_BASE_PREFIX}/website?order=last_modified_at.desc,created_at.desc`;
 
   if (searchQuery) {
     params.append("title_search", `wfts(english).${searchQuery}`);
-  }
-
-  switch (sortBy) {
-    case null:
-    case "creation-time":
-      params.append("order", "created_at.desc");
-      break;
-    case "last-modified":
-      params.append("order", "last_modified_at.desc");
-      break;
-    case "title-a-to-z":
-      params.append("order", "title.asc");
-      break;
-    case "title-z-to-a":
-      params.append("order", "title.desc");
-      break;
   }
 
   switch (filterBy) {
@@ -41,7 +24,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
       break;
   }
 
-  const constructedFetchUrl = `${baseFetchUrl}?${params.toString()}`;
+  const constructedFetchUrl = `${baseFetchUrl}&${params.toString()}`;
 
   const totalWebsitesData = await fetch(baseFetchUrl, {
     method: "HEAD",

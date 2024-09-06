@@ -103,6 +103,8 @@ SELECT
 FROM
   internal.article;
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON api.article TO authenticated_user;
+
 DROP VIEW api.docs_category;
 
 ALTER TABLE internal.article

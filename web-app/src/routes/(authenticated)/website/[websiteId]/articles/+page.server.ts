@@ -12,6 +12,11 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
     baseFetchUrl +=
       ",article_weight,docs_category(category_name,category_weight)&order=docs_category(category_weight).desc.nullslast,article_weight.desc.nullslast";
   }
+  if (website.content_type === "Blog") {
+    baseFetchUrl += "&order=last_modified_at.desc,created_at.desc";
+  }
+
+  console.log(baseFetchUrl);
 
   const parameters = new URLSearchParams();
 

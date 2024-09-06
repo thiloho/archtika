@@ -136,3 +136,5 @@ FROM
   JOIN internal.home ho ON w.id = ho.website_id
   JOIN internal.footer f ON w.id = f.website_id;
 
+GRANT SELECT ON api.website_overview TO authenticated_user;
+

@@ -52,3 +52,5 @@ FROM
 ALTER TABLE internal.article
   DROP COLUMN article_weight;
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON api.article TO authenticated_user;
+

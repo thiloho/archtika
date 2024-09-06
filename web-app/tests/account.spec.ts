@@ -14,40 +14,42 @@ const test = base.extend<{ authenticatedPage: Page }>({
   }
 });
 
-test("Register", async ({ page }) => {
-  await page.goto("/register");
-  await page.getByLabel("Username:").click();
-  await page.getByLabel("Username:").fill(username);
-  await page.getByLabel("Password:").click();
-  await page.getByLabel("Password:").fill(password);
-  await page.getByRole("button", { name: "Submit" }).click();
-  await expect(page.getByText("Successfully registered, you")).toBeVisible();
-});
+test.describe.serial("Account tests", () => {
+  test("Register", async ({ page }) => {
+    await page.goto("/register");
+    await page.getByLabel("Username:").click();
+    await page.getByLabel("Username:").fill(username);
+    await page.getByLabel("Password:").click();
+    await page.getByLabel("Password:").fill(password);
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Successfully registered, you")).toBeVisible();
+  });
 
-test("Login", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByLabel("Username:").click();
-  await page.getByLabel("Username:").fill(username);
-  await page.getByLabel("Password:").click();
-  await page.getByLabel("Password:").fill(password);
-  await page.getByRole("button", { name: "Submit" }).click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-});
+  test("Login", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel("Username:").click();
+    await page.getByLabel("Username:").fill(username);
+    await page.getByLabel("Password:").click();
+    await page.getByLabel("Password:").fill(password);
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  });
 
-test("Logout", async ({ authenticatedPage: page }) => {
-  await page.getByRole("link", { name: "Account" }).click();
-  await page.getByRole("button", { name: "Logout" }).click();
-  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
-});
+  test("Logout", async ({ authenticatedPage: page }) => {
+    await page.getByRole("link", { name: "Account" }).click();
+    await page.getByRole("button", { name: "Logout" }).click();
+    await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  });
 
-test("Delete account", async ({ authenticatedPage: page }) => {
-  await page.getByRole("link", { name: "Account" }).click();
-  await page.getByRole("button", { name: "Delete account" }).click();
-  await page.getByLabel("Password:").click();
-  await page.getByLabel("Password:").fill(password);
-  await page
-    .locator("#delete-account-modal")
-    .getByRole("button", { name: "Delete account" })
-    .click();
-  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  test("Delete account", async ({ authenticatedPage: page }) => {
+    await page.getByRole("link", { name: "Account" }).click();
+    await page.getByRole("button", { name: "Delete account" }).click();
+    await page.getByLabel("Password:").click();
+    await page.getByLabel("Password:").fill(password);
+    await page
+      .locator("#delete-account-modal")
+      .getByRole("button", { name: "Delete account" })
+      .click();
+    await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  });
 });

@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) =
   const { website, home } = await parent();
 
   const collabData = await fetch(
-    `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)`,
+    `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)&order=last_modified_at.desc,added_at.desc`,
     {
       method: "GET",
       headers: {
