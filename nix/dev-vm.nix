@@ -70,7 +70,7 @@
           "/" = {
             root = "/var/www/archtika-websites";
             index = "index.html";
-            tryFiles = "$uri $uri/ $uri/index.html =404";
+            tryFiles = "$uri $uri/ $uri.html $uri/index.html index.html =404";
             extraConfig = ''
               autoindex on;
             '';

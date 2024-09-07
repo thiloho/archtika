@@ -58,13 +58,13 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) =
       : process.env.ORIGIN
         ? process.env.ORIGIN
         : "http://localhost:18000"
-  }/previews/${websiteOverview.id}/index.html`;
+  }/previews/${websiteOverview.id}/`;
 
   const websiteProdUrl = dev
-    ? `http://localhost:18000/${websiteOverview.id}/index.html`
+    ? `http://localhost:18000/${websiteOverview.id}/`
     : process.env.ORIGIN
       ? process.env.ORIGIN.replace("//", `//${websiteOverview.id}.`)
-      : `http://localhost:18000/${websiteOverview.id}/index.html`;
+      : `http://localhost:18000/${websiteOverview.id}/`;
 
   return {
     websiteOverview,

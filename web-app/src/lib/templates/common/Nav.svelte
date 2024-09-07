@@ -43,7 +43,7 @@
                 {#each categorizedArticles[key] as { title }}
                   {@const articleFileName = title.toLowerCase().split(" ").join("-")}
                   <li>
-                    <a href="{isIndexPage ? './articles' : '.'}/{articleFileName}.html">{title}</a>
+                    <a href="{isIndexPage ? './articles' : '.'}/{articleFileName}">{title}</a>
                   </li>
                 {/each}
               </ul>
@@ -52,7 +52,7 @@
         </ul>
       </section>
     {/if}
-    <a href="../">
+    <a href={isIndexPage ? "." : ".."}>
       {#if logoType === "text"}
         <strong>{logo}</strong>
       {:else}
