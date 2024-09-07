@@ -8,7 +8,7 @@
     title: string;
     favicon: string;
     nestingLevel?: number;
-    metaDescription: string | null;
+    metaDescription?: string | null;
   } = $props();
 </script>
 

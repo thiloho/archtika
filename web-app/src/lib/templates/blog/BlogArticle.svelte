@@ -28,7 +28,7 @@
 
 <Head {title} {favicon} nestingLevel={1} {metaDescription} />
 
-<Nav {logoType} {logo} />
+<Nav {logoType} {logo} isIndexPage={false} />
 
 <header>
   <div class="container">

@@ -48,7 +48,7 @@
               <p>{article.publication_date}</p>
               <p>
                 <strong>
-                  <a href="./articles/{articleFileName}.html">{article.title}</a>
+                  <a href="./articles/{articleFileName}">{article.title}</a>
                 </strong>
               </p>
               {#if article.meta_description}
