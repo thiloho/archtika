@@ -60,9 +60,16 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) =
         : "http://localhost:18000"
   }/previews/${websiteOverview.id}/index.html`;
 
+  const websiteProdUrl = dev
+    ? `http://localhost:18000/${websiteOverview.id}/index.html`
+    : process.env.ORIGIN
+      ? process.env.ORIGIN.replace("//", `//${websiteOverview.id}.`)
+      : `http://localhost:18000/${websiteOverview.id}/index.html`;
+
   return {
     websiteOverview,
     websitePreviewUrl,
+    websiteProdUrl,
     website
   };
 };
