@@ -134,7 +134,7 @@ in
       };
 
       script = ''
-        ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        BODY_SIZE_LIMIT=Infinity ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
