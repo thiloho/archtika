@@ -16,8 +16,6 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
     baseFetchUrl += "&order=last_modified_at.desc,created_at.desc";
   }
 
-  console.log(baseFetchUrl);
-
   const parameters = new URLSearchParams();
 
   if (searchQuery) {
@@ -67,7 +65,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 };
 
 export const actions: Actions = {
-  createArticle: async ({ request, fetch, cookies, params, locals }) => {
+  createArticle: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
 
     const res = await fetch(`${API_BASE_PREFIX}/article`, {

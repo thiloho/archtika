@@ -3,13 +3,20 @@
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
   const prodWebsiteUrl = data.websitePreviewUrl.replace("/previews", "");
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <WebsiteEditor
   id={data.website.id}
@@ -27,7 +34,17 @@
       is published. If you are happy with the results, click the button below and your website will
       be published on the Internet.
     </p>
-    <form method="POST" action="?/publishWebsite" use:enhance>
+    <form
+      method="POST"
+      action="?/publishWebsite"
+      use:enhance={() => {
+        sending = true;
+        return async ({ update }) => {
+          await update();
+          sending = false;
+        };
+      }}
+    >
       <button type="submit">Publish</button>
     </form>
 

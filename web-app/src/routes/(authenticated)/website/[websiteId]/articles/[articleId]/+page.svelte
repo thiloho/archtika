@@ -5,6 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import { handleImagePaste } from "$lib/utils";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
@@ -24,9 +25,15 @@
       previewContent = newContent;
     }
   };
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <WebsiteEditor
   id={data.website.id}
@@ -46,8 +53,10 @@
       action="?/editArticle"
       enctype="multipart/form-data"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update({ reset: false });
+          sending = false;
         };
       }}
     >

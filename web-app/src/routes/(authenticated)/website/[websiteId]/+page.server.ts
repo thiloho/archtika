@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 
-export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const globalSettingsData = await fetch(
     `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`,
     {
@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url }) => {
 };
 
 export const actions: Actions = {
-  updateGlobal: async ({ request, fetch, cookies, params, locals }) => {
+  updateGlobal: async ({ request, fetch, cookies, params }) => {
     const data = await request.formData();
     const faviconFile = data.get("favicon") as File;
 

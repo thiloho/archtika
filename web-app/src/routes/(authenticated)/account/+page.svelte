@@ -2,12 +2,19 @@
   import { enhance } from "$app/forms";
   import Modal from "$lib/components/Modal.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import type { ActionData, PageServerData } from "./$types";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <section id="overview">
   <h2>
@@ -31,7 +38,17 @@
     <a href="#logout">Logout</a>
   </h2>
 
-  <form method="POST" action="?/logout" use:enhance>
+  <form
+    method="POST"
+    action="?/logout"
+    use:enhance={() => {
+      sending = true;
+      return async ({ update }) => {
+        await update();
+        sending = false;
+      };
+    }}
+  >
     <button type="submit">Logout</button>
   </form>
 </section>
@@ -53,9 +70,11 @@
       method="POST"
       action="?/deleteAccount"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update();
           window.location.hash = "!";
+          sending = false;
         };
       }}
     >

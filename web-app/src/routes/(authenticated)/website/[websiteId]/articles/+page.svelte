@@ -1,16 +1,22 @@
 <script lang="ts">
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
-  import { sortOptions } from "$lib/utils.js";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import Modal from "$lib/components/Modal.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import type { ActionData, PageServerData } from "./$types";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <WebsiteEditor
   id={data.website.id}
@@ -30,9 +36,11 @@
         method="POST"
         action="?/createArticle"
         use:enhance={() => {
+          sending = true;
           return async ({ update }) => {
             await update();
             window.location.hash = "!";
+            sending = false;
           };
         }}
       >
@@ -127,9 +135,11 @@
                   method="POST"
                   action="?/deleteArticle"
                   use:enhance={() => {
+                    sending = true;
                     return async ({ update }) => {
                       await update();
                       window.location.hash = "!";
+                      sending = false;
                     };
                   }}
                 >
