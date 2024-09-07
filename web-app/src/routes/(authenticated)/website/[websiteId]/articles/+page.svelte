@@ -1,6 +1,5 @@
 <script lang="ts">
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
-  import { sortOptions } from "$lib/utils.js";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import Modal from "$lib/components/Modal.svelte";

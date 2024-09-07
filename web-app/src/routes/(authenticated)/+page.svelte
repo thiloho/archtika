@@ -1,7 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import DateTime from "$lib/components/DateTime.svelte";
-  import { sortOptions } from "$lib/utils.js";
   import { page } from "$app/stores";
   import Modal from "$lib/components/Modal.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";

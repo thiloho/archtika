@@ -10,6 +10,30 @@ import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import { dev } from "$app/environment";
 
+interface WebsiteData {
+  id: string;
+  content_type: "Blog" | "Docs";
+  favicon_image: string | null;
+  title: string;
+  logo_type: "text" | "image";
+  logo_text: string | null;
+  logo_image: string | null;
+  main_content: string;
+  additional_text: string;
+  accent_color_light_theme: string;
+  accent_color_dark_theme: string;
+  articles: {
+    cover_image: string | null;
+    title: string;
+    publication_date: string;
+    meta_description: string;
+    main_content: string;
+  }[];
+  categorized_articles: {
+    [key: string]: { title: string; publication_date: string; meta_description: string }[];
+  };
+}
+
 export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) => {
   const websiteOverviewData = await fetch(
     `${API_BASE_PREFIX}/website_overview?id=eq.${params.websiteId}`,
@@ -80,7 +104,7 @@ export const actions: Actions = {
   }
 };
 
-const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) => {
+const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean = true) => {
   let head = "";
   let body = "";
 
@@ -96,7 +120,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             logoType: websiteData.logo_type,
             logo:
               websiteData.logo_type === "text"
-                ? websiteData.logo_text
+                ? (websiteData.logo_text ?? "")
                 : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
             mainContent: md(websiteData.main_content ?? "", false),
             articles: websiteData.articles ?? [],
@@ -116,7 +140,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
             logoType: websiteData.logo_type,
             logo:
               websiteData.logo_type === "text"
-                ? websiteData.logo_text
+                ? (websiteData.logo_text ?? "")
                 : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
             mainContent: md(websiteData.main_content ?? "", false),
             categorizedArticles: websiteData.categorized_articles ?? [],
@@ -161,7 +185,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
               logoType: websiteData.logo_type,
               logo:
                 websiteData.logo_type === "text"
-                  ? websiteData.logo_text
+                  ? (websiteData.logo_text ?? "")
                   : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
               coverImage: article.cover_image
                 ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
@@ -184,7 +208,7 @@ const generateStaticFiles = async (websiteData: any, isPreview: boolean = true) 
               logoType: websiteData.logo_type,
               logo:
                 websiteData.logo_type === "text"
-                  ? websiteData.logo_text
+                  ? (websiteData.logo_text ?? "")
                   : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
               mainContent: md(article.main_content ?? ""),
               categorizedArticles: websiteData.categorized_articles ?? [],
