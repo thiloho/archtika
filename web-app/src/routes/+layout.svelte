@@ -3,8 +3,19 @@
   import { page } from "$app/stores";
   import type { LayoutServerData } from "./$types";
   import type { Snippet } from "svelte";
+  import { beforeNavigate, afterNavigate } from "$app/navigation";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   const { data, children }: { data: LayoutServerData; children: Snippet } = $props();
+
+  let loading = $state(false);
+
+  beforeNavigate(() => {
+    loading = true;
+  });
+  afterNavigate(() => {
+    loading = false;
+  });
 
   const isProjectRoute = $derived($page.url.pathname.startsWith("/website") && !$page.error);
   const routeName = $derived(
@@ -13,6 +24,10 @@
       : `${$page.url.pathname.charAt(1).toUpperCase()}${$page.url.pathname.slice(2)}`
   );
 </script>
+
+{#if loading}
+  <LoadingSpinner />
+{/if}
 
 <svelte:head>
   <title>archtika | {routeName.replaceAll("/", " - ")}</title>

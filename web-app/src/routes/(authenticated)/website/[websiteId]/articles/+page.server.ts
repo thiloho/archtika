@@ -16,8 +16,6 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
     baseFetchUrl += "&order=last_modified_at.desc,created_at.desc";
   }
 
-  console.log(baseFetchUrl);
-
   const parameters = new URLSearchParams();
 
   if (searchQuery) {

@@ -5,6 +5,7 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, LayoutServerData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   const { data, form }: { data: PageServerData & LayoutServerData; form: ActionData } = $props();
 
@@ -24,9 +25,15 @@
       previewContent = newContent;
     }
   };
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <WebsiteEditor
   id={data.website.id}
@@ -44,8 +51,10 @@
       method="POST"
       enctype="multipart/form-data"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update({ reset: false });
+          sending = false;
         };
       }}
     >
@@ -98,8 +107,10 @@
       method="POST"
       enctype="multipart/form-data"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update({ reset: false });
+          sending = false;
         };
       }}
     >
@@ -148,8 +159,10 @@
       action="?/updateHome"
       method="POST"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update({ reset: false });
+          sending = false;
         };
       }}
     >
@@ -179,8 +192,10 @@
       action="?/updateFooter"
       method="POST"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update({ reset: false });
+          sending = false;
         };
       }}
     >

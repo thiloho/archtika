@@ -5,11 +5,18 @@
   import Modal from "$lib/components/Modal.svelte";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   const { form, data }: { form: ActionData; data: PageServerData } = $props();
+
+  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
+
+{#if sending}
+  <LoadingSpinner />
+{/if}
 
 <section id="create-website">
   <h2>
@@ -23,9 +30,11 @@
       method="POST"
       action="?/createWebsite"
       use:enhance={() => {
+        sending = true;
         return async ({ update }) => {
           await update();
           window.location.hash = "!";
+          sending = false;
         };
       }}
     >
@@ -111,9 +120,11 @@
                 method="POST"
                 action="?/updateWebsite"
                 use:enhance={() => {
+                  sending = true;
                   return async ({ update }) => {
                     await update({ reset: false });
                     window.location.hash = "!";
+                    sending = false;
                   };
                 }}
               >
@@ -144,9 +155,11 @@
                 method="POST"
                 action="?/deleteWebsite"
                 use:enhance={() => {
+                  sending = true;
                   return async ({ update }) => {
                     await update();
                     window.location.hash = "!";
+                    sending = false;
                   };
                 }}
               >
