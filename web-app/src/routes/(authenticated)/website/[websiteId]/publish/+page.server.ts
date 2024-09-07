@@ -158,7 +158,16 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
       break;
   }
 
-  const indexFileContents = head.concat(body);
+  const indexFileContents = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ${head}
+  </head>
+  <body>
+    ${body}
+  </body>
+</html>`;
 
   let uploadDir = "";
 
@@ -199,7 +208,8 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
                 : "",
               publicationDate: article.publication_date,
               mainContent: md(article.main_content ?? ""),
-              footerAdditionalText: md(websiteData.additional_text ?? "")
+              footerAdditionalText: md(websiteData.additional_text ?? ""),
+              metaDescription: article.meta_description
             }
           }));
         }
@@ -219,14 +229,24 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
                   : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
               mainContent: md(article.main_content ?? ""),
               categorizedArticles: websiteData.categorized_articles ?? [],
-              footerAdditionalText: md(websiteData.additional_text ?? "")
+              footerAdditionalText: md(websiteData.additional_text ?? ""),
+              metaDescription: article.meta_description
             }
           }));
         }
         break;
     }
 
-    const articleFileContents = head.concat(body);
+    const articleFileContents = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ${head}
+  </head>
+  <body>
+    ${body}
+  </body>
+</html>`;
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
   }

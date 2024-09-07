@@ -10,7 +10,8 @@
     logo,
     mainContent,
     categorizedArticles,
-    footerAdditionalText
+    footerAdditionalText,
+    metaDescription
   }: {
     favicon: string;
     title: string;
@@ -19,10 +20,11 @@
     mainContent: string;
     categorizedArticles: { [key: string]: { title: string }[] };
     footerAdditionalText: string;
+    metaDescription: string;
   } = $props();
 </script>
 
-<Head {title} {favicon} nestingLevel={1} />
+<Head {title} {favicon} nestingLevel={1} {metaDescription} />
 
 <Nav {logoType} {logo} isDocsTemplate={true} {categorizedArticles} isIndexPage={false} />
 
