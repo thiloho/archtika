@@ -11,7 +11,8 @@
     mainContent,
     coverImage,
     publicationDate,
-    footerAdditionalText
+    footerAdditionalText,
+    metaDescription
   }: {
     favicon: string;
     title: string;
@@ -21,10 +22,11 @@
     coverImage: string;
     publicationDate: string;
     footerAdditionalText: string;
+    metaDescription: string;
   } = $props();
 </script>
 
-<Head {title} {favicon} nestingLevel={1} />
+<Head {title} {favicon} nestingLevel={1} {metaDescription} />
 
 <Nav {logoType} {logo} />
 
