@@ -7,8 +7,6 @@
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  const prodWebsiteUrl = data.websitePreviewUrl.replace("/previews", "");
-
   let sending = $state(false);
 </script>
 
@@ -56,7 +54,7 @@
         <p>
           Your website is published at:
           <br />
-          <a href={prodWebsiteUrl}>{prodWebsiteUrl}</a>
+          <a href={data.websiteProdUrl}>{data.websiteProdUrl}</a>
         </p>
       </section>
     {/if}
