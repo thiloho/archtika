@@ -50,6 +50,9 @@
         <a href="/website/{id}/collaborators">Collaborators</a>
       </li>
       <li>
+        <a href="/website/{id}/legal-information">Legal information</a>
+      </li>
+      <li>
         <a href="/website/{id}/publish">Publish</a>
       </li>
     </ul>

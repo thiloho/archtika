@@ -32,6 +32,7 @@ interface WebsiteData {
   categorized_articles: {
     [key: string]: { title: string; publication_date: string; meta_description: string }[];
   };
+  legal_information_main_content: string | null;
 }
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) => {
@@ -249,6 +250,67 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
 </html>`;
 
     await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
+  }
+
+  if (websiteData.legal_information_main_content) {
+    let head = "";
+    let body = "";
+
+    switch (websiteData.content_type) {
+      case "Blog":
+        {
+          ({ head, body } = render(BlogIndex, {
+            props: {
+              favicon: websiteData.favicon_image
+                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
+                : "",
+              title: "Legal information",
+              logoType: websiteData.logo_type,
+              logo:
+                websiteData.logo_type === "text"
+                  ? (websiteData.logo_text ?? "")
+                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
+              mainContent: md(websiteData.legal_information_main_content ?? "", false),
+              articles: [],
+              footerAdditionalText: md(websiteData.additional_text ?? "")
+            }
+          }));
+        }
+        break;
+      case "Docs":
+        {
+          ({ head, body } = render(DocsIndex, {
+            props: {
+              favicon: websiteData.favicon_image
+                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
+                : "",
+              title: "Legal information",
+              logoType: websiteData.logo_type,
+              logo:
+                websiteData.logo_type === "text"
+                  ? (websiteData.logo_text ?? "")
+                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
+              mainContent: md(websiteData.legal_information_main_content ?? "", false),
+              categorizedArticles: {},
+              footerAdditionalText: md(websiteData.additional_text ?? "")
+            }
+          }));
+        }
+        break;
+    }
+
+    const legalInformationFileContents = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ${head}
+  </head>
+  <body>
+    ${body}
+  </body>
+</html>`;
+
+    await writeFile(join(uploadDir, "legal-information.html"), legalInformationFileContents);
   }
 
   const commonStyles = await readFile(`${process.cwd()}/template-styles/common-styles.css`, {

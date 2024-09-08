@@ -47,7 +47,7 @@
     </form>
 
     {#if data.website.is_published}
-      <section>
+      <section id="publication-status">
         <h3>
           <a href="#publication-status">Publication status</a>
         </h3>

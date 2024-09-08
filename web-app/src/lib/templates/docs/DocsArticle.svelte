@@ -42,4 +42,4 @@
   </main>
 {/if}
 
-<Footer text={footerAdditionalText} />
+<Footer text={footerAdditionalText} isIndexPage={false} />

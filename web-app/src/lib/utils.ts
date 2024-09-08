@@ -150,7 +150,7 @@ export const md = (markdownContent: string, showToc = true) => {
 };
 
 export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {
-  const clipboardItems = Array.from(event.clipboardData?.items || []);
+  const clipboardItems = Array.from(event.clipboardData?.items ?? []);
   const file = clipboardItems.find((item) => item.type.startsWith("image/"));
 
   if (!file) return null;

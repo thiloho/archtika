@@ -97,6 +97,11 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByLabel("Username:").click();
     await page.getByLabel("Username:").fill(collabUsername);
     await page.getByRole("button", { name: "Submit" }).click();
+
+    await page.getByRole("link", { name: "Legal information" }).click();
+    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+    await page.getByRole("button", { name: "Submit" }).click();
   });
 
   for (const permissionLevel of permissionLevels) {
@@ -319,6 +324,45 @@ test.describe.serial("Collaborator tests", () => {
             .nth(1)
             .click();
           await page.getByRole("button", { name: "Remove collaborator" }).click();
+          await expect(page.getByText("You do not have the required")).toBeVisible();
+        }
+      });
+      test("Create/Update legal information", async ({ page }) => {
+        await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByRole("link", { name: "Legal information" }).click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByRole("button", { name: "Submit" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully created legal")).toBeVisible();
+        } else {
+          await expect(page.getByText("You do not have the required")).toBeVisible();
+        }
+
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByRole("button", { name: "Submit" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully updated legal")).toBeVisible();
+        } else {
+          await expect(page.getByText("You do not have the required")).toBeVisible();
+        }
+      });
+      test("Delete legal information", async ({ page }) => {
+        await page
+          .getByRole("link", {
+            name: [10, 20].includes(permissionLevel) ? "Documentation" : "Blog"
+          })
+          .click();
+        await page.getByRole("link", { name: "Legal information" }).click();
+        await page.getByRole("button", { name: "Delete" }).click();
+        await page.getByRole("button", { name: "Delete legal information" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully deleted legal")).toBeVisible();
+        } else {
           await expect(page.getByText("You do not have the required")).toBeVisible();
         }
       });
