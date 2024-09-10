@@ -72,6 +72,8 @@ SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION api.upload_file (BYTEA) TO authenticated_user;
 
+GRANT EXECUTE ON FUNCTION api.retrieve_file (UUID) TO anon;
+
 GRANT EXECUTE ON FUNCTION api.retrieve_file (UUID) TO authenticated_user;
 
 -- migrate:down

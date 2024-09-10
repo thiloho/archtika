@@ -17,8 +17,7 @@ END IF;
   RETURN NEW;
 END;
 $$
-LANGUAGE plpgsql
-SECURITY DEFINER;
+LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER check_user_not_website_owner
   AFTER INSERT ON internal.collab

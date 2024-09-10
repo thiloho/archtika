@@ -81,14 +81,6 @@ CREATE POLICY delete_website ON internal.website
   FOR DELETE
     USING (internal.user_has_website_access (id, 40));
 
-CREATE POLICY view_media ON internal.media
-  FOR SELECT
-    USING (internal.user_has_website_access (website_id, 10));
-
-CREATE POLICY insert_media ON internal.media
-  FOR INSERT
-    WITH CHECK (internal.user_has_website_access (website_id, 20));
-
 CREATE POLICY view_settings ON internal.settings
   FOR SELECT
     USING (internal.user_has_website_access (website_id, 10));
@@ -193,10 +185,6 @@ DROP POLICY view_websites ON internal.website;
 DROP POLICY delete_website ON internal.website;
 
 DROP POLICY update_website ON internal.website;
-
-DROP POLICY view_media ON internal.media;
-
-DROP POLICY insert_media ON internal.media;
 
 DROP POLICY view_settings ON internal.settings;
 
