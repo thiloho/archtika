@@ -13,29 +13,30 @@ ALTER TABLE internal.home ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.article ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE internal.docs_category ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE internal.footer ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE internal.legal_information ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.collab ENABLE ROW LEVEL SECURITY;
 
-CREATE FUNCTION internal.user_has_website_access (website_id UUID, required_permission INTEGER, collaborator_permission_level INTEGER DEFAULT NULL, collaborator_user_id UUID DEFAULT NULL, article_user_id UUID DEFAULT NULL, raise_error BOOLEAN DEFAULT TRUE)
-  RETURNS BOOLEAN
-  AS $$
+CREATE FUNCTION internal.user_has_website_access (website_id UUID, required_permission INTEGER, collaborator_permission_level INTEGER DEFAULT NULL, collaborator_user_id UUID DEFAULT NULL, article_user_id UUID DEFAULT NULL, raise_error BOOLEAN DEFAULT TRUE, OUT has_access BOOLEAN)
+AS $$
 DECLARE
-  _user_id UUID;
-  _has_access BOOLEAN;
+  _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
 BEGIN
-  _user_id := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
   SELECT
     EXISTS (
       SELECT
         1
       FROM
-        internal.website
+        internal.website AS w
       WHERE
-        id = website_id
-        AND user_id = _user_id) INTO _has_access;
-  IF _has_access THEN
-    RETURN _has_access;
+        w.id = user_has_website_access.website_id
+        AND w.user_id = _user_id) INTO has_access;
+  IF has_access THEN
+    RETURN;
   END IF;
   SELECT
     EXISTS (
@@ -45,23 +46,24 @@ BEGIN
         internal.collab c
       WHERE
         c.website_id = user_has_website_access.website_id
-        AND c.user_id = (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID
+        AND c.user_id = _user_id
         AND c.permission_level >= user_has_website_access.required_permission
         AND (user_has_website_access.article_user_id IS NULL
           OR (c.permission_level = 30
             OR user_has_website_access.article_user_id = _user_id))
         AND (user_has_website_access.collaborator_permission_level IS NULL
           OR (user_has_website_access.collaborator_user_id != _user_id
-            AND user_has_website_access.collaborator_permission_level < 30))) INTO _has_access;
-  IF NOT _has_access AND user_has_website_access.raise_error THEN
+            AND user_has_website_access.collaborator_permission_level < 30))) INTO has_access;
+  IF NOT has_access AND user_has_website_access.raise_error THEN
     RAISE insufficient_privilege
     USING message = 'You do not have the required permissions for this action.';
   END IF;
-    RETURN _has_access;
 END;
 $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION internal.user_has_website_access (UUID, INTEGER, INTEGER, UUID, UUID, BOOLEAN) TO authenticated_user;
 
 CREATE POLICY view_user ON internal.user
   FOR SELECT
@@ -127,6 +129,22 @@ CREATE POLICY insert_article ON internal.article
   FOR INSERT
     WITH CHECK (internal.user_has_website_access (website_id, 20));
 
+CREATE POLICY view_categories ON internal.docs_category
+  FOR SELECT
+    USING (internal.user_has_website_access (website_id, 10));
+
+CREATE POLICY update_category ON internal.docs_category
+  FOR UPDATE
+    USING (internal.user_has_website_access (website_id, 20));
+
+CREATE POLICY delete_category ON internal.docs_category
+  FOR DELETE
+    USING (internal.user_has_website_access (website_id, 20, article_user_id => user_id));
+
+CREATE POLICY insert_category ON internal.docs_category
+  FOR INSERT
+    WITH CHECK (internal.user_has_website_access (website_id, 20));
+
 CREATE POLICY view_footer ON internal.footer
   FOR SELECT
     USING (internal.user_has_website_access (website_id, 10));
@@ -134,6 +152,22 @@ CREATE POLICY view_footer ON internal.footer
 CREATE POLICY update_footer ON internal.footer
   FOR UPDATE
     USING (internal.user_has_website_access (website_id, 20));
+
+CREATE POLICY view_legal_information ON internal.legal_information
+  FOR SELECT
+    USING (internal.user_has_website_access (website_id, 10));
+
+CREATE POLICY update_legal_information ON internal.legal_information
+  FOR UPDATE
+    USING (internal.user_has_website_access (website_id, 30));
+
+CREATE POLICY delete_legal_information ON internal.legal_information
+  FOR DELETE
+    USING (internal.user_has_website_access (website_id, 30));
+
+CREATE POLICY insert_legal_information ON internal.legal_information
+  FOR INSERT
+    WITH CHECK (internal.user_has_website_access (website_id, 30));
 
 CREATE POLICY view_collaborations ON internal.collab
   FOR SELECT
@@ -184,9 +218,25 @@ DROP POLICY delete_article ON internal.article;
 
 DROP POLICY insert_article ON internal.article;
 
+DROP POLICY view_categories ON internal.docs_category;
+
+DROP POLICY update_category ON internal.docs_category;
+
+DROP POLICY delete_category ON internal.docs_category;
+
+DROP POLICY insert_category ON internal.docs_category;
+
 DROP POLICY view_footer ON internal.footer;
 
 DROP POLICY update_footer ON internal.footer;
+
+DROP POLICY insert_legal_information ON internal.legal_information;
+
+DROP POLICY delete_legal_information ON internal.legal_information;
+
+DROP POLICY update_legal_information ON internal.legal_information;
+
+DROP POLICY view_legal_information ON internal.legal_information;
 
 DROP POLICY view_collaborations ON internal.collab;
 
@@ -212,7 +262,11 @@ ALTER TABLE internal.home DISABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.article DISABLE ROW LEVEL SECURITY;
 
+ALTER TABLE internal.docs_category DISABLE ROW LEVEL SECURITY;
+
 ALTER TABLE internal.footer DISABLE ROW LEVEL SECURITY;
+
+ALTER TABLE internal.legal_information DISABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.collab DISABLE ROW LEVEL SECURITY;
 

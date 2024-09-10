@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { Collab, CollabInput, User } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) => {
   const { website, home } = await parent();
@@ -15,7 +16,7 @@ export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) =
     }
   );
 
-  const collaborators = await collabData.json();
+  const collaborators: (Collab & { user: User })[] = await collabData.json();
 
   return {
     website,
@@ -37,6 +38,8 @@ export const actions: Actions = {
       }
     });
 
+    const user: User = await userData.json();
+
     const res = await fetch(`${API_BASE_PREFIX}/collab`, {
       method: "POST",
       headers: {
@@ -45,9 +48,9 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        user_id: (await userData.json()).id,
-        permission_level: data.get("permission-level")
-      })
+        user_id: user.id,
+        permission_level: data.get("permission-level") as unknown as number
+      } satisfies CollabInput)
     });
 
     if (!res.ok) {

@@ -2,40 +2,39 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
+  import { md, type WebsiteOverview } from "../../utils";
 
   const {
-    favicon,
-    title,
-    logoType,
-    logo,
-    mainContent,
-    categorizedArticles,
-    footerAdditionalText
-  }: {
-    favicon: string;
-    title: string;
-    logoType: "text" | "image";
-    logo: string;
-    mainContent: string;
-    categorizedArticles: { [key: string]: { title: string }[] };
-    footerAdditionalText: string;
-  } = $props();
+    websiteOverview,
+    apiUrl,
+    isLegalPage
+  }: { websiteOverview: WebsiteOverview; apiUrl: string; isLegalPage: boolean } = $props();
 </script>
 
-<Head {title} {favicon} />
+<Head
+  {websiteOverview}
+  nestingLevel={0}
+  {apiUrl}
+  title={isLegalPage ? "Legal information" : websiteOverview.title}
+/>
 
-<Nav {logoType} {logo} isDocsTemplate={true} {categorizedArticles} />
+<Nav {websiteOverview} isDocsTemplate={true} isIndexPage={true} {apiUrl} />
 
 <header>
   <div class="container">
-    <h1>{title}</h1>
+    <h1>{isLegalPage ? "Legal information" : websiteOverview.title}</h1>
   </div>
 </header>
 
 <main>
   <div class="container">
-    {@html mainContent}
+    {@html md(
+      isLegalPage
+        ? (websiteOverview.legal_information?.main_content ?? "")
+        : websiteOverview.home.main_content,
+      false
+    )}
   </div>
 </main>
 
-<Footer text={footerAdditionalText} />
+<Footer {websiteOverview} isIndexPage={true} />

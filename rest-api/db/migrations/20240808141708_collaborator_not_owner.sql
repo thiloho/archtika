@@ -7,10 +7,10 @@ BEGIN
     SELECT
       1
     FROM
-      internal.website
+      internal.website AS w
     WHERE
-      id = NEW.website_id
-      AND user_id = NEW.user_id) THEN
+      w.id = NEW.website_id
+      AND w.user_id = NEW.user_id) THEN
   RAISE foreign_key_violation
   USING message = 'User cannot be added as a collaborator to their own website';
 END IF;

@@ -17,9 +17,9 @@
 {/if}
 
 <WebsiteEditor
-  id={data.website.id}
-  contentType={data.website.content_type}
-  title={data.website.title}
+  id={data.websiteOverview.id}
+  contentType={data.websiteOverview.content_type}
+  title={data.websiteOverview.title}
   previewContent={data.websitePreviewUrl}
   fullPreview={true}
 >
@@ -46,7 +46,7 @@
       <button type="submit">Publish</button>
     </form>
 
-    {#if data.website.is_published}
+    {#if data.websiteOverview.is_published}
       <section id="publication-status">
         <h3>
           <a href="#publication-status">Publication status</a>

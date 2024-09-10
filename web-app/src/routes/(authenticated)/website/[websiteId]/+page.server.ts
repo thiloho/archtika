@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { Settings, Header, Footer } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const globalSettingsData = await fetch(
@@ -32,9 +33,9 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
     }
   });
 
-  const globalSettings = await globalSettingsData.json();
-  const header = await headerData.json();
-  const footer = await footerData.json();
+  const globalSettings: Settings = await globalSettingsData.json();
+  const header: Header = await headerData.json();
+  const footer: Footer = await footerData.json();
 
   return {
     globalSettings,

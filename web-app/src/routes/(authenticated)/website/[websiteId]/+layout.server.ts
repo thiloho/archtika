@@ -1,6 +1,7 @@
 import type { LayoutServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { error } from "@sveltejs/kit";
+import type { Website, Home } from "$lib/db-schema";
 
 export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
   const websiteData = await fetch(`${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`, {
@@ -25,8 +26,8 @@ export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
     }
   });
 
-  const website = await websiteData.json();
-  const home = await homeData.json();
+  const website: Website = await websiteData.json();
+  const home: Home = await homeData.json();
 
   return {
     website,

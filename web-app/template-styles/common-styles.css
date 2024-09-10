@@ -25,11 +25,12 @@
 
   --color-text: black;
   --color-text-invert: white;
+  --color-border: hsl(0 0% 50%);
   --color-accent: hsl(210, 100%, 30%);
   --color-success: hsl(105, 100%, 30%);
   --color-error: hsl(0, 100%, 30%);
 
-  --border-primary: 0.0625rem solid var(--bg-tertiary);
+  --border-primary: 0.0625rem solid var(--color-border);
   --border-radius: 0.125rem;
 
   /* Step -1: 14.9953px → 14.2222px */
@@ -222,6 +223,10 @@ a {
   color: var(--color-accent);
 }
 
+a:has(img) {
+  display: inline-block;
+}
+
 :is(h1, h2, h3, h4, h5, h6) > a {
   color: var(--color-text);
   text-decoration: none;
@@ -242,6 +247,7 @@ svg,
 video {
   max-inline-size: 100%;
   block-size: auto;
+  vertical-align: middle;
 }
 
 p,

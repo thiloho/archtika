@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import type { LegalInformation, LegalInformationInput } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ parent, fetch, params, cookies }) => {
   const legalInformationData = await fetch(
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async ({ parent, fetch, params, cookies }) =
     }
   );
 
-  const legalInformation = legalInformationData.ok ? await legalInformationData.json() : null;
+  const legalInformation: LegalInformation = await legalInformationData.json();
   const { website } = await parent();
 
   return {
@@ -39,8 +40,8 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        main_content: data.get("main-content")
-      })
+        main_content: data.get("main-content") as string
+      } satisfies LegalInformationInput)
     });
 
     if (!res.ok) {

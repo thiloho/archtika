@@ -10,7 +10,9 @@ DECLARE
   _original_filename TEXT := _headers ->> 'x-original-filename';
   _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/jpeg', 'image/webp'];
   _max_file_size INT := 5 * 1024 * 1024;
+  _has_access BOOLEAN;
 BEGIN
+  _has_access = internal.user_has_website_access (_website_id, 20);
   IF OCTET_LENGTH($1) = 0 THEN
     RAISE invalid_parameter_value
     USING message = 'No file data was provided';
@@ -19,7 +21,7 @@ BEGIN
       SELECT
         UNNEST(_allowed_mimetypes)) THEN
       RAISE invalid_parameter_value
-      USING message = 'Invalid MIME type. Allowed types are: png, svg, jpg, webp';
+      USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp';
     END IF;
       IF OCTET_LENGTH($1) > _max_file_size THEN
         RAISE program_limit_exceeded
@@ -46,7 +48,7 @@ BEGIN
     '{ "Content-Disposition": "inline; filename=\"%s\"" },'
     '{ "Cache-Control": "max-age=259200" }]', m.mimetype, m.original_name)
   FROM
-    internal.media m
+    internal.media AS m
   WHERE
     m.id = retrieve_file.id INTO _headers;
   PERFORM

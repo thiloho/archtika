@@ -23,7 +23,7 @@ export const actions: Actions = {
         Authorization: `Bearer ${cookies.get("session_token")}`
       },
       body: JSON.stringify({
-        password: data.get("password")
+        pass: data.get("password")
       })
     });
 

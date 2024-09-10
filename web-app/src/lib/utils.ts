@@ -5,6 +5,16 @@ import hljs from "highlight.js";
 import GithubSlugger from "github-slugger";
 import DOMPurify from "isomorphic-dompurify";
 import { applyAction, deserialize } from "$app/forms";
+import type {
+  Website,
+  Settings,
+  Header,
+  Home,
+  Footer,
+  Article,
+  DocsCategory,
+  LegalInformation
+} from "$lib/db-schema";
 
 export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/svg+xml", "image/webp"];
 
@@ -189,3 +199,12 @@ export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: s
     return "";
   }
 };
+
+export interface WebsiteOverview extends Website {
+  settings: Settings;
+  header: Header;
+  home: Home;
+  footer: Footer;
+  article: (Article & { docs_category: DocsCategory | null })[];
+  legal_information?: LegalInformation;
+}

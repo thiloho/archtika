@@ -2,8 +2,7 @@
 CREATE VIEW api.account WITH ( security_invoker = ON
 ) AS
 SELECT
-  id,
-  username
+  *
 FROM
   internal.user
 WHERE
@@ -23,99 +22,70 @@ FROM
 CREATE VIEW api.website WITH ( security_invoker = ON
 ) AS
 SELECT
-  id,
-  user_id,
-  content_type,
-  title,
-  created_at,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.website;
 
 CREATE VIEW api.settings WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  accent_color_light_theme,
-  accent_color_dark_theme,
-  favicon_image,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.settings;
 
 CREATE VIEW api.header WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  logo_type,
-  logo_text,
-  logo_image,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.header;
 
 CREATE VIEW api.home WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  main_content,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.home;
 
 CREATE VIEW api.article WITH ( security_invoker = ON
 ) AS
 SELECT
-  id,
-  website_id,
-  user_id,
-  title,
-  meta_description,
-  meta_author,
-  cover_image,
-  publication_date,
-  main_content,
-  created_at,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.article;
+
+CREATE VIEW api.docs_category WITH ( security_invoker = ON
+) AS
+SELECT
+  *
+FROM
+  internal.docs_category;
 
 CREATE VIEW api.footer WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  additional_text,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.footer;
+
+CREATE VIEW api.legal_information WITH ( security_invoker = ON
+) AS
+SELECT
+  *
+FROM
+  internal.legal_information;
 
 CREATE VIEW api.collab WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  user_id,
-  permission_level,
-  added_at,
-  last_modified_at,
-  last_modified_by
+  *
 FROM
   internal.collab;
 
 CREATE VIEW api.change_log WITH ( security_invoker = ON
 ) AS
 SELECT
-  website_id,
-  user_id,
-  change_summary,
-  previous_value,
-  new_value,
-  timestamp
+  *
 FROM
   internal.change_log;
 
@@ -123,9 +93,8 @@ CREATE FUNCTION api.create_website (content_type VARCHAR(10), title VARCHAR(50),
 AS $$
 DECLARE
   _website_id UUID;
-  _user_id UUID;
+  _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
 BEGIN
-  _user_id := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
   INSERT INTO internal.website (content_type, title)
     VALUES (create_website.content_type, create_website.title)
   RETURNING
@@ -135,8 +104,7 @@ BEGIN
   INSERT INTO internal.header (website_id, logo_text)
     VALUES (_website_id, 'archtika ' || create_website.content_type);
   INSERT INTO internal.home (website_id, main_content)
-    VALUES (_website_id, '
-## About
+    VALUES (_website_id, '## About
 
 archtika is a FLOSS, modern, performant and lightweight CMS (Content Mangement System) in the form of a web application. It allows you to easily create, manage and publish minimal, responsive and SEO friendly blogging and documentation websites with official, professionally designed templates.
 
@@ -148,8 +116,7 @@ For the backend, PostgreSQL is used in combination with PostgREST to create a RE
 
 The web application uses SvelteKit with SSR (Server Side Rendering) and Svelte version 5, currently in beta.
 
-NGINX is used to deploy the websites, serving the static site files from the `/var/www/archtika-websites` directory. The static files can be found in this directory via the path `<user_id>/<website_id>`, which is dynamically created by the web application.
-  ');
+NGINX is used to deploy the websites, serving the static site files from the `/var/www/archtika-websites` directory. The static files can be found in this directory via the path `<user_id>/<website_id>`, which is dynamically created by the web application.');
   INSERT INTO internal.footer (website_id, additional_text)
     VALUES (_website_id, 'archtika is a free, open, modern, performant and lightweight CMS');
   website_id := _website_id;
@@ -187,9 +154,17 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON internal.article TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.article TO authenticated_user;
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON internal.docs_category TO authenticated_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON api.docs_category TO authenticated_user;
+
 GRANT SELECT, UPDATE ON internal.footer TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.footer TO authenticated_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON internal.legal_information TO authenticated_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON api.legal_information TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON internal.collab TO authenticated_user;
 
@@ -206,9 +181,13 @@ DROP VIEW api.change_log;
 
 DROP VIEW api.collab;
 
+DROP VIEW api.legal_information;
+
 DROP VIEW api.footer;
 
 DROP VIEW api.home;
+
+DROP VIEW api.docs_category;
 
 DROP VIEW api.article;
 

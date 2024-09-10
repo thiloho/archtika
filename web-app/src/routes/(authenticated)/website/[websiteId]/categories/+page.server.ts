@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { DocsCategory, DocsCategoryInput } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
   const categoryData = await fetch(
@@ -13,7 +14,7 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
     }
   );
 
-  const categories = await categoryData.json();
+  const categories: DocsCategory[] = await categoryData.json();
   const { website, home } = await parent();
 
   return {
@@ -35,9 +36,9 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        category_name: data.get("category-name"),
-        category_weight: data.get("category-weight")
-      })
+        category_name: data.get("category-name") as string,
+        category_weight: data.get("category-weight") as unknown as number
+      } satisfies DocsCategoryInput)
     });
 
     if (!res.ok) {

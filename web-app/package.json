@@ -10,7 +10,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal"
   },
   "devDependencies": {
     "@playwright/test": "1.40.0",
@@ -26,6 +27,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-svelte": "2.43.0",
     "globals": "15.9.0",
+    "pg-to-ts": "4.1.1",
     "prettier": "3.3.3",
     "prettier-plugin-svelte": "3.2.6",
     "svelte": "5.0.0-next.220",

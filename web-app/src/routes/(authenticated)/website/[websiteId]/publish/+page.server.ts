@@ -1,6 +1,6 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { md } from "$lib/utils";
+import { type WebsiteOverview } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { render } from "svelte/server";
@@ -10,34 +10,9 @@ import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import { dev } from "$app/environment";
 
-interface WebsiteData {
-  id: string;
-  content_type: "Blog" | "Docs";
-  favicon_image: string | null;
-  title: string;
-  logo_type: "text" | "image";
-  logo_text: string | null;
-  logo_image: string | null;
-  main_content: string;
-  additional_text: string;
-  accent_color_light_theme: string;
-  accent_color_dark_theme: string;
-  articles: {
-    cover_image: string | null;
-    title: string;
-    publication_date: string;
-    meta_description: string;
-    main_content: string;
-  }[];
-  categorized_articles: {
-    [key: string]: { title: string; publication_date: string; meta_description: string }[];
-  };
-  legal_information_main_content: string | null;
-}
-
-export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const websiteOverviewData = await fetch(
-    `${API_BASE_PREFIX}/website_overview?id=eq.${params.websiteId}`,
+    `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*)`,
     {
       method: "GET",
       headers: {
@@ -48,8 +23,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) =
     }
   );
 
-  const websiteOverview = await websiteOverviewData.json();
-  const { website } = await parent();
+  const websiteOverview: WebsiteOverview = await websiteOverviewData.json();
 
   generateStaticFiles(websiteOverview);
 
@@ -70,15 +44,14 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) =
   return {
     websiteOverview,
     websitePreviewUrl,
-    websiteProdUrl,
-    website
+    websiteProdUrl
   };
 };
 
 export const actions: Actions = {
   publishWebsite: async ({ fetch, params, cookies }) => {
     const websiteOverviewData = await fetch(
-      `${API_BASE_PREFIX}/website_overview?id=eq.${params.websiteId}`,
+      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*)`,
       {
         method: "GET",
         headers: {
@@ -112,54 +85,9 @@ export const actions: Actions = {
   }
 };
 
-const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean = true) => {
-  let head = "";
-  let body = "";
-
-  switch (websiteData.content_type) {
-    case "Blog":
-      {
-        ({ head, body } = render(BlogIndex, {
-          props: {
-            favicon: websiteData.favicon_image
-              ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-              : "",
-            title: websiteData.title,
-            logoType: websiteData.logo_type,
-            logo:
-              websiteData.logo_type === "text"
-                ? (websiteData.logo_text ?? "")
-                : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-            mainContent: md(websiteData.main_content ?? "", false),
-            articles: websiteData.articles ?? [],
-            footerAdditionalText: md(websiteData.additional_text ?? "")
-          }
-        }));
-      }
-      break;
-    case "Docs":
-      {
-        ({ head, body } = render(DocsIndex, {
-          props: {
-            favicon: websiteData.favicon_image
-              ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-              : "",
-            title: websiteData.title,
-            logoType: websiteData.logo_type,
-            logo:
-              websiteData.logo_type === "text"
-                ? (websiteData.logo_text ?? "")
-                : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-            mainContent: md(websiteData.main_content ?? "", false),
-            categorizedArticles: websiteData.categorized_articles ?? [],
-            footerAdditionalText: md(websiteData.additional_text ?? "")
-          }
-        }));
-      }
-      break;
-  }
-
-  const indexFileContents = `
+const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview: boolean = true) => {
+  const fileContents = (head: string, body: string) => {
+    return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -169,6 +97,15 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
     ${body}
   </body>
 </html>`;
+  };
+
+  const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
+    props: {
+      websiteOverview: websiteData,
+      apiUrl: API_BASE_PREFIX,
+      isLegalPage: false
+    }
+  });
 
   let uploadDir = "";
 
@@ -179,138 +116,38 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
   }
 
   await mkdir(uploadDir, { recursive: true });
-  await writeFile(join(uploadDir, "index.html"), indexFileContents);
+  await writeFile(join(uploadDir, "index.html"), fileContents(head, body));
   await mkdir(join(uploadDir, "articles"), {
     recursive: true
   });
 
-  for (const article of websiteData.articles ?? []) {
+  for (const article of websiteData.article ?? []) {
     const articleFileName = article.title.toLowerCase().split(" ").join("-");
 
-    let head = "";
-    let body = "";
+    const { head, body } = render(websiteData.content_type === "Blog" ? BlogArticle : DocsArticle, {
+      props: {
+        websiteOverview: websiteData,
+        article,
+        apiUrl: API_BASE_PREFIX
+      }
+    });
 
-    switch (websiteData.content_type) {
-      case "Blog":
-        {
-          ({ head, body } = render(BlogArticle, {
-            props: {
-              favicon: websiteData.favicon_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-                : "",
-              title: article.title,
-              logoType: websiteData.logo_type,
-              logo:
-                websiteData.logo_type === "text"
-                  ? (websiteData.logo_text ?? "")
-                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-              coverImage: article.cover_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${article.cover_image}`
-                : "",
-              publicationDate: article.publication_date,
-              mainContent: md(article.main_content ?? ""),
-              footerAdditionalText: md(websiteData.additional_text ?? ""),
-              metaDescription: article.meta_description
-            }
-          }));
-        }
-        break;
-      case "Docs":
-        {
-          ({ head, body } = render(DocsArticle, {
-            props: {
-              favicon: websiteData.favicon_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-                : "",
-              title: article.title,
-              logoType: websiteData.logo_type,
-              logo:
-                websiteData.logo_type === "text"
-                  ? (websiteData.logo_text ?? "")
-                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-              mainContent: md(article.main_content ?? ""),
-              categorizedArticles: websiteData.categorized_articles ?? [],
-              footerAdditionalText: md(websiteData.additional_text ?? ""),
-              metaDescription: article.meta_description
-            }
-          }));
-        }
-        break;
-    }
-
-    const articleFileContents = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    ${head}
-  </head>
-  <body>
-    ${body}
-  </body>
-</html>`;
-
-    await writeFile(join(uploadDir, "articles", `${articleFileName}.html`), articleFileContents);
+    await writeFile(
+      join(uploadDir, "articles", `${articleFileName}.html`),
+      fileContents(head, body)
+    );
   }
 
-  if (websiteData.legal_information_main_content) {
-    let head = "";
-    let body = "";
+  if (websiteData.legal_information) {
+    const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
+      props: {
+        websiteOverview: websiteData,
+        apiUrl: API_BASE_PREFIX,
+        isLegalPage: true
+      }
+    });
 
-    switch (websiteData.content_type) {
-      case "Blog":
-        {
-          ({ head, body } = render(BlogIndex, {
-            props: {
-              favicon: websiteData.favicon_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-                : "",
-              title: "Legal information",
-              logoType: websiteData.logo_type,
-              logo:
-                websiteData.logo_type === "text"
-                  ? (websiteData.logo_text ?? "")
-                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-              mainContent: md(websiteData.legal_information_main_content ?? "", false),
-              articles: [],
-              footerAdditionalText: md(websiteData.additional_text ?? "")
-            }
-          }));
-        }
-        break;
-      case "Docs":
-        {
-          ({ head, body } = render(DocsIndex, {
-            props: {
-              favicon: websiteData.favicon_image
-                ? `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.favicon_image}`
-                : "",
-              title: "Legal information",
-              logoType: websiteData.logo_type,
-              logo:
-                websiteData.logo_type === "text"
-                  ? (websiteData.logo_text ?? "")
-                  : `${API_BASE_PREFIX}/rpc/retrieve_file?id=${websiteData.logo_image}`,
-              mainContent: md(websiteData.legal_information_main_content ?? "", false),
-              categorizedArticles: {},
-              footerAdditionalText: md(websiteData.additional_text ?? "")
-            }
-          }));
-        }
-        break;
-    }
-
-    const legalInformationFileContents = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    ${head}
-  </head>
-  <body>
-    ${body}
-  </body>
-</html>`;
-
-    await writeFile(join(uploadDir, "legal-information.html"), legalInformationFileContents);
+    await writeFile(join(uploadDir, "legal-information.html"), fileContents(head, body));
   }
 
   const commonStyles = await readFile(`${process.cwd()}/template-styles/common-styles.css`, {
@@ -328,14 +165,14 @@ const generateStaticFiles = async (websiteData: WebsiteData, isPreview: boolean 
       .concat(specificStyles)
       .replace(
         /--color-accent:\s*(.*?);/,
-        `--color-accent: ${websiteData.accent_color_dark_theme};`
+        `--color-accent: ${websiteData.settings.accent_color_dark_theme};`
       )
       .replace(
         /@media\s*\(prefers-color-scheme:\s*dark\)\s*{[^}]*--color-accent:\s*(.*?);/,
         (match) =>
           match.replace(
             /--color-accent:\s*(.*?);/,
-            `--color-accent: ${websiteData.accent_color_light_theme};`
+            `--color-accent: ${websiteData.settings.accent_color_light_theme};`
           )
       )
   );

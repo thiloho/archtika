@@ -8,7 +8,7 @@
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let previewContent = $state(data.legalInformation?.main_content);
+  let previewContent = $state(data.legalInformation.main_content);
   let mainContentTextarea: HTMLTextAreaElement;
   let textareaScrollTop = $state(0);
 
@@ -80,14 +80,14 @@
           bind:value={previewContent}
           bind:this={mainContentTextarea}
           onscroll={updateScrollPercentage}
-          required>{data.legalInformation?.main_content ?? ""}</textarea
+          required>{data.legalInformation.main_content ?? ""}</textarea
         >
       </label>
 
       <button type="submit">Submit</button>
     </form>
 
-    {#if data.legalInformation?.main_content}
+    {#if data.legalInformation.main_content}
       <Modal id="delete-legal-information" text="Delete">
         <form
           action="?/deleteLegalInformation"
@@ -98,7 +98,6 @@
               await update();
               window.location.hash = "!";
               sending = false;
-              previewContent = null;
             };
           }}
         >

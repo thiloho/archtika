@@ -2,44 +2,38 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
+  import { md, type WebsiteOverview } from "../../utils";
+  import type { Article } from "../../db-schema";
 
   const {
-    favicon,
-    title,
-    logoType,
-    logo,
-    mainContent,
-    categorizedArticles,
-    footerAdditionalText,
-    metaDescription
-  }: {
-    favicon: string;
-    title: string;
-    logoType: "text" | "image";
-    logo: string;
-    mainContent: string;
-    categorizedArticles: { [key: string]: { title: string }[] };
-    footerAdditionalText: string;
-    metaDescription: string;
-  } = $props();
+    websiteOverview,
+    article,
+    apiUrl
+  }: { websiteOverview: WebsiteOverview; article: Article; apiUrl: string } = $props();
 </script>
 
-<Head {title} {favicon} nestingLevel={1} {metaDescription} />
+<Head
+  {websiteOverview}
+  nestingLevel={1}
+  {apiUrl}
+  title={article.title}
+  metaDescription={article.meta_description}
+/>
 
-<Nav {logoType} {logo} isDocsTemplate={true} {categorizedArticles} isIndexPage={false} />
+<Nav {websiteOverview} isDocsTemplate={true} isIndexPage={false} {apiUrl} />
 
 <header>
   <div class="container">
-    <h1>{title}</h1>
+    <h1>{article.title}</h1>
   </div>
 </header>
 
-{#if mainContent}
+{#if article.main_content}
   <main>
     <div class="container">
-      {@html mainContent}
+      {@html md(article.main_content)}
     </div>
   </main>
 {/if}
 
-<Footer text={footerAdditionalText} isIndexPage={false} />
+<Footer {websiteOverview} isIndexPage={false} />

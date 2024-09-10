@@ -10,7 +10,7 @@ export const actions: Actions = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: data.get("username"),
-        password: data.get("password")
+        pass: data.get("password")
       })
     });
 

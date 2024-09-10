@@ -1,9 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
-interface User {
-  id: string;
-  username: string;
-}
+import type { User } from "$lib/db-schema";
 
 declare global {
   namespace App {

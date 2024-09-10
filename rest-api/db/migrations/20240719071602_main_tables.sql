@@ -1,21 +1,25 @@
 -- migrate:up
+CREATE SCHEMA internal;
+
 CREATE SCHEMA api;
+
+CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
 
 CREATE ROLE anon NOLOGIN NOINHERIT;
 
-GRANT USAGE ON SCHEMA api TO anon;
-
 CREATE ROLE authenticated_user NOLOGIN NOINHERIT;
-
-GRANT USAGE ON SCHEMA api TO authenticated_user;
-
-CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
 
 GRANT anon TO authenticator;
 
 GRANT authenticated_user TO authenticator;
 
-CREATE SCHEMA internal;
+GRANT USAGE ON SCHEMA api TO anon;
+
+GRANT USAGE ON SCHEMA api TO authenticated_user;
+
+GRANT USAGE ON SCHEMA internal TO authenticated_user;
+
+ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
@@ -30,8 +34,10 @@ CREATE TABLE internal.website (
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
+  is_published BOOLEAN NOT NULL DEFAULT FALSE,
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  title_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', title)) STORED
 );
 
 CREATE TABLE internal.media (
@@ -70,24 +76,44 @@ CREATE TABLE internal.home (
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
 
+CREATE TABLE internal.docs_category (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+  website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
+  category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
+  category_weight INTEGER CHECK (category_weight >= 0) NOT NULL,
+  UNIQUE (website_id, category_name),
+  UNIQUE (website_id, category_weight)
+);
+
 CREATE TABLE internal.article (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
-  user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   title VARCHAR(100) NOT NULL CHECK (TRIM(title) != ''),
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
-  publication_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  publication_date DATE DEFAULT CURRENT_DATE,
   main_content TEXT CHECK (TRIM(main_content) != ''),
+  category UUID REFERENCES internal.docs_category (id) ON DELETE SET NULL,
+  article_weight INTEGER CHECK (article_weight IS NULL OR article_weight >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  title_description_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', COALESCE(title, '') || ' ' || COALESCE(meta_description, ''))) STORED
 );
 
 CREATE TABLE internal.footer (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
   additional_text VARCHAR(250) NOT NULL CHECK (TRIM(additional_text) != ''),
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
+);
+
+CREATE TABLE internal.legal_information (
+  website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
+  main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
@@ -117,9 +143,13 @@ DROP TABLE internal.change_log;
 
 DROP TABLE internal.collab;
 
+DROP TABLE internal.legal_information;
+
 DROP TABLE internal.footer;
 
 DROP TABLE internal.article;
+
+DROP TABLE internal.docs_category;
 
 DROP TABLE internal.home;
 
@@ -131,15 +161,17 @@ DROP TABLE internal.media;
 
 DROP TABLE internal.website;
 
-DROP SCHEMA api;
-
 DROP TABLE internal.user;
 
-DROP SCHEMA internal;
+DROP SCHEMA api;
 
-DROP ROLE authenticator;
+DROP SCHEMA internal;
 
 DROP ROLE anon;
 
 DROP ROLE authenticated_user;
+
+DROP ROLE authenticator;
+
+ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC;
 

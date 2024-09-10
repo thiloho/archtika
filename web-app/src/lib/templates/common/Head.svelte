@@ -1,13 +1,17 @@
 <script lang="ts">
+  import type { WebsiteOverview } from "../../utils";
+
   const {
+    websiteOverview,
+    nestingLevel,
+    apiUrl,
     title,
-    favicon,
-    nestingLevel = 0,
-    metaDescription = null
+    metaDescription
   }: {
+    websiteOverview: WebsiteOverview;
+    nestingLevel: number;
+    apiUrl: string;
     title: string;
-    favicon: string;
-    nestingLevel?: number;
     metaDescription?: string | null;
   } = $props();
 </script>
@@ -19,8 +23,11 @@
     <title>{title}</title>
     <meta name="description" content={metaDescription ?? title} />
     <link rel="stylesheet" href={`${"../".repeat(nestingLevel)}styles.css`} />
-    {#if favicon}
-      <link rel="icon" href={favicon} />
+    {#if websiteOverview.settings.favicon_image}
+      <link
+        rel="icon"
+        href="{apiUrl}/rpc/retrieve_file?id={websiteOverview.settings.favicon_image}"
+      />
     {/if}
   </head>
 </svelte:head>
