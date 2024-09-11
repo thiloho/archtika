@@ -82,13 +82,6 @@ SELECT
 FROM
   internal.collab;
 
-CREATE VIEW api.change_log WITH ( security_invoker = ON
-) AS
-SELECT
-  *
-FROM
-  internal.change_log;
-
 CREATE FUNCTION api.create_website (content_type VARCHAR(10), title VARCHAR(50), OUT website_id UUID)
 AS $$
 DECLARE
@@ -170,14 +163,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON internal.collab TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.collab TO authenticated_user;
 
-GRANT SELECT ON internal.change_log TO authenticated_user;
-
-GRANT SELECT ON api.change_log TO authenticated_user;
-
 -- migrate:down
 DROP FUNCTION api.create_website (VARCHAR(10), VARCHAR(50));
-
-DROP VIEW api.change_log;
 
 DROP VIEW api.collab;
 

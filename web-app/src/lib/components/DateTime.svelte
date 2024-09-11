@@ -11,6 +11,6 @@
   };
 </script>
 
-<time datetime={date.toLocaleString("sv").replace(" ", "T")}>
-  {date.toLocaleString("en-us", { ...options })}
+<time datetime={new Date(date).toLocaleString("sv").replace(" ", "T")}>
+  {new Date(date).toLocaleString("en-us", { ...options })}
 </time>

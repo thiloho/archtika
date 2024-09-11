@@ -44,6 +44,11 @@ CREATE TRIGGER update_article_last_modified
   FOR EACH ROW
   EXECUTE FUNCTION internal.update_last_modified ();
 
+CREATE TRIGGER update_docs_category_modified
+  BEFORE INSERT OR UPDATE OR DELETE ON internal.docs_category
+  FOR EACH ROW
+  EXECUTE FUNCTION internal.update_last_modified ();
+
 CREATE TRIGGER update_footer_last_modified
   BEFORE UPDATE ON internal.footer
   FOR EACH ROW
@@ -69,6 +74,8 @@ DROP TRIGGER update_header_last_modified ON internal.header;
 DROP TRIGGER update_home_last_modified ON internal.home;
 
 DROP TRIGGER update_article_last_modified ON internal.article;
+
+DROP TRIGGER update_docs_category_modified ON internal.docs_category;
 
 DROP TRIGGER update_footer_last_modified ON internal.footer;
 

@@ -82,6 +82,8 @@ CREATE TABLE internal.docs_category (
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
   category_weight INTEGER CHECK (category_weight >= 0) NOT NULL,
+  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
   UNIQUE (website_id, category_name),
   UNIQUE (website_id, category_weight)
 );
@@ -94,14 +96,15 @@ CREATE TABLE internal.article (
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
-  publication_date DATE DEFAULT CURRENT_DATE,
+  publication_date DATE,
   main_content TEXT CHECK (TRIM(main_content) != ''),
   category UUID REFERENCES internal.docs_category (id) ON DELETE SET NULL,
   article_weight INTEGER CHECK (article_weight IS NULL OR article_weight >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
-  title_description_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', COALESCE(title, '') || ' ' || COALESCE(meta_description, ''))) STORED
+  title_description_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', COALESCE(title, '') || ' ' || COALESCE(meta_description, ''))) STORED,
+  UNIQUE (website_id, category, article_weight)
 );
 
 CREATE TABLE internal.footer (
@@ -128,19 +131,7 @@ CREATE TABLE internal.collab (
   PRIMARY KEY (website_id, user_id)
 );
 
-CREATE TABLE internal.change_log (
-  website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE,
-  user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
-  change_summary VARCHAR(255) NOT NULL,
-  previous_value JSONB,
-  new_value JSONB,
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  PRIMARY KEY (website_id, user_id, TIMESTAMP)
-);
-
 -- migrate:down
-DROP TABLE internal.change_log;
-
 DROP TABLE internal.collab;
 
 DROP TABLE internal.legal_information;
