@@ -9,10 +9,10 @@ BEGIN
     UPDATE
       internal.website
     SET
-      last_modified_at = NEW.last_modified_at,
-      last_modified_by = NEW.last_modified_by
+      last_modified_at = CLOCK_TIMESTAMP(),
+      last_modified_by = (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID
     WHERE
-      id = NEW.website_id;
+      id = COALESCE(NEW.website_id, OLD.website_id);
   END IF;
   RETURN NEW;
 END;
@@ -55,12 +55,12 @@ CREATE TRIGGER update_footer_last_modified
   EXECUTE FUNCTION internal.update_last_modified ();
 
 CREATE TRIGGER update_legal_information_last_modified
-  BEFORE INSERT OR UPDATE OR DELETE ON internal.legal_information
+  BEFORE INSERT OR DELETE ON internal.legal_information
   FOR EACH ROW
   EXECUTE FUNCTION internal.update_last_modified ();
 
 CREATE TRIGGER update_collab_last_modified
-  BEFORE UPDATE ON internal.collab
+  BEFORE INSERT OR UPDATE OR DELETE ON internal.collab
   FOR EACH ROW
   EXECUTE FUNCTION internal.update_last_modified ();
 

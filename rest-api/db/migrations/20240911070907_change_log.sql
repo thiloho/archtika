@@ -21,7 +21,7 @@ BEGIN
   IF TG_TABLE_NAME = 'website' THEN
     _website_id := NEW.id;
   ELSE
-    _website_id := NEW.website_id;
+    _website_id := COALESCE(NEW.website_id, OLD.website_id);
   END IF;
   IF TG_OP = 'INSERT' THEN
     INSERT INTO internal.change_log (website_id, table_name, operation, new_value)
@@ -42,7 +42,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER;
 
 CREATE TRIGGER website_track_changes
-  AFTER INSERT OR UPDATE OR DELETE ON internal.website
+  AFTER UPDATE ON internal.website
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
@@ -77,7 +77,7 @@ CREATE TRIGGER footer_track_changes
   EXECUTE FUNCTION internal.track_changes ();
 
 CREATE TRIGGER legal_information_track_changes
-  AFTER UPDATE ON internal.legal_information
+  AFTER INSERT OR UPDATE OR DELETE ON internal.legal_information
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
