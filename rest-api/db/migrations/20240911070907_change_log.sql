@@ -27,15 +27,30 @@ BEGIN
     INSERT INTO internal.change_log (website_id, table_name, operation, new_value)
       VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (NEW));
     RETURN NEW;
-  ELSIF TG_OP = 'UPDATE' THEN
-    INSERT INTO internal.change_log (website_id, table_name, operation, old_value, new_value)
-      VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD) - HSTORE (NEW), HSTORE (NEW) - HSTORE (OLD));
+  ELSIF TG_OP = 'UPDATE'
+      AND EXISTS (
+        SELECT
+          id
+        FROM
+          internal.website
+        WHERE
+          id = _website_id) THEN
+      INSERT INTO internal.change_log (website_id, table_name, operation, old_value, new_value)
+        VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD) - HSTORE (NEW), HSTORE (NEW) - HSTORE (OLD));
     RETURN NEW;
-  ELSIF TG_OP = 'DELETE' THEN
-    INSERT INTO internal.change_log (website_id, table_name, operation, old_value)
-      VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD));
+  ELSIF TG_OP = 'DELETE'
+      AND EXISTS (
+        SELECT
+          id
+        FROM
+          internal.website
+        WHERE
+          id = _website_id) THEN
+      INSERT INTO internal.change_log (website_id, table_name, operation, old_value)
+        VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD));
     RETURN NEW;
   END IF;
+  RETURN NEW;
 END;
 $$
 LANGUAGE plpgsql

@@ -56,7 +56,7 @@ BEGIN
             AND user_has_website_access.collaborator_permission_level < 30))) INTO has_access;
   IF NOT has_access AND user_has_website_access.raise_error THEN
     RAISE insufficient_privilege
-    USING message = 'You do not have the required permissions for this action.';
+    USING message = 'Insufficient permissions';
   END IF;
 END;
 $$
