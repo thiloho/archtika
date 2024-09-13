@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WebsiteOverview } from "../../utils";
+  import { type WebsiteOverview, slugify } from "../../utils";
   import type { Article } from "../../db-schema";
 
   const {
@@ -60,9 +60,8 @@
               <strong>{key}</strong>
               <ul>
                 {#each categorizedArticles[key] as { title }}
-                  {@const articleFileName = title.toLowerCase().split(" ").join("-")}
                   <li>
-                    <a href="{isIndexPage ? './articles' : '.'}/{articleFileName}">{title}</a>
+                    <a href="{isIndexPage ? './articles' : '.'}/{slugify(title)}">{title}</a>
                   </li>
                 {/each}
               </ul>

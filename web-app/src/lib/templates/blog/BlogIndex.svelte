@@ -2,7 +2,7 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
-  import { md, type WebsiteOverview } from "../../utils";
+  import { md, slugify, type WebsiteOverview } from "$lib/utils";
 
   const {
     websiteOverview,
@@ -42,14 +42,13 @@
 
         <ul class="unpadded">
           {#each websiteOverview.article as article}
-            {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
             <li>
               {#if article.publication_date}
                 <p>{article.publication_date}</p>
               {/if}
               <p>
                 <strong>
-                  <a href="./articles/{articleFileName}">{article.title}</a>
+                  <a href="./articles/{slugify(article.title)}">{article.title}</a>
                 </strong>
               </p>
               {#if article.meta_description}

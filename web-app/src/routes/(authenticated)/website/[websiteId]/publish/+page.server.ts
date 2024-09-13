@@ -1,6 +1,6 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { type WebsiteOverview } from "$lib/utils";
+import { type WebsiteOverview, slugify } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { render } from "svelte/server";
@@ -122,8 +122,6 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview: bool
   });
 
   for (const article of websiteData.article ?? []) {
-    const articleFileName = article.title.toLowerCase().split(" ").join("-");
-
     const { head, body } = render(websiteData.content_type === "Blog" ? BlogArticle : DocsArticle, {
       props: {
         websiteOverview: websiteData,
@@ -133,7 +131,7 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview: bool
     });
 
     await writeFile(
-      join(uploadDir, "articles", `${articleFileName}.html`),
+      join(uploadDir, "articles", `${slugify(article.title)}.html`),
       fileContents(head, body)
     );
   }

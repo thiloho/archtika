@@ -2,7 +2,6 @@ import { Marked } from "marked";
 import type { Renderer, Token } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
-import GithubSlugger from "github-slugger";
 import DOMPurify from "isomorphic-dompurify";
 import { applyAction, deserialize } from "$app/forms";
 import type {
@@ -17,6 +16,19 @@ import type {
 } from "$lib/db-schema";
 
 export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/svg+xml", "image/webp"];
+
+export const slugify = (string: string) => {
+  return string
+    .toString()
+    .normalize("NFKD") // Normalize Unicode characters
+    .toLowerCase() // Convert to lowercase
+    .trim() // Trim leading and trailing whitespace
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^\w\-]+/g, "") // Remove non-word characters (except hyphens)
+    .replace(/\-\-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-+/, "") // Remove leading hyphens
+    .replace(/-+$/, ""); // Remove trailing hyphens
+};
 
 const createMarkdownParser = (showToc = true) => {
   const marked = new Marked();
@@ -38,36 +50,17 @@ const createMarkdownParser = (showToc = true) => {
     })
   );
 
-  const unescapeTest = /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi;
-
-  const unescape = (html: string) => {
-    return html.replace(unescapeTest, (_, n) => {
-      n = n.toLowerCase();
-      if (n === "colon") return ":";
-      if (n.charAt(0) === "#") {
-        return n.charAt(1) === "x"
-          ? String.fromCharCode(parseInt(n.substring(2), 16))
-          : String.fromCharCode(+n.substring(1));
-      }
-      return "";
-    });
-  };
-
-  let slugger = new GithubSlugger();
-  let headings: { text: string; raw: string; level: number; id: string }[] = [];
-  let sectionStack: { level: number; id: string }[] = [];
-
   const gfmHeadingId = ({ prefix = "", showToc = true } = {}) => {
+    let headings: { text: string; level: number; id: string }[] = [];
+    let sectionStack: { level: number; id: string }[] = [];
+
     return {
       renderer: {
         heading(this: Renderer, { tokens, depth }: { tokens: Token[]; depth: number }) {
           const text = this.parser.parseInline(tokens);
-          const raw = unescape(this.parser.parseInline(tokens, this.parser.textRenderer))
-            .trim()
-            .replace(/<[!a-z].*?>/gi, "");
           const level = depth;
-          const id = `${prefix}${slugger.slug(raw.toLowerCase())}`;
-          const heading = { level, text, id, raw };
+          const id = `${prefix}${slugify(text)}`;
+          const heading = { level, text, id };
           headings.push(heading);
 
           let closingSections = "";
@@ -89,16 +82,7 @@ const createMarkdownParser = (showToc = true) => {
         }
       },
       hooks: {
-        preprocess(src: string) {
-          headings = [];
-          sectionStack = [];
-          slugger = new GithubSlugger();
-
-          return src;
-        },
         postprocess(html: string) {
-          const closingRemainingSection = "</section>".repeat(sectionStack.length);
-
           let tableOfContents = "";
           if (showToc && headings.length > 0) {
             const tocItems = [];
@@ -140,7 +124,7 @@ const createMarkdownParser = (showToc = true) => {
           return `
             ${tableOfContents}
             ${html}
-            ${closingRemainingSection}
+            ${"</section>".repeat(sectionStack.length)}
           `;
         }
       }
