@@ -25,7 +25,9 @@
 <header>
   <div class="container">
     <hgroup>
-      <p>{article.publication_date}</p>
+      {#if article.publication_date}
+        <p>{article.publication_date}</p>
+      {/if}
       <h1>{article.title}</h1>
     </hgroup>
     {#if article.cover_image}

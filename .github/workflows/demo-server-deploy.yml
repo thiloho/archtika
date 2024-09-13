@@ -2,8 +2,8 @@ name: Deploy app to demo server (demo.archtika.com)
 
 on:
   workflow_run:
-    workflows: ['Playwright tests']
-    types: [completed]
+    workflows: [ 'Playwright tests' ]
+    types: [ completed ]
 env:
   SERVER_USER: root
   SERVER_IP: 128.140.75.240

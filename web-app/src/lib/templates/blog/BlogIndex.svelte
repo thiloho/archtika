@@ -44,7 +44,9 @@
           {#each websiteOverview.article as article}
             {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
             <li>
-              <p>{article.publication_date}</p>
+              {#if article.publication_date}
+                <p>{article.publication_date}</p>
+              {/if}
               <p>
                 <strong>
                   <a href="./articles/{articleFileName}">{article.title}</a>
