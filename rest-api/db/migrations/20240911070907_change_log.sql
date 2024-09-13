@@ -18,10 +18,10 @@ CREATE FUNCTION internal.track_changes ()
 DECLARE
   _website_id UUID;
 BEGIN
+  IF (to_jsonb (OLD.*) - 'last_modified_at') = (to_jsonb (NEW.*) - 'last_modified_at') OR (to_jsonb (OLD.*) - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_by') THEN
+    RETURN NEW;
+  END IF;
   IF TG_TABLE_NAME = 'website' THEN
-    IF (to_jsonb (OLD.*) - 'last_modified_at') = (to_jsonb (NEW.*) - 'last_modified_at') OR (to_jsonb (OLD.*) - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_by') THEN
-      RETURN NEW;
-    END IF;
     _website_id := NEW.id;
   ELSE
     _website_id := COALESCE(NEW.website_id, OLD.website_id);
