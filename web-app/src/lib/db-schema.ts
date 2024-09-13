@@ -22,12 +22,12 @@ export interface Article {
   cover_image: string | null;
   publication_date: Date | null;
   main_content: string | null;
+  category: string | null;
+  article_weight: number | null;
   created_at: Date;
   last_modified_at: Date;
   last_modified_by: string | null;
   title_description_search: any | null;
-  category: string | null;
-  article_weight: number | null;
 }
 export interface ArticleInput {
   id?: string;
@@ -39,12 +39,12 @@ export interface ArticleInput {
   cover_image?: string | null;
   publication_date?: Date | null;
   main_content?: string | null;
+  category?: string | null;
+  article_weight?: number | null;
   created_at?: Date;
   last_modified_at?: Date;
   last_modified_by?: string | null;
   title_description_search?: any | null;
-  category?: string | null;
-  article_weight?: number | null;
 }
 const article = {
   tableName: "article",
@@ -58,12 +58,12 @@ const article = {
     "cover_image",
     "publication_date",
     "main_content",
+    "category",
+    "article_weight",
     "created_at",
     "last_modified_at",
     "last_modified_by",
-    "title_description_search",
-    "category",
-    "article_weight"
+    "title_description_search"
   ],
   requiredForInsert: ["website_id", "title"],
   primaryKey: "id",
@@ -71,8 +71,8 @@ const article = {
     website_id: { table: "website", column: "id", $type: null as unknown as Website },
     user_id: { table: "user", column: "id", $type: null as unknown as User },
     cover_image: { table: "media", column: "id", $type: null as unknown as Media },
-    last_modified_by: { table: "user", column: "id", $type: null as unknown as User },
-    category: { table: "docs_category", column: "id", $type: null as unknown as DocsCategory }
+    category: { table: "docs_category", column: "id", $type: null as unknown as DocsCategory },
+    last_modified_by: { table: "user", column: "id", $type: null as unknown as User }
   },
   $type: null as unknown as Article,
   $input: null as unknown as ArticleInput
@@ -80,26 +80,39 @@ const article = {
 
 // Table change_log
 export interface ChangeLog {
-  website_id: string;
-  user_id: string;
-  change_summary: string;
-  previous_value: Json | null;
-  new_value: Json | null;
-  timestamp: Date;
+  id: string;
+  website_id: string | null;
+  user_id: string | null;
+  tstamp: Date;
+  table_name: string;
+  operation: string;
+  old_value: any | null;
+  new_value: any | null;
 }
 export interface ChangeLogInput {
-  website_id: string;
-  user_id?: string;
-  change_summary: string;
-  previous_value?: Json | null;
-  new_value?: Json | null;
-  timestamp?: Date;
+  id?: string;
+  website_id?: string | null;
+  user_id?: string | null;
+  tstamp?: Date;
+  table_name: string;
+  operation: string;
+  old_value?: any | null;
+  new_value?: any | null;
 }
 const change_log = {
   tableName: "change_log",
-  columns: ["website_id", "user_id", "change_summary", "previous_value", "new_value", "timestamp"],
-  requiredForInsert: ["website_id", "change_summary"],
-  primaryKey: "website_id",
+  columns: [
+    "id",
+    "website_id",
+    "user_id",
+    "tstamp",
+    "table_name",
+    "operation",
+    "old_value",
+    "new_value"
+  ],
+  requiredForInsert: ["table_name", "operation"],
+  primaryKey: "id",
   foreignKeys: {
     website_id: { table: "website", column: "id", $type: null as unknown as Website },
     user_id: { table: "user", column: "id", $type: null as unknown as User }
@@ -153,6 +166,8 @@ export interface DocsCategory {
   user_id: string | null;
   category_name: string;
   category_weight: number;
+  last_modified_at: Date;
+  last_modified_by: string | null;
 }
 export interface DocsCategoryInput {
   id?: string;
@@ -160,15 +175,26 @@ export interface DocsCategoryInput {
   user_id?: string | null;
   category_name: string;
   category_weight: number;
+  last_modified_at?: Date;
+  last_modified_by?: string | null;
 }
 const docs_category = {
   tableName: "docs_category",
-  columns: ["id", "website_id", "user_id", "category_name", "category_weight"],
+  columns: [
+    "id",
+    "website_id",
+    "user_id",
+    "category_name",
+    "category_weight",
+    "last_modified_at",
+    "last_modified_by"
+  ],
   requiredForInsert: ["website_id", "category_name", "category_weight"],
   primaryKey: "id",
   foreignKeys: {
     website_id: { table: "website", column: "id", $type: null as unknown as Website },
-    user_id: { table: "user", column: "id", $type: null as unknown as User }
+    user_id: { table: "user", column: "id", $type: null as unknown as User },
+    last_modified_by: { table: "user", column: "id", $type: null as unknown as User }
   },
   $type: null as unknown as DocsCategory,
   $input: null as unknown as DocsCategoryInput
@@ -390,10 +416,10 @@ export interface Website {
   content_type: string;
   title: string;
   created_at: Date;
+  is_published: boolean;
   last_modified_at: Date;
   last_modified_by: string | null;
   title_search: any | null;
-  is_published: boolean;
 }
 export interface WebsiteInput {
   id?: string;
@@ -401,10 +427,10 @@ export interface WebsiteInput {
   content_type: string;
   title: string;
   created_at?: Date;
+  is_published?: boolean;
   last_modified_at?: Date;
   last_modified_by?: string | null;
   title_search?: any | null;
-  is_published?: boolean;
 }
 const website = {
   tableName: "website",
@@ -414,10 +440,10 @@ const website = {
     "content_type",
     "title",
     "created_at",
+    "is_published",
     "last_modified_at",
     "last_modified_by",
-    "title_search",
-    "is_published"
+    "title_search"
   ],
   requiredForInsert: ["content_type", "title"],
   primaryKey: "id",

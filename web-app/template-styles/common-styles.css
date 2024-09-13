@@ -331,3 +331,13 @@ td {
   padding: var(--space-2xs);
   border: var(--border-primary);
 }
+
+ins {
+  background-color: var(--color-success);
+  color: var(--color-text-invert);
+}
+
+del {
+  background-color: var(--color-error);
+  color: var(--color-text-invert);
+}
