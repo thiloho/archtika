@@ -9,10 +9,10 @@ export const load: PageServerLoad = async ({ parent, fetch, params, cookies, url
 
   const searchParams = new URLSearchParams();
 
-  const baseFetchUrl = `${API_BASE_PREFIX}/change_log?website_id=eq.${params.websiteId}&select=id,table_name,operation,tstamp,old_value,new_value,user!inner(username)&order=tstamp.desc`;
+  const baseFetchUrl = `${API_BASE_PREFIX}/change_log?website_id=eq.${params.websiteId}&select=id,table_name,operation,tstamp,old_value,new_value,user_id,username&order=tstamp.desc`;
 
   if (userFilter && userFilter !== "all") {
-    searchParams.append("user.username", `eq.${userFilter}`);
+    searchParams.append("username", `eq.${userFilter}`);
   }
 
   if (resourceFilter && resourceFilter !== "all") {

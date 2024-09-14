@@ -83,6 +83,7 @@ export interface ChangeLog {
   id: string;
   website_id: string | null;
   user_id: string | null;
+  username: string;
   tstamp: Date;
   table_name: string;
   operation: string;
@@ -93,6 +94,7 @@ export interface ChangeLogInput {
   id?: string;
   website_id?: string | null;
   user_id?: string | null;
+  username?: string;
   tstamp?: Date;
   table_name: string;
   operation: string;
@@ -105,6 +107,7 @@ const change_log = {
     "id",
     "website_id",
     "user_id",
+    "username",
     "tstamp",
     "table_name",
     "operation",
@@ -320,7 +323,7 @@ const legal_information = {
 export interface Media {
   id: string;
   website_id: string;
-  user_id: string;
+  user_id: string | null;
   blob: string;
   mimetype: string;
   original_name: string;
@@ -329,7 +332,7 @@ export interface Media {
 export interface MediaInput {
   id?: string;
   website_id: string;
-  user_id?: string;
+  user_id?: string | null;
   blob: string;
   mimetype: string;
   original_name: string;

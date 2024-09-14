@@ -43,7 +43,7 @@ CREATE TABLE internal.website (
 CREATE TABLE internal.media (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
-  user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
+  user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   blob BYTEA NOT NULL,
   mimetype TEXT NOT NULL,
   original_name TEXT NOT NULL,

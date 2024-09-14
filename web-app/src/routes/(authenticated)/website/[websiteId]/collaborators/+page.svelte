@@ -69,10 +69,10 @@
       </h2>
 
       <ul class="unpadded">
-        {#each data.collaborators as { website_id, user_id, permission_level, user: { username } } (`${website_id}-${user_id}`)}
+        {#each data.collaborators as { website_id, user_id, permission_level, user } (`${website_id}-${user_id}`)}
           <li class="collaborator-card">
             <p>
-              <strong>{username} ({permission_level})</strong>
+              <strong>{user?.username} ({permission_level})</strong>
             </p>
 
             <div class="collaborator-card__actions">

@@ -16,21 +16,21 @@ BEGIN
   IF OCTET_LENGTH($1) = 0 THEN
     RAISE invalid_parameter_value
     USING message = 'No file data was provided';
+  ELSIF (_mimetype IS NULL
+      OR _mimetype NOT IN (
+        SELECT
+          UNNEST(_allowed_mimetypes))) THEN
+    RAISE invalid_parameter_value
+    USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp';
+  ELSIF OCTET_LENGTH($1) > _max_file_size THEN
+    RAISE program_limit_exceeded
+    USING message = FORMAT('File size exceeds the maximum limit of %s MB', _max_file_size / (1024 * 1024));
+  ELSE
+    INSERT INTO internal.media (website_id, blob, mimetype, original_name)
+      VALUES (_website_id, $1, _mimetype, _original_filename)
+    RETURNING
+      id INTO file_id;
   END IF;
-    IF _mimetype IS NULL OR _mimetype NOT IN (
-      SELECT
-        UNNEST(_allowed_mimetypes)) THEN
-      RAISE invalid_parameter_value
-      USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp';
-    END IF;
-      IF OCTET_LENGTH($1) > _max_file_size THEN
-        RAISE program_limit_exceeded
-        USING message = FORMAT('File size exceeds the maximum limit of %s MB', _max_file_size / (1024 * 1024));
-      END IF;
-        INSERT INTO internal.media (website_id, blob, mimetype, original_name)
-          VALUES (_website_id, $1, _mimetype, _original_filename)
-        RETURNING
-          id INTO file_id;
 END;
 $$
 LANGUAGE plpgsql

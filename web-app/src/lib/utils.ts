@@ -15,7 +15,7 @@ import type {
   LegalInformation
 } from "$lib/db-schema";
 
-export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/svg+xml", "image/webp"];
+export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export const slugify = (string: string) => {
   return string

@@ -2,19 +2,32 @@
 CREATE FUNCTION internal.update_last_modified ()
   RETURNS TRIGGER
   AS $$
+DECLARE
+  _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
 BEGIN
-  NEW.last_modified_at = CLOCK_TIMESTAMP();
-  NEW.last_modified_by = (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
+  IF (NOT EXISTS (
+    SELECT
+      id
+    FROM
+      internal.user
+    WHERE
+      id = _user_id)) THEN
+    RETURN COALESCE(NEW, OLD);
+  END IF;
+  IF TG_OP != 'DELETE' THEN
+    NEW.last_modified_at = CLOCK_TIMESTAMP();
+    NEW.last_modified_by = _user_id;
+  END IF;
   IF TG_TABLE_NAME != 'website' THEN
     UPDATE
       internal.website
     SET
       last_modified_at = CLOCK_TIMESTAMP(),
-      last_modified_by = (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID
+      last_modified_by = _user_id
     WHERE
       id = COALESCE(NEW.website_id, OLD.website_id);
   END IF;
-  RETURN NEW;
+  RETURN COALESCE(NEW, OLD);
 END;
 $$
 LANGUAGE plpgsql;

@@ -7,18 +7,17 @@ CREATE FUNCTION internal.check_role_exists ()
   RETURNS TRIGGER
   AS $$
 BEGIN
-  IF NOT EXISTS (
+  IF (NOT EXISTS (
     SELECT
       1
     FROM
       pg_roles AS r
     WHERE
-      r.rolname = NEW.role) THEN
-  RAISE foreign_key_violation
-  USING message = 'Unknown database role: ' || NEW.role;
-  RETURN NULL;
-END IF;
-  RETURN NEW;
+      r.rolname = NEW.role)) THEN
+    RAISE foreign_key_violation
+    USING message = 'Unknown database role: ' || NEW.role;
+  END IF;
+    RETURN NULL;
 END
 $$
 LANGUAGE plpgsql;
@@ -67,43 +66,42 @@ DECLARE
   _password_length_min CONSTANT INT := 12;
   _password_length_max CONSTANT INT := 128;
 BEGIN
-  CASE WHEN LENGTH(register.username)
-  NOT BETWEEN _username_length_min AND _username_length_max THEN
-  RAISE string_data_length_mismatch
-  USING message = FORMAT('Username must be between %s and %s characters long', _username_length_min, _username_length_max);
-  WHEN EXISTS (
-    SELECT
-      1
-    FROM
-      internal.user AS u
-    WHERE
-      u.username = register.username) THEN
+  IF (LENGTH(register.username)
+    NOT BETWEEN _username_length_min AND _username_length_max) THEN
+    RAISE string_data_length_mismatch
+    USING message = FORMAT('Username must be between %s and %s characters long', _username_length_min, _username_length_max);
+  ELSIF (EXISTS (
+        SELECT
+          1
+        FROM
+          internal.user AS u
+        WHERE
+          u.username = register.username)) THEN
     RAISE unique_violation
-      USING message = 'Username is already taken';
-      WHEN LENGTH(register.pass) NOT BETWEEN _password_length_min AND _password_length_max THEN
-        RAISE string_data_length_mismatch
-        USING message = FORMAT('Password must be between %s and %s characters long', _password_length_min, _password_length_max);
-        WHEN register.pass !~ '[a-z]' THEN
-        RAISE invalid_parameter_value
-        USING message = 'Password must contain at least one lowercase letter';
-        WHEN register.pass !~ '[A-Z]' THEN
-        RAISE invalid_parameter_value
-        USING message = 'Password must contain at least one uppercase letter';
-        WHEN register.pass !~ '[0-9]' THEN
-        RAISE invalid_parameter_value
-        USING message = 'Password must contain at least one number';
-        WHEN register.pass !~ '[!@#$%^&*(),.?":{}|<>]' THEN
-        RAISE invalid_parameter_value
-        USING message = 'Password must contain at least one special character';
-      ELSE
-          INSERT
-            INTO internal.user (username, password_hash)
-              VALUES (register.username, register.pass)
-            RETURNING
-              id INTO user_id;
-              END
-                CASE;
-        END;
+    USING message = 'Username is already taken';
+  ELSIF (LENGTH(register.pass)
+      NOT BETWEEN _password_length_min AND _password_length_max) THEN
+    RAISE string_data_length_mismatch
+    USING message = FORMAT('Password must be between %s and %s characters long', _password_length_min, _password_length_max);
+  ELSIF register.pass !~ '[a-z]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Password must contain at least one lowercase letter';
+  ELSIF register.pass !~ '[A-Z]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Password must contain at least one uppercase letter';
+  ELSIF register.pass !~ '[0-9]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Password must contain at least one number';
+  ELSIF register.pass !~ '[!@#$%^&*(),.?":{}|<>]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Password must contain at least one special character';
+  ELSE
+    INSERT INTO internal.user (username, password_hash)
+      VALUES (register.username, register.pass)
+    RETURNING
+      id INTO user_id;
+  END IF;
+END;
 $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
@@ -120,7 +118,7 @@ BEGIN
   IF _role IS NULL THEN
     RAISE invalid_password
     USING message = 'Invalid username or password';
-  END IF;
+  ELSE
     SELECT
       id INTO _user_id
     FROM
@@ -130,6 +128,7 @@ BEGIN
     _exp := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INTEGER + 86400;
     SELECT
       SIGN(JSON_BUILD_OBJECT('role', _role, 'user_id', _user_id, 'username', login.username, 'exp', _exp), CURRENT_SETTING('app.jwt_secret')) INTO token;
+  END IF;
 END;
 $$
 LANGUAGE plpgsql
@@ -146,10 +145,11 @@ BEGIN
   IF _role IS NULL THEN
     RAISE invalid_password
     USING message = 'Invalid password';
-  END IF;
+  ELSE
     DELETE FROM internal.user AS u
     WHERE u.username = _username;
     was_deleted := TRUE;
+  END IF;
 END;
 $$
 LANGUAGE plpgsql

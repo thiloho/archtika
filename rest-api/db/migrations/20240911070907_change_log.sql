@@ -4,7 +4,8 @@ CREATE EXTENSION hstore;
 CREATE TABLE internal.change_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE,
-  user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
+  user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
+  username VARCHAR(16) NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'username'),
   tstamp TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   table_name TEXT NOT NULL,
   operation TEXT NOT NULL,
@@ -17,9 +18,16 @@ CREATE FUNCTION internal.track_changes ()
   AS $$
 DECLARE
   _website_id UUID;
+  _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
 BEGIN
-  IF (to_jsonb (OLD.*) - 'last_modified_at') = (to_jsonb (NEW.*) - 'last_modified_at') THEN
-    RETURN NEW;
+  IF (NOT EXISTS (
+    SELECT
+      id
+    FROM
+      internal.user
+    WHERE
+      id = _user_id) OR (to_jsonb (OLD.*) - 'last_modified_at' - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_at' - 'last_modified_by')) THEN
+    RETURN NULL;
   END IF;
   IF TG_TABLE_NAME = 'website' THEN
     _website_id := NEW.id;
@@ -29,31 +37,28 @@ BEGIN
   IF TG_OP = 'INSERT' THEN
     INSERT INTO internal.change_log (website_id, table_name, operation, new_value)
       VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (NEW));
-    RETURN NEW;
-  ELSIF TG_OP = 'UPDATE'
+  ELSIF (TG_OP = 'UPDATE'
       AND EXISTS (
         SELECT
           id
         FROM
           internal.website
         WHERE
-          id = _website_id) THEN
-      INSERT INTO internal.change_log (website_id, table_name, operation, old_value, new_value)
-        VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD) - HSTORE (NEW), HSTORE (NEW) - HSTORE (OLD));
-    RETURN NEW;
-  ELSIF TG_OP = 'DELETE'
+          id = _website_id)) THEN
+    INSERT INTO internal.change_log (website_id, table_name, operation, old_value, new_value)
+      VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD) - HSTORE (NEW), HSTORE (NEW) - HSTORE (OLD));
+  ELSIF (TG_OP = 'DELETE'
       AND EXISTS (
         SELECT
           id
         FROM
           internal.website
         WHERE
-          id = _website_id) THEN
-      INSERT INTO internal.change_log (website_id, table_name, operation, old_value)
-        VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD));
-    RETURN NEW;
+          id = _website_id)) THEN
+    INSERT INTO internal.change_log (website_id, table_name, operation, old_value)
+      VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD));
   END IF;
-  RETURN NEW;
+  RETURN NULL;
 END;
 $$
 LANGUAGE plpgsql

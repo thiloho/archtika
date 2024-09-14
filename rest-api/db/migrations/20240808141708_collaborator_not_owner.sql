@@ -3,18 +3,17 @@ CREATE FUNCTION internal.check_user_not_website_owner ()
   RETURNS TRIGGER
   AS $$
 BEGIN
-  IF EXISTS (
+  IF (EXISTS (
     SELECT
       1
     FROM
       internal.website AS w
     WHERE
-      w.id = NEW.website_id
-      AND w.user_id = NEW.user_id) THEN
-  RAISE foreign_key_violation
-  USING message = 'User cannot be added as a collaborator to their own website';
-END IF;
-  RETURN NEW;
+      w.id = NEW.website_id AND w.user_id = NEW.user_id)) THEN
+    RAISE foreign_key_violation
+    USING message = 'User cannot be added as a collaborator to their own website';
+  END IF;
+    RETURN NULL;
 END;
 $$
 LANGUAGE plpgsql;
