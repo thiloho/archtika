@@ -65,7 +65,6 @@
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
-    jwtSecret = /var/lib/archtika-jwt-secret.txt;
     domain = "qs.archtika.com";
     acmeEmail = "thilo.hohlt@tutanota.com";
     dnsProvider = "porkbun";
