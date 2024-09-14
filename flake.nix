@@ -27,6 +27,7 @@
             shellHook = ''
               alias dbmate="${pkgs.dbmate}/bin/dbmate --no-dump-schema --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
+              alias dbconnect="${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika"
             '';
           };
           web = pkgs.mkShell {

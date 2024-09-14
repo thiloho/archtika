@@ -1,17 +1,36 @@
 <script lang="ts">
+  import { type WebsiteOverview, slugify } from "../../utils";
+  import type { Article } from "../../db-schema";
+
   const {
-    logoType,
-    logo,
-    isDocsTemplate = false,
-    categorizedArticles = {},
-    isIndexPage = true
+    websiteOverview,
+    isDocsTemplate,
+    isIndexPage,
+    apiUrl
   }: {
-    logoType: "text" | "image";
-    logo: string;
-    isDocsTemplate?: boolean;
-    categorizedArticles?: { [key: string]: { title: string }[] };
-    isIndexPage?: boolean;
+    websiteOverview: WebsiteOverview;
+    isDocsTemplate: boolean;
+    isIndexPage: boolean;
+    apiUrl: string;
   } = $props();
+
+  const categorizedArticles = Object.fromEntries(
+    Object.entries(
+      Object.groupBy(
+        websiteOverview.article.sort((a, b) => (b.article_weight ?? 0) - (a.article_weight ?? 0)),
+        (article) => article.docs_category?.category_name ?? "Uncategorized"
+      )
+    ).sort(([a], [b]) =>
+      a === "Uncategorized"
+        ? 1
+        : b === "Uncategorized"
+          ? -1
+          : (websiteOverview.article.find((art) => art.docs_category?.category_name === b)
+              ?.docs_category?.category_weight ?? 0) -
+            (websiteOverview.article.find((art) => art.docs_category?.category_name === a)
+              ?.docs_category?.category_weight ?? 0)
+    )
+  ) as { [key: string]: Article[] };
 </script>
 
 <nav>
@@ -41,9 +60,8 @@
               <strong>{key}</strong>
               <ul>
                 {#each categorizedArticles[key] as { title }}
-                  {@const articleFileName = title.toLowerCase().split(" ").join("-")}
                   <li>
-                    <a href="{isIndexPage ? './articles' : '.'}/{articleFileName}">{title}</a>
+                    <a href="{isIndexPage ? './articles' : '.'}/{slugify(title)}">{title}</a>
                   </li>
                 {/each}
               </ul>
@@ -53,10 +71,15 @@
       </section>
     {/if}
     <a href={isIndexPage ? "." : ".."}>
-      {#if logoType === "text"}
-        <strong>{logo}</strong>
+      {#if websiteOverview.header.logo_type === "text"}
+        <strong>{websiteOverview.header.logo_text}</strong>
       {:else}
-        <img src={logo} width="24" height="24" alt="" />
+        <img
+          src="{apiUrl}/rpc/retrieve_file?id={websiteOverview.header.logo_image}"
+          width="24"
+          height="24"
+          alt=""
+        />
       {/if}
     </a>
   </div>

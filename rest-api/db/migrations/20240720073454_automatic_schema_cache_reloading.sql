@@ -1,6 +1,6 @@
 -- migrate:up
 CREATE FUNCTION pgrst_watch ()
-  RETURNS event_trigger
+  RETURNS EVENT_TRIGGER
   AS $$
 BEGIN
   NOTIFY pgrst,

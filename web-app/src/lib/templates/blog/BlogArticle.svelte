@@ -2,52 +2,46 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
+  import { type WebsiteOverview, md } from "../../utils";
+  import type { Article } from "../../db-schema";
 
   const {
-    favicon,
-    title,
-    logoType,
-    logo,
-    mainContent,
-    coverImage,
-    publicationDate,
-    footerAdditionalText,
-    metaDescription
-  }: {
-    favicon: string;
-    title: string;
-    logoType: "text" | "image";
-    logo: string;
-    mainContent: string;
-    coverImage: string;
-    publicationDate: string;
-    footerAdditionalText: string;
-    metaDescription: string;
-  } = $props();
+    websiteOverview,
+    article,
+    apiUrl
+  }: { websiteOverview: WebsiteOverview; article: Article; apiUrl: string } = $props();
 </script>
 
-<Head {title} {favicon} nestingLevel={1} {metaDescription} />
+<Head
+  {websiteOverview}
+  nestingLevel={1}
+  {apiUrl}
+  title={article.title}
+  metaDescription={article.meta_description}
+/>
 
-<Nav {logoType} {logo} isIndexPage={false} />
+<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={false} {apiUrl} />
 
 <header>
   <div class="container">
     <hgroup>
-      <p>{publicationDate}</p>
-      <h1>{title}</h1>
+      {#if article.publication_date}
+        <p>{article.publication_date}</p>
+      {/if}
+      <h1>{article.title}</h1>
     </hgroup>
-    {#if coverImage}
-      <img src={coverImage} alt="" />
+    {#if article.cover_image}
+      <img src="{apiUrl}/rpc/retrieve_file?id={article.cover_image}" alt="" />
     {/if}
   </div>
 </header>
 
-{#if mainContent}
+{#if article.main_content}
   <main>
     <div class="container">
-      {@html mainContent}
+      {@html md(article.main_content)}
     </div>
   </main>
 {/if}
 
-<Footer text={footerAdditionalText} />
+<Footer {websiteOverview} isIndexPage={false} />

@@ -39,7 +39,8 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  {previewContent}
+  previewContent={previewContent ||
+    "Put some markdown content in main content to see a live preview here"}
   previewScrollTop={textareaScrollTop}
 >
   <section id="global">

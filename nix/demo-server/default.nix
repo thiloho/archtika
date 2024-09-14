@@ -23,7 +23,7 @@
   nixpkgs.config.allowUnfree = true;
 
   networking = {
-    hostName = "archtika-demo-server";
+    hostName = "archtika-qs";
     networkmanager.enable = true;
     firewall = {
       allowedTCPPorts = [
@@ -65,8 +65,8 @@
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
-    jwtSecret = "a42kVyAhTImYxZeebZkApoAZLmf0VtDA";
-    domain = "demo.archtika.com";
+    jwtSecret = /var/lib/archtika-jwt-secret.txt;
+    domain = "qs.archtika.com";
     acmeEmail = "thilo.hohlt@tutanota.com";
     dnsProvider = "porkbun";
     dnsEnvironmentFile = /var/lib/porkbun.env;

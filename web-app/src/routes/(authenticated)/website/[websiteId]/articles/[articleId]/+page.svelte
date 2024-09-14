@@ -111,7 +111,7 @@
           <input
             type="date"
             name="publication-date"
-            value={data.article.publication_date}
+            value={data.article.publication_date ?? new Date().toISOString().split("T")[0]}
             required
           />
         </label>

@@ -50,7 +50,13 @@
         <a href="/website/{id}/collaborators">Collaborators</a>
       </li>
       <li>
+        <a href="/website/{id}/legal-information">Legal information</a>
+      </li>
+      <li>
         <a href="/website/{id}/publish">Publish</a>
+      </li>
+      <li>
+        <a href="/website/{id}/logs">Logs</a>
       </li>
     </ul>
   </nav>
@@ -117,13 +123,13 @@
     }
 
     .operations {
-      border-inline-end: var(--border-primary);
       padding-block-start: var(--space-s);
     }
 
     .preview {
       display: flex;
       padding-block-start: var(--space-s);
+      border-inline-start: var(--border-primary);
     }
   }
 </style>

@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { User } from "$lib/db-schema";
 
 export const handle = async ({ event, resolve }) => {
   if (!event.url.pathname.startsWith("/api/")) {
@@ -21,7 +22,7 @@ export const handle = async ({ event, resolve }) => {
         throw redirect(303, "/");
       }
 
-      const user = await userData.json();
+      const user: User = await userData.json();
 
       event.locals.user = user;
     }

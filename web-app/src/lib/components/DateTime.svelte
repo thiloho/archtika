@@ -1,5 +1,5 @@
 <script lang="ts">
-  const { date }: { date: string } = $props();
+  const { date }: { date: Date } = $props();
 
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",

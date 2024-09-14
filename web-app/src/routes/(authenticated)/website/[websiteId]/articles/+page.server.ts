@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { Article, ArticleInput, DocsCategory } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent, locals }) => {
   const searchQuery = url.searchParams.get("article_search_query");
@@ -54,7 +55,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
     }
   });
 
-  const articles = await articlesData.json();
+  const articles: (Article & { docs_category: DocsCategory | null })[] = await articlesData.json();
 
   return {
     totalArticleCount,
@@ -76,8 +77,8 @@ export const actions: Actions = {
       },
       body: JSON.stringify({
         website_id: params.websiteId,
-        title: data.get("title")
-      })
+        title: data.get("title") as string
+      } satisfies ArticleInput)
     });
 
     if (!res.ok) {

@@ -1,14 +1,19 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  const { children, id, text }: { children: Snippet; id: string; text: string } = $props();
+  const {
+    children,
+    id,
+    text,
+    isWider = false
+  }: { children: Snippet; id: string; text: string; isWider?: boolean } = $props();
 
   const modalId = `${id}-modal`;
 </script>
 
 <a href={`#${modalId}`} role="button">{text}</a>
 
-<div id={modalId} class="modal">
+<div id={modalId} class="modal" style="--modal-width: {isWider ? 600 : 300}px">
   <div class="modal__content">
     {@render children()}
     <a href="#!" role="button">Close</a>
@@ -46,7 +51,7 @@
     background-color: var(--bg-primary);
     border-radius: var(--border-radius);
     border: var(--border-primary);
-    inline-size: 300px;
+    inline-size: var(--modal-width);
     max-inline-size: 100%;
     max-block-size: calc(100vh - var(--space-m));
     overflow-y: auto;

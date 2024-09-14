@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { Article, DocsCategory } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
   const articleData = await fetch(`${API_BASE_PREFIX}/article?id=eq.${params.articleId}`, {
@@ -22,8 +23,8 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
     }
   );
 
-  const article = await articleData.json();
-  const categories = await categoryData.json();
+  const article: Article = await articleData.json();
+  const categories: DocsCategory[] = await categoryData.json();
   const { website } = await parent();
 
   return { website, article, categories, API_BASE_PREFIX };

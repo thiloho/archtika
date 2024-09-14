@@ -2,53 +2,53 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
+  import { md, slugify, type WebsiteOverview } from "$lib/utils";
 
   const {
-    favicon,
-    title,
-    logoType,
-    logo,
-    mainContent,
-    articles,
-    footerAdditionalText
-  }: {
-    favicon: string;
-    title: string;
-    logoType: "text" | "image";
-    logo: string;
-    mainContent: string;
-    articles: { title: string; publication_date: string; meta_description: string }[];
-    footerAdditionalText: string;
-  } = $props();
+    websiteOverview,
+    apiUrl,
+    isLegalPage
+  }: { websiteOverview: WebsiteOverview; apiUrl: string; isLegalPage: boolean } = $props();
 </script>
 
-<Head {title} {favicon} />
+<Head
+  {websiteOverview}
+  nestingLevel={0}
+  {apiUrl}
+  title={isLegalPage ? "Legal information" : websiteOverview.title}
+/>
 
-<Nav {logoType} {logo} />
+<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {apiUrl} />
 
 <header>
   <div class="container">
-    <h1>{title}</h1>
+    <h1>{isLegalPage ? "Legal information" : websiteOverview.title}</h1>
   </div>
 </header>
 
 <main>
   <div class="container">
-    {@html mainContent}
-    {#if articles.length > 0}
+    {@html md(
+      isLegalPage
+        ? (websiteOverview.legal_information?.main_content ?? "")
+        : websiteOverview.home.main_content,
+      false
+    )}
+    {#if websiteOverview.article.length > 0 && !isLegalPage}
       <section class="articles" id="articles">
         <h2>
           <a href="#articles">Articles</a>
         </h2>
 
         <ul class="unpadded">
-          {#each articles as article}
-            {@const articleFileName = article.title.toLowerCase().split(" ").join("-")}
+          {#each websiteOverview.article as article}
             <li>
-              <p>{article.publication_date}</p>
+              {#if article.publication_date}
+                <p>{article.publication_date}</p>
+              {/if}
               <p>
                 <strong>
-                  <a href="./articles/{articleFileName}">{article.title}</a>
+                  <a href="./articles/{slugify(article.title)}">{article.title}</a>
                 </strong>
               </p>
               {#if article.meta_description}
@@ -62,4 +62,4 @@
   </div>
 </main>
 
-<Footer text={footerAdditionalText} />
+<Footer {websiteOverview} isIndexPage={true} />

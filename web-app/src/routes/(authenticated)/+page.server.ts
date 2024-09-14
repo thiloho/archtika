@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import type { Website, WebsiteInput } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
   const searchQuery = url.searchParams.get("website_search_query");
@@ -47,7 +48,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
     }
   });
 
-  const websites = await websiteData.json();
+  const websites: Website[] = await websiteData.json();
 
   return {
     totalWebsiteCount,
@@ -66,9 +67,9 @@ export const actions: Actions = {
         Authorization: `Bearer ${cookies.get("session_token")}`
       },
       body: JSON.stringify({
-        content_type: data.get("content-type"),
-        title: data.get("title")
-      })
+        content_type: data.get("content-type") as string,
+        title: data.get("title") as string
+      } satisfies WebsiteInput)
     });
 
     if (!res.ok) {

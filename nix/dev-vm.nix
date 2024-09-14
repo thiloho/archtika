@@ -68,7 +68,7 @@
         ];
         locations = {
           "/" = {
-            root = "/var/www/archtika-websites";
+            root = "/var/www/archtika-websites/";
             index = "index.html";
             tryFiles = "$uri $uri/ $uri.html $uri/index.html index.html =404";
             extraConfig = ''

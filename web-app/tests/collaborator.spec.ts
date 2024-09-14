@@ -97,6 +97,11 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByLabel("Username:").click();
     await page.getByLabel("Username:").fill(collabUsername);
     await page.getByRole("button", { name: "Submit" }).click();
+
+    await page.getByRole("link", { name: "Legal information" }).click();
+    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+    await page.getByRole("button", { name: "Submit" }).click();
   });
 
   for (const permissionLevel of permissionLevels) {
@@ -142,7 +147,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated website")).toBeVisible();
         }
@@ -150,14 +155,14 @@ test.describe.serial("Collaborator tests", () => {
       test("Delete website", async ({ page }) => {
         await page.locator("li").filter({ hasText: "Blog" }).getByRole("button").nth(1).click();
         await page.getByRole("button", { name: "Delete website" }).click();
-        await expect(page.getByText("You do not have the required")).toBeVisible();
+        await expect(page.getByText("Insufficient permissions")).toBeVisible();
       });
       test("Update Global", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.locator("#global").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated global")).toBeVisible();
         }
@@ -167,7 +172,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.locator("#header").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated header")).toBeVisible();
         }
@@ -177,7 +182,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.locator("#home").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated home")).toBeVisible();
         }
@@ -187,7 +192,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.locator("#footer").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated footer")).toBeVisible();
         }
@@ -201,7 +206,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully created article")).toBeVisible();
         }
@@ -223,7 +228,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated article")).toBeVisible();
         }
@@ -239,7 +244,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Delete article" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
         if ([20, 30].includes(permissionLevel)) {
           await expect(page.getByText("Successfully deleted article")).toBeVisible();
@@ -248,7 +253,7 @@ test.describe.serial("Collaborator tests", () => {
           await page.getByRole("button", { name: "Delete article" }).click();
 
           if (permissionLevel === 20) {
-            await expect(page.getByText("You do not have the required")).toBeVisible();
+            await expect(page.getByText("Insufficient permissions")).toBeVisible();
           } else {
             await expect(page.getByText("Successfully deleted article")).toBeVisible();
           }
@@ -263,7 +268,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully added")).toBeVisible();
         }
@@ -281,7 +286,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Update collaborator" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated")).toBeVisible();
 
@@ -293,7 +298,7 @@ test.describe.serial("Collaborator tests", () => {
             .click();
           await page.getByRole("combobox").selectOption("30");
           await page.getByRole("button", { name: "Update collaborator" }).click();
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
       });
       test("Remove collaborator", async ({ page }) => {
@@ -308,7 +313,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Remove collaborator" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully removed")).toBeVisible();
 
@@ -319,7 +324,46 @@ test.describe.serial("Collaborator tests", () => {
             .nth(1)
             .click();
           await page.getByRole("button", { name: "Remove collaborator" }).click();
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
+        }
+      });
+      test("Create/Update legal information", async ({ page }) => {
+        await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByRole("link", { name: "Legal information" }).click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByRole("button", { name: "Submit" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully created legal")).toBeVisible();
+        } else {
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
+        }
+
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
+        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByRole("button", { name: "Submit" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully updated legal")).toBeVisible();
+        } else {
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
+        }
+      });
+      test("Delete legal information", async ({ page }) => {
+        await page
+          .getByRole("link", {
+            name: [10, 20].includes(permissionLevel) ? "Documentation" : "Blog"
+          })
+          .click();
+        await page.getByRole("link", { name: "Legal information" }).click();
+        await page.getByRole("button", { name: "Delete" }).click();
+        await page.getByRole("button", { name: "Delete legal information" }).click();
+
+        if (permissionLevel === 30) {
+          await expect(page.getByText("Successfully deleted legal")).toBeVisible();
+        } else {
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
       });
       test("Create category", async ({ page }) => {
@@ -333,7 +377,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully created category")).toBeVisible();
         }
@@ -354,7 +398,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Update category" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated category")).toBeVisible();
         }
@@ -371,7 +415,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Delete category" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
         if ([20, 30].includes(permissionLevel)) {
           await expect(page.getByText("Successfully deleted category")).toBeVisible();
@@ -385,7 +429,7 @@ test.describe.serial("Collaborator tests", () => {
           await page.getByRole("button", { name: "Delete category" }).click();
 
           if (permissionLevel === 20) {
-            await expect(page.getByText("You do not have the required")).toBeVisible();
+            await expect(page.getByText("Insufficient permissions")).toBeVisible();
           } else {
             await expect(page.getByText("Successfully deleted category")).toBeVisible();
           }
@@ -397,7 +441,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Publish" }).click();
 
         if (permissionLevel === 10) {
-          await expect(page.getByText("You do not have the required")).toBeVisible();
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully published website")).toBeVisible();
         }
