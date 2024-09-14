@@ -23,7 +23,7 @@
   nixpkgs.config.allowUnfree = true;
 
   networking = {
-    hostName = "archtika-demo-server";
+    hostName = "archtika-qs";
     networkmanager.enable = true;
     firewall = {
       allowedTCPPorts = [
@@ -62,6 +62,7 @@
     settings.PasswordAuthentication = false;
   };
 
+  /*
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
@@ -71,6 +72,7 @@
     dnsProvider = "porkbun";
     dnsEnvironmentFile = /var/lib/porkbun.env;
   };
+  */
 
   system.stateVersion = "24.11";
 }
