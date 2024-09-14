@@ -102,7 +102,7 @@ in
       };
 
       script = ''
-        JWT_SECRET=$(head -c 64 /dev/urandom | base64 | tr -d '/+=' | head -c 64)
+        JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
 
         ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '$JWT_SECRET'"
 
