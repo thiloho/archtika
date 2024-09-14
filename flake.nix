@@ -61,7 +61,7 @@
           api = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "api-setup" ''
-              JWT_SECRET=$(head -c 64 /dev/urandom | base64 | tr -d '/+=' | head -c 64)
+              JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
 
               ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
 
