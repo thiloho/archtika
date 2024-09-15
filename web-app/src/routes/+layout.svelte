@@ -16,7 +16,7 @@
   );
 </script>
 
-{#if $navigating}
+{#if $navigating && ["link", "goto"].includes($navigating.type)}
   <LoadingSpinner />
 {/if}
 
