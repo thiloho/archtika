@@ -158,16 +158,14 @@ in
               proxyPass = "http://localhost:${toString cfg.webAppPort}";
             };
             "/previews/" = {
-              alias = "/var/www/archtika-websites/previews/";
+              root = "/var/www/archtika-websites/previews";
               index = "index.html";
-              tryFiles = "$uri $uri/ $uri.html $uri/index.html index.html =404";
+              tryFiles = "$uri $uri/ $uri.html =404"
             };
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.apiPort}/";
               extraConfig = ''
                 default_type  application/json;
-                proxy_hide_header Content-Location;
-                add_header Content-Location /api/$upstream_http_content_location;
                 proxy_set_header Connection "";
                 proxy_http_version 1.1;
               '';
@@ -179,9 +177,9 @@ in
           forceSSL = true;
           locations = {
             "/" = {
-              alias = "/var/www/archtika-websites/$subdomain/";
+              root = "/var/www/archtika-websites/$subdomain";
               index = "index.html";
-              tryFiles = "$uri $uri/ $uri.html $uri/index.html index.html =404";
+              tryFiles = "$uri $uri/ $uri.html =404";
             };
           };
         };
