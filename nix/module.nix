@@ -160,7 +160,7 @@ in
             "/previews/" = {
               root = "/var/www/archtika-websites/previews";
               index = "index.html";
-              tryFiles = "$uri $uri/ $uri.html =404"
+              tryFiles = "$uri $uri/ $uri.html =404";
             };
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.apiPort}/";
