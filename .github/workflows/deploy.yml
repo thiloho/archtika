@@ -8,7 +8,7 @@ on:
 env:
   SERVER_USER: root
   QS_SERVER_IP: 128.140.75.240
-  PROD_SERVER_IP: 128.140.75.240
+  PROD_SERVER_IP: 116.203.122.75
 
 jobs:
   deploy:
