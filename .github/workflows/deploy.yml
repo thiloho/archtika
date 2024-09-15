@@ -31,8 +31,9 @@ jobs:
     - name: Deploy to demo server
       run: |
         nix run nixpkgs#nixos-rebuild -- switch \
-          --flake .#${{ github.ref_name == 'devel' && 'qs' || 'prod' }} \
+          --flake github:archtika/archtika/${{ github.ref_name }}#${{ github.ref_name == 'devel' && 'qs' || 'prod' }} \
           --fast \
+          --refresh \
           --build-host ${{ env.SERVER_USER }}@${{ github.ref_name == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
           --target-host ${{ env.SERVER_USER }}@${{ github.ref_name == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
           --use-remote-sudo
