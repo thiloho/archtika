@@ -78,10 +78,17 @@
           system = "x86_64-linux";
           modules = [ ./nix/dev-vm.nix ];
         };
-        demo-server = nixpkgs.lib.nixosSystem {
+        qs = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
           modules = [
-            ./nix/demo-server
+            ./nix/deploy/qs
+            { _module.args.localArchtikaPackage = self.packages."aarch64-linux".default; }
+          ];
+        };
+        prod = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            ./nix/deploy/prod
             { _module.args.localArchtikaPackage = self.packages."aarch64-linux".default; }
           ];
         };

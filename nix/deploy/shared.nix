@@ -1,10 +1,5 @@
-{ pkgs, localArchtikaPackage, ... }:
+{ pkgs, ... }:
 {
-  imports = [
-    ./hardware-configuration.nix
-    ../module.nix
-  ];
-
   boot = {
     loader = {
       systemd-boot.enable = true;
@@ -23,7 +18,6 @@
   nixpkgs.config.allowUnfree = true;
 
   networking = {
-    hostName = "archtika-qs";
     networkmanager.enable = true;
     firewall = {
       allowedTCPPorts = [
@@ -60,15 +54,6 @@
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
-  };
-
-  services.archtika = {
-    enable = true;
-    package = localArchtikaPackage;
-    domain = "qs.archtika.com";
-    acmeEmail = "thilo.hohlt@tutanota.com";
-    dnsProvider = "porkbun";
-    dnsEnvironmentFile = /var/lib/porkbun.env;
   };
 
   system.stateVersion = "24.11";
