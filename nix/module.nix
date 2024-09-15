@@ -158,7 +158,7 @@ in
               proxyPass = "http://localhost:${toString cfg.webAppPort}";
             };
             "/previews/" = {
-              root = "/var/www/archtika-websites/previews";
+              root = "/var/www/archtika-websites/previews/";
               index = "index.html";
               tryFiles = "$uri $uri/ $uri.html =404";
             };
