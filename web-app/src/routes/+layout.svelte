@@ -3,19 +3,10 @@
   import { page } from "$app/stores";
   import type { LayoutServerData } from "./$types";
   import type { Snippet } from "svelte";
-  import { beforeNavigate, afterNavigate } from "$app/navigation";
+  import { navigating } from "$app/stores";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   const { data, children }: { data: LayoutServerData; children: Snippet } = $props();
-
-  let loading = $state(false);
-
-  beforeNavigate(() => {
-    loading = true;
-  });
-  afterNavigate(() => {
-    loading = false;
-  });
 
   const isProjectRoute = $derived($page.url.pathname.startsWith("/website") && !$page.error);
   const routeName = $derived(
@@ -25,7 +16,7 @@
   );
 </script>
 
-{#if loading}
+{#if $navigating && ["link", "goto"].includes($navigating.type)}
   <LoadingSpinner />
 {/if}
 

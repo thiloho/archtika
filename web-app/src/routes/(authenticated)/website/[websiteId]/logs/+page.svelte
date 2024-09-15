@@ -42,6 +42,8 @@
     const { user, change_log, media, ...restTables } = tables;
     resources = restTables;
   }
+
+  let logsSection: HTMLElement;
 </script>
 
 <WebsiteEditor
@@ -50,14 +52,14 @@
   title={data.website.title}
   previewContent={data.home.main_content}
 >
-  <section id="logs">
+  <section id="logs" bind:this={logsSection}>
     <hgroup>
       <h2>
         <a href="#logs">Logs</a>
       </h2>
       <p>
-        <strong>{data.resultChangeLogCount}</strong>
-        <small>results</small>
+        <strong>{data.resultChangeLogCount.toLocaleString("en", { useGrouping: true })}</strong>
+        <small>result(s)</small>
       </p>
     </hgroup>
     <details>
@@ -111,6 +113,7 @@
             >
           </select>
         </label>
+        <input type="hidden" name="logs_results_page" value={1} />
         <button type="submit">Submit</button>
       </form>
     </details>
@@ -155,6 +158,106 @@
           {/each}
         </tbody>
       </table>
+      {#snippet commonFilterInputs()}
+        <input
+          type="hidden"
+          name="logs_filter_user"
+          value={$page.url.searchParams.get("logs_filter_user")}
+        />
+        <input
+          type="hidden"
+          name="logs_filter_resource"
+          value={$page.url.searchParams.get("logs_filter_resource")}
+        />
+        <input
+          type="hidden"
+          name="logs_filter_operation"
+          value={$page.url.searchParams.get("logs_filter_operation")}
+        />
+      {/snippet}
+      <div class="pagination">
+        <p>
+          {$page.url.searchParams.get("logs_results_page") ?? 1} / {Math.max(
+            Math.floor(data.resultChangeLogCount / 50),
+            1
+          )}
+        </p>
+        <form method="GET" onsubmit={() => logsSection.scrollIntoView()}>
+          <input type="hidden" name="logs_results_page" value={1} />
+          {@render commonFilterInputs()}
+          <button
+            type="submit"
+            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
+            >First</button
+          >
+        </form>
+        <form method="GET" onsubmit={() => logsSection.scrollIntoView()}>
+          <input
+            type="hidden"
+            name="logs_results_page"
+            value={Math.max(
+              1,
+              Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") - 1
+            )}
+          />
+          {@render commonFilterInputs()}
+          <button
+            type="submit"
+            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
+            >Previous</button
+          >
+        </form>
+        <form method="GET" onsubmit={() => logsSection.scrollIntoView()}>
+          <input
+            type="hidden"
+            name="logs_results_page"
+            value={Math.min(
+              Math.max(Math.floor(data.resultChangeLogCount / 50), 1),
+              Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") + 1
+            )}
+          />
+          {@render commonFilterInputs()}
+          <button
+            type="submit"
+            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+              Math.max(Math.floor(data.resultChangeLogCount / 50), 1).toString()}>Next</button
+          >
+        </form>
+        <form method="GET" onsubmit={() => logsSection.scrollIntoView()}>
+          <input
+            type="hidden"
+            name="logs_results_page"
+            value={Math.max(Math.floor(data.resultChangeLogCount / 50), 1)}
+          />
+          {@render commonFilterInputs()}
+          <button
+            type="submit"
+            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+              Math.max(Math.floor(data.resultChangeLogCount / 50), 1).toString()}>Last</button
+          >
+        </form>
+      </div>
     </div>
   </section>
 </WebsiteEditor>
+
+<style>
+  .pagination {
+    display: flex;
+    align-items: center;
+    margin-inline: var(--space-2xs);
+    margin-block: var(--space-s);
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    justify-content: end;
+  }
+
+  .pagination > form:first-of-type {
+    margin-inline-start: auto;
+  }
+
+  button[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+</style>
