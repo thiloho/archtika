@@ -21,6 +21,7 @@
 
   const handlePaste = async (event: ClipboardEvent) => {
     const newContent = await handleImagePaste(event, data.API_BASE_PREFIX);
+
     if (newContent) {
       previewContent = newContent;
     }

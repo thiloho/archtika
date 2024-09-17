@@ -15,7 +15,14 @@ import type {
   LegalInformation
 } from "$lib/db-schema";
 
-export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "image/svg+xml"
+];
 
 export const slugify = (string: string) => {
   return string
@@ -24,8 +31,8 @@ export const slugify = (string: string) => {
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading and trailing whitespace
     .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/[^\w\-]+/g, "") // Remove non-word characters (except hyphens)
-    .replace(/\-\-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/[^\w-]+/g, "") // Remove non-word characters (except hyphens)
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
     .replace(/^-+/, "") // Remove leading hyphens
     .replace(/-+$/, ""); // Remove trailing hyphens
 };
@@ -51,8 +58,8 @@ const createMarkdownParser = (showToc = true) => {
   );
 
   const gfmHeadingId = ({ prefix = "", showToc = true } = {}) => {
-    let headings: { text: string; level: number; id: string }[] = [];
-    let sectionStack: { level: number; id: string }[] = [];
+    const headings: { text: string; level: number; id: string }[] = [];
+    const sectionStack: { level: number; id: string }[] = [];
 
     return {
       renderer: {

@@ -34,11 +34,13 @@
   let resources = $state({});
 
   if (data.website.content_type === "Blog") {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { user, change_log, media, docs_category, ...restTables } = tables;
     resources = restTables;
   }
 
   if (data.website.content_type === "Docs") {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { user, change_log, media, ...restTables } = tables;
     resources = restTables;
   }
@@ -253,8 +255,8 @@
     margin-inline-start: auto;
   }
 
-  button[disabled] {
-    opacity: 0.5;
+  button:disabled {
     pointer-events: none;
+    color: hsl(0 0% 50%);
   }
 </style>
