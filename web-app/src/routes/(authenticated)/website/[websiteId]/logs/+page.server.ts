@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ parent, fetch, params, cookies, url
   const resourceFilter = url.searchParams.get("logs_filter_resource");
   const operationFilter = url.searchParams.get("logs_filter_operation");
   const currentPage = Number.parseInt(url.searchParams.get("logs_results_page") ?? "1");
-  const resultOffset = currentPage === 1 ? 0 : currentPage * 50;
+  const resultOffset = (currentPage - 1) * 50;
 
   const searchParams = new URLSearchParams();
 

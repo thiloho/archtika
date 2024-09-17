@@ -13,9 +13,11 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Install Nix
       uses: cachix/install-nix-action@v27
@@ -31,9 +33,8 @@ jobs:
     - name: Deploy to demo server
       run: |
         nix run nixpkgs#nixos-rebuild -- switch \
-          --flake github:archtika/archtika/${{ github.event.workflow_run.head_branch }}#${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }} \
+          --flake .#${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }} \
           --fast \
-          --refresh \
           --build-host ${{ env.SERVER_USER }}@${{ github.event.workflow_run.head_branch == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
           --target-host ${{ env.SERVER_USER }}@${{ github.event.workflow_run.head_branch == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
           --use-remote-sudo
