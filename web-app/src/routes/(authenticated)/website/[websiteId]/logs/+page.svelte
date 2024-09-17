@@ -158,6 +158,8 @@
           {/each}
         </tbody>
       </table>
+    </div>
+    <div class="pagination">
       {#snippet commonFilterInputs()}
         <input
           type="hidden"
@@ -175,68 +177,65 @@
           value={$page.url.searchParams.get("logs_filter_operation")}
         />
       {/snippet}
-      <div class="pagination">
-        <p>
-          {$page.url.searchParams.get("logs_results_page") ?? 1} / {Math.max(
-            Math.ceil(data.resultChangeLogCount / 50),
-            1
+      <p>
+        {$page.url.searchParams.get("logs_results_page") ?? 1} / {Math.max(
+          Math.ceil(data.resultChangeLogCount / 50),
+          1
+        )}
+      </p>
+      <form method="GET">
+        <input type="hidden" name="logs_results_page" value={1} />
+        {@render commonFilterInputs()}
+        <button
+          type="submit"
+          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}>First</button
+        >
+      </form>
+      <form method="GET">
+        <input
+          type="hidden"
+          name="logs_results_page"
+          value={Math.max(
+            1,
+            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") - 1
           )}
-        </p>
-        <form method="GET">
-          <input type="hidden" name="logs_results_page" value={1} />
-          {@render commonFilterInputs()}
-          <button
-            type="submit"
-            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
-            >First</button
-          >
-        </form>
-        <form method="GET">
-          <input
-            type="hidden"
-            name="logs_results_page"
-            value={Math.max(
-              1,
-              Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") - 1
-            )}
-          />
-          {@render commonFilterInputs()}
-          <button
-            type="submit"
-            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
-            >Previous</button
-          >
-        </form>
-        <form method="GET">
-          <input
-            type="hidden"
-            name="logs_results_page"
-            value={Math.min(
-              Math.max(Math.ceil(data.resultChangeLogCount / 50), 1),
-              Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") + 1
-            )}
-          />
-          {@render commonFilterInputs()}
-          <button
-            type="submit"
-            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
-              Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Next</button
-          >
-        </form>
-        <form method="GET">
-          <input
-            type="hidden"
-            name="logs_results_page"
-            value={Math.max(Math.ceil(data.resultChangeLogCount / 50), 1)}
-          />
-          {@render commonFilterInputs()}
-          <button
-            type="submit"
-            disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
-              Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Last</button
-          >
-        </form>
-      </div>
+        />
+        {@render commonFilterInputs()}
+        <button
+          type="submit"
+          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
+          >Previous</button
+        >
+      </form>
+      <form method="GET">
+        <input
+          type="hidden"
+          name="logs_results_page"
+          value={Math.min(
+            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1),
+            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") + 1
+          )}
+        />
+        {@render commonFilterInputs()}
+        <button
+          type="submit"
+          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Next</button
+        >
+      </form>
+      <form method="GET">
+        <input
+          type="hidden"
+          name="logs_results_page"
+          value={Math.max(Math.ceil(data.resultChangeLogCount / 50), 1)}
+        />
+        {@render commonFilterInputs()}
+        <button
+          type="submit"
+          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Last</button
+        >
+      </form>
     </div>
   </section>
 </WebsiteEditor>
@@ -245,8 +244,6 @@
   .pagination {
     display: flex;
     align-items: center;
-    margin-inline: var(--space-2xs);
-    margin-block: var(--space-s);
     flex-wrap: wrap;
     gap: var(--space-xs);
     justify-content: end;
