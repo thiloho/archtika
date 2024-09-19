@@ -168,6 +168,8 @@ in
                 default_type  application/json;
                 proxy_set_header Connection "";
                 proxy_http_version 1.1;
+                allow 127.0.0.1;
+                deny all;
               '';
             };
           };
