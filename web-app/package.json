@@ -14,7 +14,7 @@
     "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal"
   },
   "devDependencies": {
-    "@playwright/test": "1.47.1",
+    "@playwright/test": "1.46.0",
     "@sveltejs/adapter-auto": "3.2.5",
     "@sveltejs/adapter-node": "5.2.3",
     "@sveltejs/kit": "2.5.28",
