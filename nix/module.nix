@@ -108,7 +108,7 @@ in
 
         ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
-        PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} PGRST_SERVER_PORT=${toString cfg.apiPort} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
+        PGRST_SERVER_CORS_ALLOWED_ORIGINS="${cfg.domain}, *.${cfg.domain}" PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} PGRST_SERVER_PORT=${toString cfg.apiPort} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
       '';
     };
 
