@@ -75,6 +75,12 @@ in
       default = null;
       description = "API secrets for the DNS-01 challenge (required for wildcard domains).";
     };
+
+    disableRegistration = mkOption {
+      type = types.bool;
+      default = false;
+      description = "By default any user can create an account. That behavior can be disabled by using this option.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -125,7 +131,7 @@ in
       };
 
       script = ''
-        BODY_SIZE_LIMIT=Infinity ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        REGISTRATION_IS_DISABLED=${toString cfg.disableRegistration} BODY_SIZE_LIMIT=Infinity ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -165,10 +171,13 @@ in
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.apiPort}/";
               extraConfig = ''
-                default_type  application/json;
+                default_type application/json;
                 proxy_set_header Connection "";
                 proxy_http_version 1.1;
-                allow 127.0.0.1;
+              '';
+            };
+            "/api/rpc/register" = mkIf cfg.disableRegistration {
+              extraConfig = ''
                 deny all;
               '';
             };

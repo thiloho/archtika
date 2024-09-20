@@ -103,6 +103,19 @@ export const actions: Actions = {
   deleteWebsite: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
+    const oldDomainPrefixData = await fetch(
+      `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${data.get("id")}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.get("session_token")}`,
+          Accept: "application/vnd.pgrst.object+json"
+        }
+      }
+    );
+    const oldDomainPrefix = await oldDomainPrefixData.json();
+
     const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, {
       method: "DELETE",
       headers: {
@@ -116,10 +129,18 @@ export const actions: Actions = {
       return { success: false, message: response.message };
     }
 
-    await rm(join("/", "var", "www", "archtika-websites", data.get("id") as string), {
+    await rm(join("/", "var", "www", "archtika-websites", "previews", data.get("id") as string), {
       recursive: true,
       force: true
     });
+
+    await rm(
+      join("/", "var", "www", "archtika-websites", oldDomainPrefix.prefix ?? data.get("id")),
+      {
+        recursive: true,
+        force: true
+      }
+    );
 
     return { success: true, message: "Successfully deleted website" };
   }

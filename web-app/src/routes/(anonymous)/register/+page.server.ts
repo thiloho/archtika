@@ -1,5 +1,11 @@
-import type { Actions } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import type { Actions, PageServerLoad } from "./$types";
+import { API_BASE_PREFIX, REGISTRATION_IS_DISABLED } from "$lib/server/utils";
+
+export const load: PageServerLoad = async () => {
+  return {
+    REGISTRATION_IS_DISABLED
+  };
+};
 
 export const actions: Actions = {
   default: async ({ request, fetch }) => {

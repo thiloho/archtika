@@ -12,7 +12,8 @@ import type {
   Footer,
   Article,
   DocsCategory,
-  LegalInformation
+  LegalInformation,
+  DomainPrefix
 } from "$lib/db-schema";
 
 export const ALLOWED_MIME_TYPES = [
@@ -198,4 +199,5 @@ export interface WebsiteOverview extends Website {
   footer: Footer;
   article: (Article & { docs_category: DocsCategory | null })[];
   legal_information?: LegalInformation;
+  domain_prefix?: DomainPrefix;
 }

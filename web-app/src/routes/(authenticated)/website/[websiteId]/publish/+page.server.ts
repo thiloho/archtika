@@ -1,4 +1,4 @@
-import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
 import { join } from "node:path";
 import { type WebsiteOverview, slugify } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
@@ -9,10 +9,11 @@ import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
 import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import { dev } from "$app/environment";
+import type { DomainPrefixInput } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   const websiteOverviewData = await fetch(
-    `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*)`,
+    `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
     {
       method: "GET",
       headers: {
@@ -36,10 +37,13 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   }/previews/${websiteOverview.id}/`;
 
   const websiteProdUrl = dev
-    ? `http://localhost:18000/${websiteOverview.id}/`
+    ? `http://localhost:18000/${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}/`
     : process.env.ORIGIN
-      ? process.env.ORIGIN.replace("//", `//${websiteOverview.id}.`)
-      : `http://localhost:18000/${websiteOverview.id}/`;
+      ? process.env.ORIGIN.replace(
+          "//",
+          `//${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}.`
+        )
+      : `http://localhost:18000/${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}/`;
 
   return {
     websiteOverview,
@@ -51,7 +55,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 export const actions: Actions = {
   publishWebsite: async ({ fetch, params, cookies }) => {
     const websiteOverviewData = await fetch(
-      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*)`,
+      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
       {
         method: "GET",
         headers: {
@@ -82,10 +86,85 @@ export const actions: Actions = {
     }
 
     return { success: true, message: "Successfully published website" };
+  },
+  createUpdateCustomDomainPrefix: async ({ request, fetch, params, cookies }) => {
+    const data = await request.formData();
+
+    const oldDomainPrefixData = await fetch(
+      `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies.get("session_token")}`,
+          Accept: "application/vnd.pgrst.object+json"
+        }
+      }
+    );
+    const oldDomainPrefix = await oldDomainPrefixData.json();
+
+    const res = await fetch(`${API_BASE_PREFIX}/domain_prefix`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Prefer: "resolution=merge-duplicates",
+        Accept: "application/vnd.pgrst.object+json"
+      },
+      body: JSON.stringify({
+        website_id: params.websiteId,
+        prefix: data.get("domain-prefix") as string
+      } satisfies DomainPrefixInput)
+    });
+
+    if (!res.ok) {
+      const response = await res.json();
+      return { success: false, message: response.message };
+    }
+
+    await rename(
+      join(
+        "/",
+        "var",
+        "www",
+        "archtika-websites",
+        res.status === 201 ? params.websiteId : oldDomainPrefix.prefix
+      ),
+      join("/", "var", "www", "archtika-websites", data.get("domain-prefix") as string)
+    );
+
+    return {
+      success: true,
+      message: `Successfully ${res.status === 201 ? "created" : "updated"} domain prefix`
+    };
+  },
+  deleteCustomDomainPrefix: async ({ fetch, params, cookies }) => {
+    const res = await fetch(`${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("session_token")}`,
+        Prefer: "return=representation",
+        Accept: "application/vnd.pgrst.object+json"
+      }
+    });
+
+    const response = await res.json();
+
+    if (!res.ok) {
+      return { success: false, message: response.message };
+    }
+
+    await rename(
+      join("/", "var", "www", "archtika-websites", response.prefix),
+      join("/", "var", "www", "archtika-websites", params.websiteId)
+    );
+
+    return { success: true, message: `Successfully deleted domain prefix` };
   }
 };
 
-const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview: boolean = true) => {
+const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = true) => {
   const fileContents = (head: string, body: string) => {
     return `
 <!DOCTYPE html>
@@ -112,7 +191,13 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview: bool
   if (isPreview) {
     uploadDir = join("/", "var", "www", "archtika-websites", "previews", websiteData.id);
   } else {
-    uploadDir = join("/", "var", "www", "archtika-websites", websiteData.id);
+    uploadDir = join(
+      "/",
+      "var",
+      "www",
+      "archtika-websites",
+      websiteData.domain_prefix?.prefix ?? websiteData.id
+    );
   }
 
   await mkdir(uploadDir, { recursive: true });
