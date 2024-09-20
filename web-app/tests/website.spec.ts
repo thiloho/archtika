@@ -261,8 +261,8 @@ test.describe.serial("Website tests", () => {
         await page.getByRole("link", { name: "Documentation" }).click();
         await page.getByRole("link", { name: "Categories" }).click();
         await page.getByRole("button", { name: "Create category" }).click();
-        await page.getByLabel("Name:").click();
-        await page.getByLabel("Name:").fill("Category");
+        await page.getByLabel("Name:").nth(0).click();
+        await page.getByLabel("Name:").nth(0).fill("Category");
         await page.getByLabel("Weight:").click();
         await page.getByLabel("Weight:").fill("1000");
         await page.getByRole("button", { name: "Submit" }).click();
@@ -294,8 +294,8 @@ test.describe.serial("Website tests", () => {
       await page.getByRole("link", { name: "Documentation" }).click();
       await page.getByRole("link", { name: "Categories" }).click();
       await page.getByRole("button", { name: "Create category" }).click();
-      await page.getByLabel("Name:").click();
-      await page.getByLabel("Name:").fill("Category");
+      await page.getByLabel("Name:").nth(0).click();
+      await page.getByLabel("Name:").nth(0).fill("Category");
       await page.getByLabel("Weight:").click();
       await page.getByLabel("Weight:").fill("1000");
       await page.getByRole("button", { name: "Submit" }).click();

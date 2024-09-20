@@ -91,7 +91,13 @@
 
                   <label>
                     Name:
-                    <input type="text" name="category-name" value={category_name} maxlength="50" required />
+                    <input
+                      type="text"
+                      name="category-name"
+                      value={category_name}
+                      maxlength="50"
+                      required
+                    />
                   </label>
 
                   <label>

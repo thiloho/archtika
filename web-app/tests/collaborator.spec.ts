@@ -86,8 +86,8 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByRole("link", { name: "Documentation" }).click();
     await page.getByRole("link", { name: "Categories" }).click();
     await page.getByRole("button", { name: "Create category" }).click();
-    await page.getByLabel("Name:").click();
-    await page.getByLabel("Name:").fill("Category-10");
+    await page.getByLabel("Name:").nth(0).click();
+    await page.getByLabel("Name:").nth(0).fill("Category-10");
     await page.getByLabel("Weight:").click();
     await page.getByLabel("Weight:").fill("10");
     await page.getByRole("button", { name: "Submit" }).click();
@@ -370,8 +370,8 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Documentation" }).click();
         await page.getByRole("link", { name: "Categories" }).click();
         await page.getByRole("button", { name: "Create category" }).click();
-        await page.getByLabel("Name:").click();
-        await page.getByLabel("Name:").fill(`Category-${permissionLevel}`);
+        await page.getByLabel("Name:").nth(0).click();
+        await page.getByLabel("Name:").nth(0).fill(`Category-${permissionLevel}`);
         await page.getByRole("spinbutton", { name: "Weight:" }).click();
         await page.getByRole("spinbutton", { name: "Weight:" }).fill(permissionLevel.toString());
         await page.getByRole("button", { name: "Submit" }).click();
