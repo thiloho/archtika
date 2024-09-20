@@ -60,6 +60,7 @@ export const actions: Actions = {
           Authorization: `Bearer ${cookies.get("session_token")}`
         },
         body: JSON.stringify({
+          category_name: data.get("category-name"),
           category_weight: data.get("category-weight")
         })
       }

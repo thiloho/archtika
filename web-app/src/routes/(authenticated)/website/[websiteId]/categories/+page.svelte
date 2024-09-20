@@ -90,6 +90,11 @@
                   <input type="hidden" name="category-id" value={id} />
 
                   <label>
+                    Name:
+                    <input type="text" name="category-name" value={category_name} maxlength="50" required />
+                  </label>
+
+                  <label>
                     Weight:
                     <input type="number" name="category-weight" value={category_weight} min="0" />
                   </label>

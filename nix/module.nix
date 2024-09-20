@@ -131,7 +131,7 @@ in
       };
 
       script = ''
-        REGISTRATION_IS_DISABLED=${toString cfg.disableRegistration} BODY_SIZE_LIMIT=Infinity ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        REGISTRATION_IS_DISABLED=${toString cfg.disableRegistration} BODY_SIZE_LIMIT=10M ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -154,6 +154,14 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
+      recommendedZstdSettings = true;
+      recommendedOptimisation = true;
+
+      appendHttpConfig = ''
+        limit_req_zone $binary_remote_addr zone=requestLimit:10m rate=5r/s;
+        limit_req_status 429;
+        limit_req zone=requestLimit burst=20 nodelay;
+      '';
 
       virtualHosts = {
         "${cfg.domain}" = {
@@ -172,8 +180,6 @@ in
               proxyPass = "http://localhost:${toString cfg.apiPort}/";
               extraConfig = ''
                 default_type application/json;
-                proxy_set_header Connection "";
-                proxy_http_version 1.1;
               '';
             };
             "/api/rpc/register" = mkIf cfg.disableRegistration {
