@@ -22,6 +22,7 @@
   --bg-primary: white;
   --bg-secondary: hsl(0 0% 95%);
   --bg-tertiary: hsl(0 0% 90%);
+  --bg-blurred: rgba(255, 255, 255, 0.5);
 
   --color-text: black;
   --color-text-invert: white;
@@ -75,6 +76,7 @@
     --bg-primary: hsl(0 0% 15%);
     --bg-secondary: hsl(0 0% 20%);
     --bg-tertiary: hsl(0 0% 25%);
+    --bg-blurred: rgba(0, 0, 0, 0.5);
 
     --color-text: white;
     --color-text-invert: black;
