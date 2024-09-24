@@ -30,7 +30,8 @@ BEGIN
   RETURN COALESCE(NEW, OLD);
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql
+SECURITY DEFINER;
 
 CREATE TRIGGER update_website_last_modified
   BEFORE UPDATE ON internal.website

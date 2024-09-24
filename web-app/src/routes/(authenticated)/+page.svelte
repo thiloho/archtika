@@ -179,7 +179,7 @@
   .website-grid {
     display: grid;
     gap: var(--space-s);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 0.5fr));
     margin-block-start: var(--space-xs);
   }
 

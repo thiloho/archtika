@@ -14,7 +14,7 @@ SELECT
 FROM
   internal.domain_prefix;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON internal.domain_prefix TO authenticated_user;
+GRANT SELECT, INSERT (website_id, prefix), UPDATE (website_id, prefix), DELETE ON internal.domain_prefix TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.domain_prefix TO authenticated_user;
 

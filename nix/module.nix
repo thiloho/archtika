@@ -161,6 +161,12 @@ in
         limit_req_zone $binary_remote_addr zone=requestLimit:10m rate=5r/s;
         limit_req_status 429;
         limit_req zone=requestLimit burst=20 nodelay;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(self),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(self),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),xr-spatial-tracking=(),clipboard-read=(self),clipboard-write=(self),gamepad=(),hid=(),idle-detection=(),interest-cohort=(),serial=(),unload=()" always;
       '';
 
       virtualHosts = {
@@ -189,7 +195,7 @@ in
             };
           };
         };
-        "~^(?<subdomain>.+)\\.${lib.strings.escapeRegex cfg.domain}$" = {
+        "~^(?<subdomain>.+)\\.${cfg.domain}$" = {
           useACMEHost = cfg.domain;
           forceSSL = true;
           locations = {
