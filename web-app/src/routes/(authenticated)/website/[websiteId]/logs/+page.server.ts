@@ -1,8 +1,8 @@
 import type { PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { ChangeLog, User, Collab } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ parent, fetch, params, cookies, url }) => {
+export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const userFilter = url.searchParams.get("logs_filter_user");
   const resourceFilter = url.searchParams.get("logs_filter_resource");
   const operationFilter = url.searchParams.get("logs_filter_operation");
@@ -27,41 +27,30 @@ export const load: PageServerLoad = async ({ parent, fetch, params, cookies, url
 
   const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=50&offset=${resultOffset}`;
 
-  const changeLogData = await fetch(constructedFetchUrl, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`
-    }
-  });
+  const changeLog: (ChangeLog & { user: { username: User["username"] } })[] = (
+    await apiRequest(fetch, constructedFetchUrl, "GET", { returnData: true })
+  ).data;
 
-  const resultChangeLogData = await fetch(constructedFetchUrl, {
-    method: "HEAD",
+  const resultChangeLogData = await apiRequest(fetch, constructedFetchUrl, "HEAD", {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
       Prefer: "count=exact"
-    }
+    },
+    returnData: true
   });
 
   const resultChangeLogCount = Number(
-    resultChangeLogData.headers.get("content-range")?.split("/").at(-1)
+    resultChangeLogData.data.headers.get("content-range")?.split("/").at(-1)
   );
 
-  const collabData = await fetch(
-    `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)&order=last_modified_at.desc,added_at.desc`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      }
-    }
-  );
+  const collaborators: (Collab & { user: User })[] = (
+    await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)&order=last_modified_at.desc,added_at.desc`,
+      "GET",
+      { returnData: true }
+    )
+  ).data;
 
-  const changeLog: (ChangeLog & { user: { username: User["username"] } })[] =
-    await changeLogData.json();
-  const collaborators: (Collab & { user: User })[] = await collabData.json();
   const { website, home } = await parent();
 
   return {

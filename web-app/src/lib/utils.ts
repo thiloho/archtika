@@ -177,7 +177,7 @@ export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: s
   const response = await request.json();
 
   if (JSON.parse(response.data)[1]) {
-    const fileId = JSON.parse(response.data)[3];
+    const fileId = JSON.parse(response.data)[4];
     const fileUrl = `${API_BASE_PREFIX}/rpc/retrieve_file?id=${fileId}`;
 
     const target = event.target as HTMLTextAreaElement;

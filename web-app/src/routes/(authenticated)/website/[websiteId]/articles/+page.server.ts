@@ -1,8 +1,9 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
-import type { Article, ArticleInput, DocsCategory } from "$lib/db-schema";
+import { apiRequest } from "$lib/server/utils";
+import type { Article, DocsCategory } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent, locals }) => {
+export const load: PageServerLoad = async ({ params, fetch, url, parent, locals }) => {
   const searchQuery = url.searchParams.get("article_search_query");
   const filterBy = url.searchParams.get("article_filter");
 
@@ -34,28 +35,22 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 
   const constructedFetchUrl = `${baseFetchUrl}&${parameters.toString()}`;
 
-  const totalArticlesData = await fetch(baseFetchUrl, {
-    method: "HEAD",
+  const totalArticles = await apiRequest(fetch, baseFetchUrl, "HEAD", {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
       Prefer: "count=exact"
-    }
+    },
+    returnData: true
   });
 
   const totalArticleCount = Number(
-    totalArticlesData.headers.get("content-range")?.split("/").at(-1)
+    totalArticles.data.headers.get("content-range")?.split("/").at(-1)
   );
 
-  const articlesData = await fetch(constructedFetchUrl, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`
-    }
-  });
-
-  const articles: (Article & { docs_category: DocsCategory | null })[] = await articlesData.json();
+  const articles: (Article & { docs_category: DocsCategory | null })[] = (
+    await apiRequest(fetch, constructedFetchUrl, "GET", {
+      returnData: true
+    })
+  ).data;
 
   return {
     totalArticleCount,
@@ -66,44 +61,22 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, url, parent
 };
 
 export const actions: Actions = {
-  createArticle: async ({ request, fetch, cookies, params }) => {
+  createArticle: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/article`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/article`, "POST", {
+      body: {
         website_id: params.websiteId,
-        title: data.get("title") as string
-      } satisfies ArticleInput)
+        title: data.get("title")
+      },
+      successMessage: "Successfully created article"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully created article" };
   },
-  deleteArticle: async ({ request, fetch, cookies }) => {
+  deleteArticle: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/article?id=eq.${data.get("id")}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      }
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/article?id=eq.${data.get("id")}`, "DELETE", {
+      successMessage: "Successfully deleted article"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully deleted article" };
   }
 };

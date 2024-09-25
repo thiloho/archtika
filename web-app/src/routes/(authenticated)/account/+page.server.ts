@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 
 export const load: PageServerLoad = async ({ locals }) => {
   return {
@@ -16,24 +16,18 @@ export const actions: Actions = {
   deleteAccount: async ({ request, fetch, cookies }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/rpc/delete_account`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
+    const response = await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/delete_account`, "POST", {
+      body: {
         pass: data.get("password")
-      })
+      },
+      successMessage: "Successfully deleted account"
     });
 
-    const response = await res.json();
-
-    if (!res.ok) {
-      return { success: false, message: response.message };
+    if (!response.success) {
+      return response;
     }
 
     cookies.delete("session_token", { path: "/" });
-    return { success: true, message: "Successfully deleted account" };
+    return response;
   }
 };

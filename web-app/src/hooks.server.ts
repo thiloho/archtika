@@ -30,3 +30,13 @@ export const handle = async ({ event, resolve }) => {
 
   return await resolve(event);
 };
+
+export const handleFetch = async ({ event, request, fetch }) => {
+  const sessionToken = event.cookies.get("session_token");
+
+  if (sessionToken) {
+    request.headers.set("Authorization", `Bearer ${sessionToken}`);
+  }
+
+  return fetch(request);
+};

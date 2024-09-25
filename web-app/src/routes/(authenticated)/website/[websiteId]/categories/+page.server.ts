@@ -1,20 +1,19 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
-import type { DocsCategory, DocsCategoryInput } from "$lib/db-schema";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
+import type { DocsCategory } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) => {
-  const categoryData = await fetch(
-    `${API_BASE_PREFIX}/docs_category?website_id=eq.${params.websiteId}&order=category_weight.desc`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
+export const load: PageServerLoad = async ({ parent, params, fetch }) => {
+  const categories: DocsCategory[] = (
+    await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/docs_category?website_id=eq.${params.websiteId}&order=category_weight.desc`,
+      "GET",
+      {
+        returnData: true
       }
-    }
-  );
+    )
+  ).data;
 
-  const categories: DocsCategory[] = await categoryData.json();
   const { website, home } = await parent();
 
   return {
@@ -25,73 +24,44 @@ export const load: PageServerLoad = async ({ parent, params, cookies, fetch }) =
 };
 
 export const actions: Actions = {
-  createCategory: async ({ request, fetch, cookies, params }) => {
+  createCategory: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/docs_category`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/docs_category`, "POST", {
+      body: {
         website_id: params.websiteId,
-        category_name: data.get("category-name") as string,
-        category_weight: data.get("category-weight") as unknown as number
-      } satisfies DocsCategoryInput)
+        category_name: data.get("category-name"),
+        category_weight: data.get("category-weight")
+      },
+      successMessage: "Successfully created category"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully created category" };
   },
-  updateCategory: async ({ request, fetch, cookies, params }) => {
+  updateCategory: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `${API_BASE_PREFIX}/docs_category?website_id=eq.${params.websiteId}&id=eq.${data.get("category-id")}`,
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/docs_category?id=eq.${data.get("category-id")}`,
+      "PATCH",
       {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        },
-        body: JSON.stringify({
+        body: {
           category_name: data.get("category-name"),
           category_weight: data.get("category-weight")
-        })
+        },
+        successMessage: "Successfully updated category"
       }
     );
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully updated category" };
   },
-  deleteCategory: async ({ request, fetch, cookies, params }) => {
+  deleteCategory: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(
-      `${API_BASE_PREFIX}/docs_category?website_id=eq.${params.websiteId}&id=eq.${data.get("category-id")}`,
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/docs_category?id=eq.${data.get("category-id")}`,
+      "DELETE",
       {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        }
+        successMessage: "Successfully deleted category"
       }
     );
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully deleted category" };
   }
 };

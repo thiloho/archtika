@@ -2,29 +2,28 @@ import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
 import { join } from "node:path";
 import { type WebsiteOverview, slugify } from "$lib/utils";
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import { render } from "svelte/server";
 import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
 import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
 import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import { dev } from "$app/environment";
-import type { DomainPrefixInput } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
-  const websiteOverviewData = await fetch(
-    `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
+export const load: PageServerLoad = async ({ params, fetch }) => {
+  const websiteOverview: WebsiteOverview = (
+    await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
+      "GET",
+      {
+        headers: {
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        returnData: true
       }
-    }
-  );
-
-  const websiteOverview: WebsiteOverview = await websiteOverviewData.json();
+    )
+  ).data;
 
   generateStaticFiles(websiteOverview);
 
@@ -53,73 +52,66 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 };
 
 export const actions: Actions = {
-  publishWebsite: async ({ fetch, params, cookies }) => {
-    const websiteOverviewData = await fetch(
-      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`,
-          Accept: "application/vnd.pgrst.object+json"
+  publishWebsite: async ({ fetch, params }) => {
+    const websiteOverview: WebsiteOverview = (
+      await apiRequest(
+        fetch,
+        `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
+        "GET",
+        {
+          headers: {
+            Accept: "application/vnd.pgrst.object+json"
+          },
+          returnData: true
         }
-      }
-    );
+      )
+    ).data;
 
-    const websiteOverview = await websiteOverviewData.json();
     generateStaticFiles(websiteOverview, false);
 
-    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
-        is_published: true
-      })
-    });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully published website" };
-  },
-  createUpdateCustomDomainPrefix: async ({ request, fetch, params, cookies }) => {
-    const data = await request.formData();
-
-    const oldDomainPrefixData = await fetch(
-      `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`,
+      "PATCH",
       {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`,
-          Accept: "application/vnd.pgrst.object+json"
-        }
+        body: {
+          is_published: true
+        },
+        successMessage: "Successfully published website"
       }
     );
-    const oldDomainPrefix = await oldDomainPrefixData.json();
+  },
+  createUpdateCustomDomainPrefix: async ({ request, fetch, params }) => {
+    const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/domain_prefix`, {
-      method: "POST",
+    const oldDomainPrefix = (
+      await apiRequest(
+        fetch,
+        `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
+        "GET",
+        {
+          headers: {
+            Accept: "application/vnd.pgrst.object+json"
+          },
+          returnData: true
+        }
+      )
+    ).data;
+
+    const newDomainPrefix = await apiRequest(fetch, `${API_BASE_PREFIX}/domain_prefix`, "POST", {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
         Prefer: "resolution=merge-duplicates",
         Accept: "application/vnd.pgrst.object+json"
       },
-      body: JSON.stringify({
+      body: {
         website_id: params.websiteId,
         prefix: data.get("domain-prefix") as string
-      } satisfies DomainPrefixInput)
+      },
+      successMessage: "Successfully created/updated domain prefix"
     });
 
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
+    if (!newDomainPrefix.success) {
+      return newDomainPrefix;
     }
 
     await rename(
@@ -128,39 +120,38 @@ export const actions: Actions = {
         "var",
         "www",
         "archtika-websites",
-        res.status === 201 ? params.websiteId : oldDomainPrefix.prefix
+        oldDomainPrefix?.prefix ? oldDomainPrefix.prefix : params.websiteId
       ),
       join("/", "var", "www", "archtika-websites", data.get("domain-prefix") as string)
     );
 
-    return {
-      success: true,
-      message: `Successfully ${res.status === 201 ? "created" : "updated"} domain prefix`
-    };
+    return newDomainPrefix;
   },
-  deleteCustomDomainPrefix: async ({ fetch, params, cookies }) => {
-    const res = await fetch(`${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Prefer: "return=representation",
-        Accept: "application/vnd.pgrst.object+json"
+  deleteCustomDomainPrefix: async ({ fetch, params }) => {
+    const customPrefix = await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
+      "DELETE",
+      {
+        headers: {
+          Prefer: "return=representation",
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        successMessage: "Successfully deleted domain prefix",
+        returnData: true
       }
-    });
+    );
 
-    const response = await res.json();
-
-    if (!res.ok) {
-      return { success: false, message: response.message };
+    if (!customPrefix.success) {
+      return customPrefix;
     }
 
     await rename(
-      join("/", "var", "www", "archtika-websites", response.prefix),
+      join("/", "var", "www", "archtika-websites", customPrefix.data.prefix),
       join("/", "var", "www", "archtika-websites", params.websiteId)
     );
 
-    return { success: true, message: `Successfully deleted domain prefix` };
+    return customPrefix;
   }
 };
 
@@ -177,6 +168,8 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
   </body>
 </html>`;
   };
+
+  console.log(websiteData);
 
   const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
     props: {

@@ -238,12 +238,12 @@ test.describe.serial("Website tests", () => {
         await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
         await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Successfully created legal")).toBeVisible();
+        await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
 
         await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
         await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Successfully updated legal")).toBeVisible();
+        await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
       });
       test("Delete legal information", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();

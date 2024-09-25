@@ -335,7 +335,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
-          await expect(page.getByText("Successfully created legal")).toBeVisible();
+          await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
         } else {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
@@ -345,7 +345,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
-          await expect(page.getByText("Successfully updated legal")).toBeVisible();
+          await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
         } else {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }

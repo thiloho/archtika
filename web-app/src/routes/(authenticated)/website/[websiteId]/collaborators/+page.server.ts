@@ -1,22 +1,20 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
-import type { Collab, CollabInput, User } from "$lib/db-schema";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
+import type { Collab, User } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) => {
-  const { website, home } = await parent();
-
-  const collabData = await fetch(
-    `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)&order=last_modified_at.desc,added_at.desc`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
+export const load: PageServerLoad = async ({ parent, params, fetch }) => {
+  const collaborators: (Collab & { user: User })[] = (
+    await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&select=*,user!user_id(*)&order=last_modified_at.desc,added_at.desc`,
+      "GET",
+      {
+        returnData: true
       }
-    }
-  );
+    )
+  ).data;
 
-  const collaborators: (Collab & { user: User })[] = await collabData.json();
+  const { website, home } = await parent();
 
   return {
     website,
@@ -26,83 +24,57 @@ export const load: PageServerLoad = async ({ parent, params, fetch, cookies }) =
 };
 
 export const actions: Actions = {
-  addCollaborator: async ({ request, fetch, cookies, params }) => {
+  addCollaborator: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const userData = await fetch(`${API_BASE_PREFIX}/user?username=eq.${data.get("username")}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
-      }
-    });
+    const user: User = (
+      await apiRequest(
+        fetch,
+        `${API_BASE_PREFIX}/user?username=eq.${data.get("username")}`,
+        "GET",
+        {
+          headers: {
+            Accept: "application/vnd.pgrst.object+json"
+          },
+          returnData: true
+        }
+      )
+    ).data;
 
-    const user: User = await userData.json();
-
-    const res = await fetch(`${API_BASE_PREFIX}/collab`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/collab`, "POST", {
+      body: {
         website_id: params.websiteId,
         user_id: user.id,
-        permission_level: data.get("permission-level") as unknown as number
-      } satisfies CollabInput)
+        permission_level: data.get("permission-level")
+      },
+      successMessage: "Successfully added collaborator"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully added collaborator" };
   },
-  updateCollaborator: async ({ request, fetch, cookies, params }) => {
+  updateCollaborator: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(
+    return await apiRequest(
+      fetch,
       `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      "PATCH",
       {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        },
-        body: JSON.stringify({
+        body: {
           permission_level: data.get("permission-level")
-        })
+        },
+        successMessage: "Successfully updated collaborator"
       }
     );
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully updated collaborator" };
   },
-  removeCollaborator: async ({ request, fetch, cookies, params }) => {
+  removeCollaborator: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(
+    return await apiRequest(
+      fetch,
       `${API_BASE_PREFIX}/collab?website_id=eq.${params.websiteId}&user_id=eq.${data.get("user-id")}`,
+      "DELETE",
       {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        }
+        successMessage: "Successfully removed collaborator"
       }
     );
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully removed collaborator" };
   }
 };

@@ -1,26 +1,24 @@
 import type { Actions } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 
 export const actions: Actions = {
   default: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/rpc/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const response = await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/login`, "POST", {
+      body: {
         username: data.get("username"),
         pass: data.get("password")
-      })
+      },
+      returnData: true,
+      successMessage: "Successfully logged in, you can refresh the page"
     });
 
-    const response = await res.json();
-
-    if (!res.ok) {
-      return { success: false, message: response.message };
+    if (!response.success) {
+      return response;
     }
 
-    cookies.set("session_token", response.token, { path: "/" });
-    return { success: true, message: "Successfully logged in" };
+    cookies.set("session_token", response.data.token, { path: "/" });
+    return response;
   }
 };
