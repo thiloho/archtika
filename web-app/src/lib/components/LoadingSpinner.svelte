@@ -27,6 +27,6 @@
     border: var(--border-primary);
     border-width: 0.125rem;
     border-block-start-color: var(--color-accent);
-    animation: spinner 0.6s linear infinite;
+    animation: spinner 500ms linear infinite;
   }
 </style>

@@ -10,6 +10,7 @@
   const { form, data }: { form: ActionData; data: PageServerData } = $props();
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -30,9 +31,10 @@
       method="POST"
       action="?/createWebsite"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update();
+          window.clearTimeout(loadingDelay);
           window.location.hash = "!";
           sending = false;
         };
@@ -120,9 +122,10 @@
                 method="POST"
                 action="?/updateWebsite"
                 use:enhance={() => {
-                  sending = true;
+                  loadingDelay = window.setTimeout(() => (sending = true), 500);
                   return async ({ update }) => {
                     await update({ reset: false });
+                    window.clearTimeout(loadingDelay);
                     window.location.hash = "!";
                     sending = false;
                   };
@@ -155,9 +158,10 @@
                 method="POST"
                 action="?/deleteWebsite"
                 use:enhance={() => {
-                  sending = true;
+                  loadingDelay = window.setTimeout(() => (sending = true), 500);
                   return async ({ update }) => {
                     await update();
+                    window.clearTimeout(loadingDelay);
                     window.location.hash = "!";
                     sending = false;
                   };

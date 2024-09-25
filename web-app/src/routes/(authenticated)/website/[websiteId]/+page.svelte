@@ -27,6 +27,7 @@
   };
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -52,9 +53,10 @@
       method="POST"
       enctype="multipart/form-data"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}
@@ -108,9 +110,10 @@
       method="POST"
       enctype="multipart/form-data"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}
@@ -160,9 +163,10 @@
       action="?/updateHome"
       method="POST"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}
@@ -193,9 +197,10 @@
       action="?/updateFooter"
       method="POST"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}

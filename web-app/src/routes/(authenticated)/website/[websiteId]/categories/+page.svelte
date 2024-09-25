@@ -9,6 +9,7 @@
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -35,9 +36,10 @@
         method="POST"
         action="?/createCategory"
         use:enhance={() => {
-          sending = true;
+          loadingDelay = window.setTimeout(() => (sending = true), 500);
           return async ({ update }) => {
             await update();
+            window.clearTimeout(loadingDelay);
             window.location.hash = "!";
             sending = false;
           };
@@ -79,9 +81,10 @@
                   method="POST"
                   action="?/updateCategory"
                   use:enhance={() => {
-                    sending = true;
+                    loadingDelay = window.setTimeout(() => (sending = true), 500);
                     return async ({ update }) => {
                       await update({ reset: false });
+                      window.clearTimeout(loadingDelay);
                       window.location.hash = "!";
                       sending = false;
                     };
@@ -117,9 +120,10 @@
                   method="POST"
                   action="?/deleteCategory"
                   use:enhance={() => {
-                    sending = true;
+                    loadingDelay = window.setTimeout(() => (sending = true), 500);
                     return async ({ update }) => {
                       await update();
+                      window.clearTimeout(loadingDelay);
                       window.location.hash = "!";
                       sending = false;
                     };

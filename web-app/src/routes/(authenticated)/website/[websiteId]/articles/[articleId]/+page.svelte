@@ -28,6 +28,7 @@
   };
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -54,9 +55,10 @@
       action="?/editArticle"
       enctype="multipart/form-data"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}

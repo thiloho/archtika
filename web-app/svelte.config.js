@@ -15,15 +15,17 @@ const config = {
     csp: {
       mode: "auto",
       directives: {
-        "default-src": ["self"],
+        "default-src": ["none"],
         "script-src": ["self"],
-        "style-src": ["self", "https:", "http:", "unsafe-inline"],
-        "img-src": ["self", "data:", "https:", "http:"],
-        "font-src": ["self", "https:", "http:"],
+        "style-src": ["self", "https:", "unsafe-inline"],
+        "img-src": ["self", "data:", "https:"],
+        "font-src": ["self", "https:"],
         "connect-src": ["self"],
-        "frame-src": ["self", "https:", "http:"],
+        "frame-src": ["self", "https:"],
         "object-src": ["none"],
-        "base-uri": ["self"]
+        "base-uri": ["self"],
+        "frame-ancestors": ["none"],
+        "form-action": ["self"]
       }
     }
   }

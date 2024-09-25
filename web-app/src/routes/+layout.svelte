@@ -14,9 +14,21 @@
       ? "Dashboard"
       : `${$page.url.pathname.charAt(1).toUpperCase()}${$page.url.pathname.slice(2)}`
   );
+
+  let loading = $state(false);
+  let loadingDelay: number;
+
+  $effect(() => {
+    if ($navigating && ["link", "goto"].includes($navigating.type)) {
+      loadingDelay = window.setTimeout(() => (loading = true), 500);
+    } else {
+      window.clearTimeout(loadingDelay);
+      loading = false;
+    }
+  });
 </script>
 
-{#if $navigating && ["link", "goto"].includes($navigating.type)}
+{#if loading}
   <LoadingSpinner />
 {/if}
 

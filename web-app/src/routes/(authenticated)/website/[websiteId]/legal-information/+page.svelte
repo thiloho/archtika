@@ -18,6 +18,7 @@
   };
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -62,9 +63,10 @@
       method="POST"
       action="?/createUpdateLegalInformation"
       use:enhance={() => {
-        sending = true;
+        loadingDelay = window.setTimeout(() => (sending = true), 500);
         return async ({ update }) => {
           await update({ reset: false });
+          window.clearTimeout(loadingDelay);
           sending = false;
         };
       }}
@@ -93,9 +95,10 @@
           action="?/deleteLegalInformation"
           method="post"
           use:enhance={() => {
-            sending = true;
+            loadingDelay = window.setTimeout(() => (sending = true), 500);
             return async ({ update }) => {
               await update();
+              window.clearTimeout(loadingDelay);
               window.location.hash = "!";
               sending = false;
             };

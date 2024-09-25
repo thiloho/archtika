@@ -7,6 +7,7 @@
   const { form }: { form: ActionData } = $props();
 
   let sending = $state(false);
+  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
@@ -18,9 +19,10 @@
 <form
   method="POST"
   use:enhance={() => {
-    sending = true;
+    loadingDelay = window.setTimeout(() => (sending = true), 500);
     return async ({ update }) => {
       await update();
+      window.clearTimeout(loadingDelay);
       sending = false;
     };
   }}
