@@ -29,13 +29,12 @@ export const load: PageServerLoad = async ({ parent, params, fetch }) => {
 };
 
 export const actions: Actions = {
-  editArticle: async ({ fetch, cookies, request, params }) => {
+  editArticle: async ({ fetch, request, params }) => {
     const data = await request.formData();
     const coverFile = data.get("cover-image") as File;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/octet-stream",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
       Accept: "application/vnd.pgrst.object+json",
       "X-Website-Id": params.websiteId
     };

@@ -105,7 +105,7 @@ export const actions: Actions = {
       },
       body: {
         website_id: params.websiteId,
-        prefix: data.get("domain-prefix") as string
+        prefix: data.get("domain-prefix")
       },
       successMessage: "Successfully created/updated domain prefix"
     });
