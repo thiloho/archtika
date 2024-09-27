@@ -41,6 +41,10 @@ export const actions: Actions = {
       )
     ).data;
 
+    if (!user) {
+      return { success: false, message: "Specified user could not be found" };
+    }
+
     return await apiRequest(fetch, `${API_BASE_PREFIX}/collab`, "POST", {
       body: {
         website_id: params.websiteId,

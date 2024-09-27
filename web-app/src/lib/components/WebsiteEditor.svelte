@@ -65,7 +65,10 @@
   {#if fullPreview}
     <iframe src={previewContent.value} title="Preview"></iframe>
   {:else}
-    {@html md(previewContent.value, Object.keys($page.params).length > 1 ? true : false)}
+    {@html md(
+      previewContent.value || "Write some markdown content to see a live preview here",
+      Object.keys($page.params).length > 1 ? true : false
+    )}
   {/if}
 </div>
 

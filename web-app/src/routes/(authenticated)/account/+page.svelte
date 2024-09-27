@@ -66,3 +66,9 @@
     </form>
   </Modal>
 </section>
+
+<style>
+  form[action="?/logout"] > button {
+    max-inline-size: fit-content;
+  }
+</style>

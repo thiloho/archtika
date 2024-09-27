@@ -42,12 +42,12 @@
 </svelte:head>
 
 <nav>
-  <img src="/favicon.svg" width="24" height="24" alt="" />
+  <div class="logo-wrapper">
+    <img src="/favicon.svg" width="24" height="24" alt="" />
+    <a href="/">archtika</a>
+  </div>
   <ul class="link-wrapper unpadded">
     {#if data.user}
-      <li>
-        <a href="/">Dashboard</a>
-      </li>
       <li>
         <a href="/account">Account</a>
       </li>
@@ -98,6 +98,12 @@
     row-gap: var(--space-3xs);
     flex-wrap: wrap;
     justify-content: space-between;
+  }
+
+  nav > .logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
   }
 
   nav > .link-wrapper {
