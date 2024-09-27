@@ -80,10 +80,14 @@ test.describe.serial("Website tests", () => {
     test.describe.serial("Update settings", () => {
       test("Global", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
-        await page.getByLabel("Light accent color:").click();
-        await page.getByLabel("Light accent color:").fill("#3975a2");
-        await page.getByLabel("Dark accent color:").click();
-        await page.getByLabel("Dark accent color:").fill("#41473e");
+        await page.getByLabel("Background color dark theme: ").click();
+        await page.getByLabel("Background color dark theme:").fill("#3975a2");
+        await page.getByLabel("Background color light theme:").click();
+        await page.getByLabel("Background color light theme:").fill("#41473e");
+        await page.getByLabel("Accent color dark theme: ").click();
+        await page.getByLabel("Accent color dark theme:").fill("#3975a2");
+        await page.getByLabel("Accent color light theme:").click();
+        await page.getByLabel("Accent color light theme:").fill("#41473e");
         await page.locator("#global").getByRole("button", { name: "Submit" }).click();
         await expect(page.getByText("Successfully updated global")).toBeVisible();
         await page.getByLabel("Favicon:").click();
