@@ -42,10 +42,14 @@
 </svelte:head>
 
 <nav>
-  <div class="logo-wrapper">
+  {#if data.user}
+    <div class="logo-wrapper">
+      <img src="/favicon.svg" width="24" height="24" alt="" />
+      <a href="/">archtika</a>
+    </div>
+  {:else}
     <img src="/favicon.svg" width="24" height="24" alt="" />
-    <a href="/">archtika</a>
-  </div>
+  {/if}
   <ul class="link-wrapper unpadded">
     {#if data.user}
       <li>

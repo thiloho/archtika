@@ -5,7 +5,8 @@ export const handle = async ({ event, resolve }) => {
   if (!event.url.pathname.startsWith("/api/")) {
     const userData = await apiRequest(event.fetch, `${API_BASE_PREFIX}/account`, "GET", {
       headers: {
-        Accept: "application/vnd.pgrst.object+json"
+        Accept: "application/vnd.pgrst.object+json",
+        Authorization: `Bearer ${event.cookies.get("session_token")}`
       },
       returnData: true
     });
@@ -27,10 +28,8 @@ export const handle = async ({ event, resolve }) => {
 };
 
 export const handleFetch = async ({ event, request, fetch }) => {
-  const sessionToken = event.cookies.get("session_token");
-
-  if (sessionToken) {
-    request.headers.set("Authorization", `Bearer ${sessionToken}`);
+  if (event.locals.user) {
+    request.headers.set("Authorization", `Bearer ${event.cookies.get("session_token")}`);
   }
 
   return fetch(request);
