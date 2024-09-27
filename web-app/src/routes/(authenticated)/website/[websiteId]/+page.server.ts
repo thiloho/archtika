@@ -76,8 +76,10 @@ export const actions: Actions = {
       "PATCH",
       {
         body: {
-          accent_color_light_theme: data.get("accent-color-light"),
           accent_color_dark_theme: data.get("accent-color-dark"),
+          accent_color_light_theme: data.get("accent-color-light"),
+          background_color_dark_theme: data.get("background-color-dark"),
+          background_color_light_theme: data.get("background-color-light"),
           favicon_image: uploadedImage.data?.file_id
         },
         successMessage: "Successfully updated global settings"

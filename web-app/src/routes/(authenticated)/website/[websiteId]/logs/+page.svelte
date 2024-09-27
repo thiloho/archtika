@@ -6,6 +6,8 @@
   import diff from "fast-diff";
   import { page } from "$app/stores";
   import { tables } from "$lib/db-schema";
+  import { previewContent } from "$lib/runes.svelte";
+  import { sanitize } from "isomorphic-dompurify";
 
   const { data }: { data: PageServerData } = $props();
 
@@ -45,6 +47,8 @@
     resources = restTables;
   }
 
+  previewContent.value = data.home.main_content;
+
   let logsSection: HTMLElement;
 </script>
 
@@ -52,7 +56,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={data.home.main_content}
 >
   <section id="logs" bind:this={logsSection}>
     <hgroup>
@@ -153,7 +156,9 @@
                     <p>{table_name} &mdash; {operation}</p>
                   </hgroup>
 
-                  <pre style="white-space: pre-wrap">{@html htmlDiff(oldValue, newValue)}</pre>
+                  <pre style="white-space: pre-wrap">{@html sanitize(htmlDiff(oldValue, newValue), {
+                      ALLOWED_TAGS: ["ins", "del"]
+                    })}</pre>
                 </Modal>
               </td>
             </tr>

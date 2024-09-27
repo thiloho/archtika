@@ -6,34 +6,19 @@
   import type { ActionData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
-  import { handleImagePaste } from "$lib/utils";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
+  import { previewContent } from "$lib/runes.svelte";
+  import MarkdownEditor from "$lib/components/MarkdownEditor.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let previewContent = $state(data.article.main_content);
-  let mainContentTextarea: HTMLTextAreaElement;
-  let textareaScrollTop = $state(0);
-
-  const updateScrollPercentage = () => {
-    const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
-    textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
-  };
-
-  const handlePaste = async (event: ClipboardEvent) => {
-    const newContent = await handleImagePaste(event, data.API_BASE_PREFIX);
-
-    if (newContent) {
-      previewContent = newContent;
-    }
-  };
-
-  let sending = $state(false);
-  let loadingDelay: number;
+  previewContent.value = data.article?.main_content ?? "";
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -41,9 +26,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={previewContent ||
-    "Put some markdown content in main content to see a live preview here"}
-  previewScrollTop={textareaScrollTop}
 >
   <section id="edit-article">
     <h2>
@@ -54,14 +36,7 @@
       method="POST"
       action="?/editArticle"
       enctype="multipart/form-data"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update({ reset: false });
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
+      use:enhance={enhanceForm({ reset: false })}
     >
       {#if data.website.content_type === "Docs"}
         <label>
@@ -135,18 +110,12 @@
         </div>
       {/if}
 
-      <label>
-        Main content:
-        <textarea
-          name="main-content"
-          rows="20"
-          bind:value={previewContent}
-          bind:this={mainContentTextarea}
-          onscroll={updateScrollPercentage}
-          onpaste={handlePaste}
-          required>{data.article.main_content}</textarea
-        >
-      </label>
+      <MarkdownEditor
+        apiPrefix={data.API_BASE_PREFIX}
+        label="Main content"
+        name="main-content"
+        content={data.article.main_content ?? ""}
+      />
 
       <button type="submit">Submit</button>
     </form>

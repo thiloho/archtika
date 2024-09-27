@@ -53,8 +53,10 @@ CREATE TABLE internal.media (
 
 CREATE TABLE internal.settings (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  accent_color_light_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#a5d8ff',
-  accent_color_dark_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#114678',
+  accent_color_dark_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#a5d8ff',
+  accent_color_light_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#114678',
+  background_color_dark_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#262626',
+  background_color_light_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#ffffff',
   favicon_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL

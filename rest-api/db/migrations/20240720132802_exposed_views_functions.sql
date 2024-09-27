@@ -131,7 +131,7 @@ GRANT SELECT, UPDATE (title, is_published), DELETE ON internal.website TO authen
 
 GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
 
-GRANT SELECT, UPDATE (accent_color_light_theme, accent_color_dark_theme, favicon_image) ON internal.settings TO authenticated_user;
+GRANT SELECT, UPDATE (accent_color_dark_theme, accent_color_light_theme, background_color_dark_theme, background_color_light_theme, favicon_image) ON internal.settings TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.settings TO authenticated_user;
 

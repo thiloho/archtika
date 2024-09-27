@@ -3,16 +3,15 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { sending } from "$lib/runes.svelte";
+  import { enhanceForm } from "$lib/utils";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
-
-  let sending = $state(false);
-  let loadingDelay: number;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -35,17 +34,7 @@
     Account registration is disabled on this instance
   </p>
 {:else}
-  <form
-    method="POST"
-    use:enhance={() => {
-      loadingDelay = window.setTimeout(() => (sending = true), 500);
-      return async ({ update }) => {
-        await update();
-        window.clearTimeout(loadingDelay);
-        sending = false;
-      };
-    }}
-  >
+  <form method="POST" use:enhance={enhanceForm()}>
     <label>
       Username:
       <input type="text" name="username" minlength="3" maxlength="16" required />

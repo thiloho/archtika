@@ -387,16 +387,20 @@ const media = {
 // Table settings
 export interface Settings {
   website_id: string;
-  accent_color_light_theme: string;
   accent_color_dark_theme: string;
+  accent_color_light_theme: string;
+  background_color_dark_theme: string;
+  background_color_light_theme: string;
   favicon_image: string | null;
   last_modified_at: Date;
   last_modified_by: string | null;
 }
 export interface SettingsInput {
   website_id: string;
-  accent_color_light_theme?: string;
   accent_color_dark_theme?: string;
+  accent_color_light_theme?: string;
+  background_color_dark_theme?: string;
+  background_color_light_theme?: string;
   favicon_image?: string | null;
   last_modified_at?: Date;
   last_modified_by?: string | null;
@@ -405,8 +409,10 @@ const settings = {
   tableName: "settings",
   columns: [
     "website_id",
-    "accent_color_light_theme",
     "accent_color_dark_theme",
+    "accent_color_light_theme",
+    "background_color_dark_theme",
+    "background_color_light_theme",
     "favicon_image",
     "last_modified_at",
     "last_modified_by"

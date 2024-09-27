@@ -99,8 +99,8 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByRole("button", { name: "Submit" }).click();
 
     await page.getByRole("link", { name: "Legal information" }).click();
-    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+    await page.getByLabel("Main content:").click();
+    await page.getByLabel("Main content:").fill("## Content");
     await page.getByRole("button", { name: "Submit" }).click();
   });
 
@@ -330,8 +330,8 @@ test.describe.serial("Collaborator tests", () => {
       test("Create/Update legal information", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Legal information" }).click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content");
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
@@ -340,8 +340,8 @@ test.describe.serial("Collaborator tests", () => {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
 
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content updated");
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {

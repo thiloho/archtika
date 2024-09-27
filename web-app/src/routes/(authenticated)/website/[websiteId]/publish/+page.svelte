@@ -5,16 +5,18 @@
   import type { ActionData, PageServerData } from "./$types";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import Modal from "$lib/components/Modal.svelte";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
+  import { previewContent } from "$lib/runes.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let sending = $state(false);
-  let loadingDelay: number;
+  previewContent.value = data.websitePreviewUrl;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -22,7 +24,6 @@
   id={data.websiteOverview.id}
   contentType={data.websiteOverview.content_type}
   title={data.websiteOverview.title}
-  previewContent={data.websitePreviewUrl}
   fullPreview={true}
 >
   <section id="publish-website">
@@ -34,18 +35,7 @@
       is published. If you are happy with the results, click the button below and your website will
       be published on the Internet.
     </p>
-    <form
-      method="POST"
-      action="?/publishWebsite"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update();
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
-    >
+    <form method="POST" action="?/publishWebsite" use:enhance={enhanceForm()}>
       <button type="submit">Publish</button>
     </form>
   </section>
@@ -69,14 +59,7 @@
       <form
         method="POST"
         action="?/createUpdateCustomDomainPrefix"
-        use:enhance={() => {
-          loadingDelay = window.setTimeout(() => (sending = true), 500);
-          return async ({ update }) => {
-            await update();
-            window.clearTimeout(loadingDelay);
-            sending = false;
-          };
-        }}
+        use:enhance={enhanceForm({ reset: false })}
       >
         <label>
           Prefix:
@@ -98,15 +81,7 @@
           <form
             action="?/deleteCustomDomainPrefix"
             method="post"
-            use:enhance={() => {
-              loadingDelay = window.setTimeout(() => (sending = true), 500);
-              return async ({ update }) => {
-                await update();
-                window.clearTimeout(loadingDelay);
-                window.location.hash = "!";
-                sending = false;
-              };
-            }}
+            use:enhance={enhanceForm({ closeModal: true })}
           >
             <h3>Delete domain prefix</h3>
             <p>

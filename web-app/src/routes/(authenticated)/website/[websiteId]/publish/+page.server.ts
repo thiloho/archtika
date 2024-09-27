@@ -1,14 +1,14 @@
-import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
-import { join } from "node:path";
-import { type WebsiteOverview, slugify } from "$lib/utils";
-import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
-import { render } from "svelte/server";
-import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
-import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
-import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
-import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import { dev } from "$app/environment";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
+import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
+import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
+import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
+import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
+import { type WebsiteOverview, hexToHSL, slugify } from "$lib/utils";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { render } from "svelte/server";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
   const websiteOverview: WebsiteOverview = (
@@ -169,8 +169,6 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
 </html>`;
   };
 
-  console.log(websiteData);
-
   const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
     props: {
       websiteOverview: websiteData,
@@ -235,21 +233,35 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
       encoding: "utf-8"
     }
   );
+
+  const {
+    h: hDark,
+    s: sDark,
+    l: lDark
+  } = hexToHSL(websiteData.settings.background_color_dark_theme);
+  const {
+    h: hLight,
+    s: sLight,
+    l: lLight
+  } = hexToHSL(websiteData.settings.background_color_light_theme);
+
   await writeFile(
     join(uploadDir, "styles.css"),
     commonStyles
       .concat(specificStyles)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_H \*\/\s*).*(?=;)/, ` ${hDark}`)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_S \*\/\s*).*(?=;)/, ` ${sDark}%`)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_L \*\/\s*).*(?=;)/, ` ${lDark}%`)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_H \*\/\s*).*(?=;)/, ` ${hLight}`)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_S \*\/\s*).*(?=;)/, ` ${sLight}%`)
+      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_L \*\/\s*).*(?=;)/, ` ${lLight}%`)
       .replace(
-        /--color-accent:\s*(.*?);/,
-        `--color-accent: ${websiteData.settings.accent_color_dark_theme};`
+        /(?<=\/\* ACCENT_COLOR_DARK_THEME \*\/\s*).*(?=;)/,
+        ` ${websiteData.settings.accent_color_dark_theme}`
       )
       .replace(
-        /@media\s*\(prefers-color-scheme:\s*dark\)\s*{[^}]*--color-accent:\s*(.*?);/,
-        (match) =>
-          match.replace(
-            /--color-accent:\s*(.*?);/,
-            `--color-accent: ${websiteData.settings.accent_color_light_theme};`
-          )
+        /(?<=\/\* ACCENT_COLOR_LIGHT_THEME \*\/\s*).*(?=;)/,
+        ` ${websiteData.settings.accent_color_light_theme}`
       )
   );
 };

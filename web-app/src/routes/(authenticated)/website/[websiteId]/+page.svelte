@@ -1,38 +1,24 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
-  import { ALLOWED_MIME_TYPES, handleImagePaste } from "$lib/utils";
+  import { ALLOWED_MIME_TYPES } from "$lib/utils";
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, LayoutServerData, PageServerData } from "./$types";
   import Modal from "$lib/components/Modal.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
+  import MarkdownEditor from "$lib/components/MarkdownEditor.svelte";
+  import { previewContent } from "$lib/runes.svelte";
 
   const { data, form }: { data: PageServerData & LayoutServerData; form: ActionData } = $props();
 
-  let previewContent = $state(data.home.main_content);
-  let mainContentTextarea: HTMLTextAreaElement;
-  let textareaScrollTop = $state(0);
-
-  const updateScrollPercentage = () => {
-    const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
-    textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
-  };
-
-  const handlePaste = async (event: ClipboardEvent) => {
-    const newContent = await handleImagePaste(event, data.API_BASE_PREFIX);
-
-    if (newContent) {
-      previewContent = newContent;
-    }
-  };
-
-  let sending = $state(false);
-  let loadingDelay: number;
+  previewContent.value = data.home.main_content;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -40,9 +26,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={previewContent ||
-    "Put some markdown content in main content to see a live preview here"}
-  previewScrollTop={textareaScrollTop}
 >
   <section id="global">
     <h2>
@@ -52,31 +35,44 @@
       action="?/updateGlobal"
       method="POST"
       enctype="multipart/form-data"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update({ reset: false });
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
+      use:enhance={enhanceForm({ reset: false })}
     >
       <label>
-        Light accent color:
+        Background color dark theme:
         <input
           type="color"
-          name="accent-color-light"
-          value={data.globalSettings.accent_color_light_theme}
+          name="background-color-dark"
+          value={data.globalSettings.background_color_dark_theme}
           pattern="\S(.*\S)?"
           required
         />
       </label>
       <label>
-        Dark accent color:
+        Background color light theme:
+        <input
+          type="color"
+          name="background-color-light"
+          value={data.globalSettings.background_color_light_theme}
+          pattern="\S(.*\S)?"
+          required
+        />
+      </label>
+      <label>
+        Accent color dark theme:
         <input
           type="color"
           name="accent-color-dark"
           value={data.globalSettings.accent_color_dark_theme}
+          pattern="\S(.*\S)?"
+          required
+        />
+      </label>
+      <label>
+        Accent color light theme:
+        <input
+          type="color"
+          name="accent-color-light"
+          value={data.globalSettings.accent_color_light_theme}
           pattern="\S(.*\S)?"
           required
         />
@@ -109,14 +105,7 @@
       action="?/updateHeader"
       method="POST"
       enctype="multipart/form-data"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update({ reset: false });
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
+      use:enhance={enhanceForm({ reset: false })}
     >
       <label>
         Logo type:
@@ -159,30 +148,13 @@
       <a href="#home">Home</a>
     </h2>
 
-    <form
-      action="?/updateHome"
-      method="POST"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update({ reset: false });
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
-    >
-      <label>
-        Main content:
-        <textarea
-          name="main-content"
-          rows="20"
-          bind:value={previewContent}
-          bind:this={mainContentTextarea}
-          onscroll={updateScrollPercentage}
-          onpaste={handlePaste}
-          required>{data.home.main_content}</textarea
-        >
-      </label>
+    <form action="?/updateHome" method="POST" use:enhance={enhanceForm({ reset: false })}>
+      <MarkdownEditor
+        apiPrefix={data.API_BASE_PREFIX}
+        label="Main content"
+        name="main-content"
+        content={data.home.main_content}
+      />
 
       <button type="submit">Submit</button>
     </form>
@@ -193,18 +165,7 @@
       <a href="#footer">Footer</a>
     </h2>
 
-    <form
-      action="?/updateFooter"
-      method="POST"
-      use:enhance={() => {
-        loadingDelay = window.setTimeout(() => (sending = true), 500);
-        return async ({ update }) => {
-          await update({ reset: false });
-          window.clearTimeout(loadingDelay);
-          sending = false;
-        };
-      }}
-    >
+    <form action="?/updateFooter" method="POST" use:enhance={enhanceForm({ reset: false })}>
       <label>
         Additional text:
         <textarea name="additional-text" rows="5" maxlength="250" required

@@ -235,13 +235,13 @@ test.describe.serial("Website tests", () => {
       test("Create/Update legal information", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Legal information" }).click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content");
         await page.getByRole("button", { name: "Submit" }).click();
         await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
 
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content updated");
         await page.getByRole("button", { name: "Submit" }).click();
         await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
       });

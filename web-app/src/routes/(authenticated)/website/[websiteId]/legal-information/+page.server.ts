@@ -23,7 +23,8 @@ export const load: PageServerLoad = async ({ parent, fetch, params }) => {
 
   return {
     legalInformation,
-    website
+    website,
+    API_BASE_PREFIX
   };
 };
 
