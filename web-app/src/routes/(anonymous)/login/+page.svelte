@@ -3,28 +3,19 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData } from "./$types";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { sending } from "$lib/runes.svelte";
+  import { enhanceForm } from "$lib/utils";
 
   const { form }: { form: ActionData } = $props();
-
-  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
-<form
-  method="POST"
-  use:enhance={() => {
-    sending = true;
-    return async ({ update }) => {
-      await update();
-      sending = false;
-    };
-  }}
->
+<form method="POST" use:enhance={enhanceForm()}>
   <label>
     Username:
     <input type="text" name="username" required />

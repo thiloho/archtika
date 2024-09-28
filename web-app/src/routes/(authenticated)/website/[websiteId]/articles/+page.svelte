@@ -6,15 +6,18 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
+  import { previewContent } from "$lib/runes.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let sending = $state(false);
+  previewContent.value = data.home.main_content;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -22,7 +25,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={data.home.main_content}
 >
   <section id="create-article">
     <h2>
@@ -32,18 +34,7 @@
     <Modal id="create-article" text="Create article">
       <h3>Create article</h3>
 
-      <form
-        method="POST"
-        action="?/createArticle"
-        use:enhance={() => {
-          sending = true;
-          return async ({ update }) => {
-            await update();
-            window.location.hash = "!";
-            sending = false;
-          };
-        }}
-      >
+      <form method="POST" action="?/createArticle" use:enhance={enhanceForm({ closeModal: true })}>
         <label>
           Title:
           <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
@@ -134,14 +125,7 @@
                 <form
                   method="POST"
                   action="?/deleteArticle"
-                  use:enhance={() => {
-                    sending = true;
-                    return async ({ update }) => {
-                      await update();
-                      window.location.hash = "!";
-                      sending = false;
-                    };
-                  }}
+                  use:enhance={enhanceForm({ closeModal: true })}
                 >
                   <input type="hidden" name="id" value={id} />
 

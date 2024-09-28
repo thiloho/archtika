@@ -1,36 +1,35 @@
 import type { LayoutServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import { error } from "@sveltejs/kit";
 import type { Website, Home, User } from "$lib/db-schema";
 
-export const load: LayoutServerLoad = async ({ params, fetch, cookies }) => {
-  const websiteData = await fetch(
+export const load: LayoutServerLoad = async ({ params, fetch }) => {
+  const websiteData = await apiRequest(
+    fetch,
     `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,user!user_id(username)`,
+    "GET",
     {
-      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
         Accept: "application/vnd.pgrst.object+json"
-      }
+      },
+      returnData: true
     }
   );
 
-  if (!websiteData.ok) {
+  const website: Website & { user: { username: User["username"] } } = websiteData.data;
+
+  if (!websiteData.success) {
     throw error(404, "Website not found");
   }
 
-  const homeData = await fetch(`${API_BASE_PREFIX}/home?website_id=eq.${params.websiteId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
-      Accept: "application/vnd.pgrst.object+json"
-    }
-  });
-
-  const website: Website & { user: { username: User["username"] } } = await websiteData.json();
-  const home: Home = await homeData.json();
+  const home: Home = (
+    await apiRequest(fetch, `${API_BASE_PREFIX}/home?website_id=eq.${params.websiteId}`, "GET", {
+      headers: {
+        Accept: "application/vnd.pgrst.object+json"
+      },
+      returnData: true
+    })
+  ).data;
 
   return {
     website,

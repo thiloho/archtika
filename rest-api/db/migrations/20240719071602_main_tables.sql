@@ -25,7 +25,8 @@ CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3),
   password_hash CHAR(60) NOT NULL,
-  role NAME NOT NULL DEFAULT 'authenticated_user'
+  role NAME NOT NULL DEFAULT 'authenticated_user',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP()
 );
 
 CREATE TABLE internal.website (
@@ -33,8 +34,8 @@ CREATE TABLE internal.website (
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
   title_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', title)) STORED
@@ -52,8 +53,10 @@ CREATE TABLE internal.media (
 
 CREATE TABLE internal.settings (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  accent_color_light_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#a5d8ff',
-  accent_color_dark_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#114678',
+  accent_color_dark_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#a5d8ff',
+  accent_color_light_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#114678',
+  background_color_dark_theme CHAR(7) CHECK (accent_color_light_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#262626',
+  background_color_light_theme CHAR(7) CHECK (accent_color_dark_theme ~ '^#[a-fA-F0-9]{6}$') NOT NULL DEFAULT '#ffffff',
   favicon_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
@@ -82,6 +85,7 @@ CREATE TABLE internal.docs_category (
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
   category_weight INTEGER CHECK (category_weight >= 0) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
   UNIQUE (website_id, category_name),
@@ -117,6 +121,7 @@ CREATE TABLE internal.footer (
 CREATE TABLE internal.legal_information (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
   main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );

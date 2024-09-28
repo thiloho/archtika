@@ -5,6 +5,7 @@
   import type { Snippet } from "svelte";
   import { navigating } from "$app/stores";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { LOADING_DELAY } from "$lib/utils";
 
   const { data, children }: { data: LayoutServerData; children: Snippet } = $props();
 
@@ -14,23 +15,43 @@
       ? "Dashboard"
       : `${$page.url.pathname.charAt(1).toUpperCase()}${$page.url.pathname.slice(2)}`
   );
+
+  let loading = $state(false);
+  let loadingDelay: number;
+
+  $effect(() => {
+    if ($navigating && ["link", "goto"].includes($navigating.type)) {
+      loadingDelay = window.setTimeout(() => (loading = true), LOADING_DELAY);
+    } else {
+      window.clearTimeout(loadingDelay);
+      loading = false;
+    }
+  });
 </script>
 
-{#if $navigating && ["link", "goto"].includes($navigating.type)}
+{#if loading}
   <LoadingSpinner />
 {/if}
 
 <svelte:head>
   <title>archtika | {routeName.replaceAll("/", " - ")}</title>
+  <meta
+    name="description"
+    content="FLOSS, modern, performant and lightweight CMS (Content Mangement System) with predefined templates"
+  />
 </svelte:head>
 
 <nav>
-  <img src="/favicon.svg" width="24" height="24" alt="" />
+  {#if data.user}
+    <div class="logo-wrapper">
+      <img src="/favicon.svg" width="24" height="24" alt="" />
+      <a href="/">archtika</a>
+    </div>
+  {:else}
+    <img src="/favicon.svg" width="24" height="24" alt="" />
+  {/if}
   <ul class="link-wrapper unpadded">
     {#if data.user}
-      <li>
-        <a href="/">Dashboard</a>
-      </li>
       <li>
         <a href="/account">Account</a>
       </li>
@@ -81,6 +102,12 @@
     row-gap: var(--space-3xs);
     flex-wrap: wrap;
     justify-content: space-between;
+  }
+
+  nav > .logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
   }
 
   nav > .link-wrapper {

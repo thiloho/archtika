@@ -127,39 +127,39 @@ GRANT SELECT ON api.account TO authenticated_user;
 
 GRANT SELECT ON api.user TO authenticated_user;
 
-GRANT SELECT, UPDATE, DELETE ON internal.website TO authenticated_user;
+GRANT SELECT, UPDATE (title, is_published), DELETE ON internal.website TO authenticated_user;
 
 GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
 
-GRANT SELECT, UPDATE ON internal.settings TO authenticated_user;
+GRANT SELECT, UPDATE (accent_color_dark_theme, accent_color_light_theme, background_color_dark_theme, background_color_light_theme, favicon_image) ON internal.settings TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.settings TO authenticated_user;
 
-GRANT SELECT, UPDATE ON internal.header TO authenticated_user;
+GRANT SELECT, UPDATE (logo_type, logo_text, logo_image) ON internal.header TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.header TO authenticated_user;
 
-GRANT SELECT, UPDATE ON internal.home TO authenticated_user;
+GRANT SELECT, UPDATE (main_content) ON internal.home TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.home TO authenticated_user;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON internal.article TO authenticated_user;
+GRANT SELECT, INSERT (website_id, title, meta_description, meta_author, cover_image, publication_date, main_content, category, article_weight), UPDATE (title, meta_description, meta_author, cover_image, publication_date, main_content, category, article_weight), DELETE ON internal.article TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.article TO authenticated_user;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON internal.docs_category TO authenticated_user;
+GRANT SELECT, INSERT (website_id, category_name, category_weight), UPDATE (category_name, category_weight), DELETE ON internal.docs_category TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.docs_category TO authenticated_user;
 
-GRANT SELECT, UPDATE ON internal.footer TO authenticated_user;
+GRANT SELECT, UPDATE (additional_text) ON internal.footer TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.footer TO authenticated_user;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON internal.legal_information TO authenticated_user;
+GRANT SELECT, INSERT (website_id, main_content), UPDATE (website_id, main_content), DELETE ON internal.legal_information TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.legal_information TO authenticated_user;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON internal.collab TO authenticated_user;
+GRANT SELECT, INSERT (website_id, user_id, permission_level), UPDATE (permission_level), DELETE ON internal.collab TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.collab TO authenticated_user;
 

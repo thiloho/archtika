@@ -4,15 +4,15 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
-
-  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -38,17 +38,7 @@
     <a href="#logout">Logout</a>
   </h2>
 
-  <form
-    method="POST"
-    action="?/logout"
-    use:enhance={() => {
-      sending = true;
-      return async ({ update }) => {
-        await update();
-        sending = false;
-      };
-    }}
-  >
+  <form method="POST" action="?/logout" use:enhance={enhanceForm()}>
     <button type="submit">Logout</button>
   </form>
 </section>
@@ -66,18 +56,7 @@
       Deleting your account will irretrievably erase all data.
     </p>
 
-    <form
-      method="POST"
-      action="?/deleteAccount"
-      use:enhance={() => {
-        sending = true;
-        return async ({ update }) => {
-          await update();
-          window.location.hash = "!";
-          sending = false;
-        };
-      }}
-    >
+    <form method="POST" action="?/deleteAccount" use:enhance={enhanceForm({ closeModal: true })}>
       <label>
         Password:
         <input type="password" name="password" required />
@@ -87,3 +66,9 @@
     </form>
   </Modal>
 </section>
+
+<style>
+  form[action="?/logout"] > button {
+    max-inline-size: fit-content;
+  }
+</style>

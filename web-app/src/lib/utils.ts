@@ -12,10 +12,20 @@ import type {
   Footer,
   Article,
   DocsCategory,
-  LegalInformation
+  LegalInformation,
+  DomainPrefix
 } from "$lib/db-schema";
+import type { SubmitFunction } from "@sveltejs/kit";
+import { sending } from "./runes.svelte";
 
-export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "image/svg+xml"
+];
 
 export const slugify = (string: string) => {
   return string
@@ -24,8 +34,8 @@ export const slugify = (string: string) => {
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading and trailing whitespace
     .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/[^\w\-]+/g, "") // Remove non-word characters (except hyphens)
-    .replace(/\-\-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/[^\w-]+/g, "") // Remove non-word characters (except hyphens)
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
     .replace(/^-+/, "") // Remove leading hyphens
     .replace(/-+$/, ""); // Remove trailing hyphens
 };
@@ -51,8 +61,8 @@ const createMarkdownParser = (showToc = true) => {
   );
 
   const gfmHeadingId = ({ prefix = "", showToc = true } = {}) => {
-    let headings: { text: string; level: number; id: string }[] = [];
-    let sectionStack: { level: number; id: string }[] = [];
+    const headings: { text: string; level: number; id: string }[] = [];
+    const sectionStack: { level: number; id: string }[] = [];
 
     return {
       renderer: {
@@ -143,45 +153,59 @@ export const md = (markdownContent: string, showToc = true) => {
   return html;
 };
 
-export const handleImagePaste = async (event: ClipboardEvent, API_BASE_PREFIX: string) => {
-  const clipboardItems = Array.from(event.clipboardData?.items ?? []);
-  const file = clipboardItems.find((item) => item.type.startsWith("image/"));
+export const LOADING_DELAY = 500;
+let loadingDelay: number;
 
-  if (!file) return null;
+export const enhanceForm = (options?: {
+  reset?: boolean;
+  closeModal?: boolean;
+}): SubmitFunction => {
+  return () => {
+    loadingDelay = window.setTimeout(() => (sending.value = true), LOADING_DELAY);
 
-  event.preventDefault();
+    return async ({ update }) => {
+      await update({ reset: options?.reset ?? true });
+      window.clearTimeout(loadingDelay);
+      if (options?.closeModal) {
+        window.location.hash = "!";
+      }
+      sending.value = false;
+    };
+  };
+};
 
-  const fileObject = file.getAsFile();
+export const hexToHSL = (hex: string) => {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
 
-  if (!fileObject) return;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
 
-  const formData = new FormData();
-  formData.append("file", fileObject);
+  let h = 0;
+  const l = (max + min) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
 
-  const request = await fetch("?/pasteImage", {
-    method: "POST",
-    body: formData
-  });
-
-  const result = deserialize(await request.clone().text());
-  applyAction(result);
-
-  const response = await request.json();
-
-  if (JSON.parse(response.data)[1]) {
-    const fileId = JSON.parse(response.data)[3];
-    const fileUrl = `${API_BASE_PREFIX}/rpc/retrieve_file?id=${fileId}`;
-
-    const target = event.target as HTMLTextAreaElement;
-    const newContent =
-      target.value.slice(0, target.selectionStart) +
-      `![](${fileUrl})` +
-      target.value.slice(target.selectionStart);
-
-    return newContent;
-  } else {
-    return "";
+  if (d !== 0) {
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
   }
+
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100)
+  };
 };
 
 export interface WebsiteOverview extends Website {
@@ -191,4 +215,5 @@ export interface WebsiteOverview extends Website {
   footer: Footer;
   article: (Article & { docs_category: DocsCategory | null })[];
   legal_information?: LegalInformation;
+  domain_prefix?: DomainPrefix;
 }

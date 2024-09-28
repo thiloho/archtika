@@ -86,8 +86,8 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByRole("link", { name: "Documentation" }).click();
     await page.getByRole("link", { name: "Categories" }).click();
     await page.getByRole("button", { name: "Create category" }).click();
-    await page.getByLabel("Name:").click();
-    await page.getByLabel("Name:").fill("Category-10");
+    await page.getByLabel("Name:").nth(0).click();
+    await page.getByLabel("Name:").nth(0).fill("Category-10");
     await page.getByLabel("Weight:").click();
     await page.getByLabel("Weight:").fill("10");
     await page.getByRole("button", { name: "Submit" }).click();
@@ -99,8 +99,8 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByRole("button", { name: "Submit" }).click();
 
     await page.getByRole("link", { name: "Legal information" }).click();
-    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-    await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+    await page.getByLabel("Main content:").click();
+    await page.getByLabel("Main content:").fill("## Content");
     await page.getByRole("button", { name: "Submit" }).click();
   });
 
@@ -330,22 +330,22 @@ test.describe.serial("Collaborator tests", () => {
       test("Create/Update legal information", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Legal information" }).click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content");
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
-          await expect(page.getByText("Successfully created legal")).toBeVisible();
+          await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
         } else {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
 
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content updated");
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
-          await expect(page.getByText("Successfully updated legal")).toBeVisible();
+          await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
         } else {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         }
@@ -370,8 +370,8 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Documentation" }).click();
         await page.getByRole("link", { name: "Categories" }).click();
         await page.getByRole("button", { name: "Create category" }).click();
-        await page.getByLabel("Name:").click();
-        await page.getByLabel("Name:").fill(`Category-${permissionLevel}`);
+        await page.getByLabel("Name:").nth(0).click();
+        await page.getByLabel("Name:").nth(0).fill(`Category-${permissionLevel}`);
         await page.getByRole("spinbutton", { name: "Weight:" }).click();
         await page.getByRole("spinbutton", { name: "Weight:" }).fill(permissionLevel.toString());
         await page.getByRole("button", { name: "Submit" }).click();

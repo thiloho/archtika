@@ -4,16 +4,18 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { enhanceForm } from "$lib/utils";
+  import { previewContent, sending } from "$lib/runes.svelte";
   import type { ActionData, PageServerData } from "./$types";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let sending = $state(false);
+  previewContent.value = data.home.main_content;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -21,7 +23,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={data.home.main_content}
 >
   <section id="add-collaborator">
     <h2>
@@ -34,14 +35,7 @@
       <form
         method="POST"
         action="?/addCollaborator"
-        use:enhance={() => {
-          sending = true;
-          return async ({ update }) => {
-            await update();
-            window.location.hash = "!";
-            sending = false;
-          };
-        }}
+        use:enhance={enhanceForm({ closeModal: true })}
       >
         <label>
           Username:
@@ -82,14 +76,7 @@
                 <form
                   method="POST"
                   action="?/updateCollaborator"
-                  use:enhance={() => {
-                    sending = true;
-                    return async ({ update }) => {
-                      await update({ reset: false });
-                      window.location.hash = "!";
-                      sending = false;
-                    };
-                  }}
+                  use:enhance={enhanceForm({ reset: false, closeModal: true })}
                 >
                   <input type="hidden" name="user-id" value={user_id} />
 
@@ -113,14 +100,7 @@
                 <form
                   method="POST"
                   action="?/removeCollaborator"
-                  use:enhance={() => {
-                    sending = true;
-                    return async ({ update }) => {
-                      await update();
-                      window.location.hash = "!";
-                      sending = false;
-                    };
-                  }}
+                  use:enhance={enhanceForm({ closeModal: true })}
                 >
                   <input type="hidden" name="user-id" value={user_id} />
 

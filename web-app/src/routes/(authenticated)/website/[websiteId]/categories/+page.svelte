@@ -5,15 +5,18 @@
   import Modal from "$lib/components/Modal.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
+  import { previewContent } from "$lib/runes.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let sending = $state(false);
+  previewContent.value = data.home.main_content;
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -21,7 +24,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={data.home.main_content}
 >
   <section id="create-category">
     <h2>
@@ -31,18 +33,7 @@
     <Modal id="create-category" text="Create category">
       <h3>Create category</h3>
 
-      <form
-        method="POST"
-        action="?/createCategory"
-        use:enhance={() => {
-          sending = true;
-          return async ({ update }) => {
-            await update();
-            window.location.hash = "!";
-            sending = false;
-          };
-        }}
-      >
+      <form method="POST" action="?/createCategory" use:enhance={enhanceForm({ closeModal: true })}>
         <label>
           Name:
           <input type="text" name="category-name" maxlength="50" required />
@@ -78,16 +69,20 @@
                 <form
                   method="POST"
                   action="?/updateCategory"
-                  use:enhance={() => {
-                    sending = true;
-                    return async ({ update }) => {
-                      await update({ reset: false });
-                      window.location.hash = "!";
-                      sending = false;
-                    };
-                  }}
+                  use:enhance={enhanceForm({ reset: false, closeModal: true })}
                 >
                   <input type="hidden" name="category-id" value={id} />
+
+                  <label>
+                    Name:
+                    <input
+                      type="text"
+                      name="category-name"
+                      value={category_name}
+                      maxlength="50"
+                      required
+                    />
+                  </label>
 
                   <label>
                     Weight:
@@ -105,14 +100,7 @@
                 <form
                   method="POST"
                   action="?/deleteCategory"
-                  use:enhance={() => {
-                    sending = true;
-                    return async ({ update }) => {
-                      await update();
-                      window.location.hash = "!";
-                      sending = false;
-                    };
-                  }}
+                  use:enhance={enhanceForm({ closeModal: true })}
                 >
                   <input type="hidden" name="category-id" value={id} />
 

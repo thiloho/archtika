@@ -14,34 +14,34 @@
     "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal"
   },
   "devDependencies": {
-    "@playwright/test": "1.40.0",
-    "@sveltejs/adapter-auto": "3.2.4",
-    "@sveltejs/adapter-node": "5.2.2",
-    "@sveltejs/kit": "2.5.22",
-    "@sveltejs/vite-plugin-svelte": "3.1.1",
+    "@playwright/test": "1.46.0",
+    "@sveltejs/adapter-auto": "3.2.5",
+    "@sveltejs/adapter-node": "5.2.3",
+    "@sveltejs/kit": "2.5.28",
+    "@sveltejs/vite-plugin-svelte": "4.0.0-next.6",
     "@types/eslint": "9.6.1",
     "@types/eslint__js": "8.42.3",
     "@types/eslint-config-prettier": "6.11.3",
-    "@types/node": "22.2.0",
+    "@types/node": "22.5.5",
     "eslint": "9.10.0",
     "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-svelte": "2.43.0",
+    "eslint-plugin-svelte": "2.44.0",
     "globals": "15.9.0",
     "pg-to-ts": "4.1.1",
     "prettier": "3.3.3",
     "prettier-plugin-svelte": "3.2.6",
-    "svelte": "5.0.0-next.220",
-    "svelte-check": "3.8.5",
-    "typescript": "5.5.4",
-    "typescript-eslint": "8.4.0",
-    "vite": "5.4.0"
+    "svelte": "5.0.0-next.253",
+    "svelte-check": "4.0.2",
+    "typescript": "5.6.2",
+    "typescript-eslint": "8.6.0",
+    "vite": "5.4.6"
   },
   "type": "module",
   "dependencies": {
     "fast-diff": "1.3.0",
     "highlight.js": "11.10.0",
-    "isomorphic-dompurify": "2.14.0",
-    "marked": "14.0.0",
+    "isomorphic-dompurify": "2.15.0",
+    "marked": "14.1.2",
     "marked-highlight": "2.1.4"
   }
 }

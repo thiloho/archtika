@@ -6,15 +6,15 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { enhanceForm } from "$lib/utils";
+  import { sending } from "$lib/runes.svelte";
 
   const { form, data }: { form: ActionData; data: PageServerData } = $props();
-
-  let sending = $state(false);
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -26,18 +26,7 @@
   <Modal id="create-website" text="Create website">
     <h3>Create website</h3>
 
-    <form
-      method="POST"
-      action="?/createWebsite"
-      use:enhance={() => {
-        sending = true;
-        return async ({ update }) => {
-          await update();
-          window.location.hash = "!";
-          sending = false;
-        };
-      }}
-    >
+    <form method="POST" action="?/createWebsite" use:enhance={enhanceForm({ closeModal: true })}>
       <label>
         Type:
         <select name="content-type">
@@ -119,14 +108,7 @@
               <form
                 method="POST"
                 action="?/updateWebsite"
-                use:enhance={() => {
-                  sending = true;
-                  return async ({ update }) => {
-                    await update({ reset: false });
-                    window.location.hash = "!";
-                    sending = false;
-                  };
-                }}
+                use:enhance={enhanceForm({ reset: false, closeModal: true })}
               >
                 <input type="hidden" name="id" value={id} />
                 <label>
@@ -154,14 +136,7 @@
               <form
                 method="POST"
                 action="?/deleteWebsite"
-                use:enhance={() => {
-                  sending = true;
-                  return async ({ update }) => {
-                    await update();
-                    window.location.hash = "!";
-                    sending = false;
-                  };
-                }}
+                use:enhance={enhanceForm({ closeModal: true })}
               >
                 <input type="hidden" name="id" value={id} />
 
@@ -179,7 +154,7 @@
   .website-grid {
     display: grid;
     gap: var(--space-s);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 0.5fr));
     margin-block-start: var(--space-xs);
   }
 

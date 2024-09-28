@@ -75,6 +75,12 @@ in
       default = null;
       description = "API secrets for the DNS-01 challenge (required for wildcard domains).";
     };
+
+    disableRegistration = mkOption {
+      type = types.bool;
+      default = false;
+      description = "By default any user can create an account. That behavior can be disabled by using this option.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -108,7 +114,7 @@ in
 
         ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
-        PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} PGRST_SERVER_PORT=${toString cfg.apiPort} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
+        PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} PGRST_SERVER_PORT=${toString cfg.apiPort} PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:5432/${cfg.databaseName}" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
       '';
     };
 
@@ -125,7 +131,7 @@ in
       };
 
       script = ''
-        BODY_SIZE_LIMIT=Infinity ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        REGISTRATION_IS_DISABLED=${toString cfg.disableRegistration} BODY_SIZE_LIMIT=10M ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -148,6 +154,20 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
+      recommendedZstdSettings = true;
+      recommendedOptimisation = true;
+
+      appendHttpConfig = ''
+        limit_req_zone $binary_remote_addr zone=requestLimit:10m rate=5r/s;
+        limit_req_status 429;
+        limit_req zone=requestLimit burst=20 nodelay;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(self),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(self),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),xr-spatial-tracking=(),clipboard-read=(self),clipboard-write=(self),gamepad=(),hid=(),idle-detection=(),interest-cohort=(),serial=(),unload=()" always;
+      '';
 
       virtualHosts = {
         "${cfg.domain}" = {
@@ -165,14 +185,17 @@ in
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.apiPort}/";
               extraConfig = ''
-                default_type  application/json;
-                proxy_set_header Connection "";
-                proxy_http_version 1.1;
+                default_type application/json;
+              '';
+            };
+            "/api/rpc/register" = mkIf cfg.disableRegistration {
+              extraConfig = ''
+                deny all;
               '';
             };
           };
         };
-        "~^(?<subdomain>.+)\\.${lib.strings.escapeRegex cfg.domain}$" = {
+        "~^(?<subdomain>.+)\\.${cfg.domain}$" = {
           useACMEHost = cfg.domain;
           forceSSL = true;
           locations = {

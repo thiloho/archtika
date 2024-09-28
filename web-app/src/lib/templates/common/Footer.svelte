@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WebsiteOverview } from "../../utils";
+  import { type WebsiteOverview, md } from "../../utils";
 
   const {
     websiteOverview,
@@ -10,7 +10,7 @@
 <footer>
   <div class="container">
     <small>
-      {@html websiteOverview.footer.additional_text.replace(
+      {@html md(websiteOverview.footer.additional_text, false).replace(
         "!!legal",
         `<a href="${isIndexPage ? "./legal-information" : "../legal-information"}">Legal information</a>`
       )}

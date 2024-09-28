@@ -1,10 +1,11 @@
 import type { Actions, PageServerLoad } from "./$types";
+import { apiRequest } from "$lib/server/utils";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { Website, WebsiteInput } from "$lib/db-schema";
+import type { Website } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
+export const load: PageServerLoad = async ({ fetch, url, locals }) => {
   const searchQuery = url.searchParams.get("website_search_query");
   const filterBy = url.searchParams.get("website_filter");
 
@@ -27,28 +28,22 @@ export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
 
   const constructedFetchUrl = `${baseFetchUrl}&${params.toString()}`;
 
-  const totalWebsitesData = await fetch(baseFetchUrl, {
-    method: "HEAD",
+  const totalWebsites = await apiRequest(fetch, baseFetchUrl, "HEAD", {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`,
       Prefer: "count=exact"
-    }
+    },
+    returnData: true
   });
 
   const totalWebsiteCount = Number(
-    totalWebsitesData.headers.get("content-range")?.split("/").at(-1)
+    totalWebsites.data.headers.get("content-range")?.split("/").at(-1)
   );
 
-  const websiteData = await fetch(constructedFetchUrl, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies.get("session_token")}`
-    }
-  });
-
-  const websites: Website[] = await websiteData.json();
+  const websites: Website[] = (
+    await apiRequest(fetch, constructedFetchUrl, "GET", {
+      returnData: true
+    })
+  ).data;
 
   return {
     totalWebsiteCount,
@@ -57,70 +52,63 @@ export const load: PageServerLoad = async ({ fetch, cookies, url, locals }) => {
 };
 
 export const actions: Actions = {
-  createWebsite: async ({ request, fetch, cookies }) => {
+  createWebsite: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/rpc/create_website`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
-        content_type: data.get("content-type") as string,
-        title: data.get("title") as string
-      } satisfies WebsiteInput)
-    });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully created website" };
-  },
-  updateWebsite: async ({ request, cookies, fetch }) => {
-    const data = await request.formData();
-
-    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      },
-      body: JSON.stringify({
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/create_website`, "POST", {
+      body: {
+        content_type: data.get("content-type"),
         title: data.get("title")
-      })
+      },
+      successMessage: "Successfully created website"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return { success: true, message: "Successfully updated website" };
   },
-  deleteWebsite: async ({ request, cookies, fetch }) => {
+  updateWebsite: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`
-      }
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/website?id=eq.${data.get("id")}`, "PATCH", {
+      body: {
+        title: data.get("title")
+      },
+      successMessage: "Successfully updated website"
     });
+  },
+  deleteWebsite: async ({ request, fetch }) => {
+    const data = await request.formData();
+    const id = data.get("id");
 
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
+    const oldDomainPrefix = (
+      await apiRequest(fetch, `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${id}`, "GET", {
+        headers: {
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        returnData: true
+      })
+    ).data;
+
+    const deleteWebsite = await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/website?id=eq.${id}`,
+      "DELETE",
+      {
+        successMessage: "Successfully deleted website"
+      }
+    );
+
+    if (!deleteWebsite.success) {
+      return deleteWebsite;
     }
 
-    await rm(join("/", "var", "www", "archtika-websites", data.get("id") as string), {
+    await rm(join("/", "var", "www", "archtika-websites", "previews", id as string), {
       recursive: true,
       force: true
     });
 
-    return { success: true, message: "Successfully deleted website" };
+    await rm(join("/", "var", "www", "archtika-websites", oldDomainPrefix?.prefix ?? id), {
+      recursive: true,
+      force: true
+    });
+
+    return deleteWebsite;
   }
 };

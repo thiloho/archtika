@@ -80,10 +80,14 @@ test.describe.serial("Website tests", () => {
     test.describe.serial("Update settings", () => {
       test("Global", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
-        await page.getByLabel("Light accent color:").click();
-        await page.getByLabel("Light accent color:").fill("#3975a2");
-        await page.getByLabel("Dark accent color:").click();
-        await page.getByLabel("Dark accent color:").fill("#41473e");
+        await page.getByLabel("Background color dark theme: ").click();
+        await page.getByLabel("Background color dark theme:").fill("#3975a2");
+        await page.getByLabel("Background color light theme:").click();
+        await page.getByLabel("Background color light theme:").fill("#41473e");
+        await page.getByLabel("Accent color dark theme: ").click();
+        await page.getByLabel("Accent color dark theme:").fill("#3975a2");
+        await page.getByLabel("Accent color light theme:").click();
+        await page.getByLabel("Accent color light theme:").fill("#41473e");
         await page.locator("#global").getByRole("button", { name: "Submit" }).click();
         await expect(page.getByText("Successfully updated global")).toBeVisible();
         await page.getByLabel("Favicon:").click();
@@ -235,15 +239,15 @@ test.describe.serial("Website tests", () => {
       test("Create/Update legal information", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Legal information" }).click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Successfully created legal")).toBeVisible();
+        await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
 
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").click();
-        await page.getByPlaceholder("## Impressum\n\n## Privacy policy").fill("## Content updated");
+        await page.getByLabel("Main content:").click();
+        await page.getByLabel("Main content:").fill("## Content updated");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Successfully updated legal")).toBeVisible();
+        await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
       });
       test("Delete legal information", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
@@ -261,8 +265,8 @@ test.describe.serial("Website tests", () => {
         await page.getByRole("link", { name: "Documentation" }).click();
         await page.getByRole("link", { name: "Categories" }).click();
         await page.getByRole("button", { name: "Create category" }).click();
-        await page.getByLabel("Name:").click();
-        await page.getByLabel("Name:").fill("Category");
+        await page.getByLabel("Name:").nth(0).click();
+        await page.getByLabel("Name:").nth(0).fill("Category");
         await page.getByLabel("Weight:").click();
         await page.getByLabel("Weight:").fill("1000");
         await page.getByRole("button", { name: "Submit" }).click();
@@ -294,8 +298,8 @@ test.describe.serial("Website tests", () => {
       await page.getByRole("link", { name: "Documentation" }).click();
       await page.getByRole("link", { name: "Categories" }).click();
       await page.getByRole("button", { name: "Create category" }).click();
-      await page.getByLabel("Name:").click();
-      await page.getByLabel("Name:").fill("Category");
+      await page.getByLabel("Name:").nth(0).click();
+      await page.getByLabel("Name:").nth(0).fill("Category");
       await page.getByLabel("Weight:").click();
       await page.getByLabel("Weight:").fill("1000");
       await page.getByRole("button", { name: "Submit" }).click();

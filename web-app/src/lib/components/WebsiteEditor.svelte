@@ -2,30 +2,27 @@
   import type { Snippet } from "svelte";
   import { md } from "$lib/utils";
   import { page } from "$app/stores";
+  import { previewContent, textareaScrollTop } from "$lib/runes.svelte";
 
   const {
     id,
     contentType,
     title,
     children,
-    fullPreview = false,
-    previewContent,
-    previewScrollTop = 0
+    fullPreview = false
   }: {
     id: string;
     contentType: string;
     title: string;
     children: Snippet;
     fullPreview?: boolean;
-    previewContent: string;
-    previewScrollTop?: number;
   } = $props();
 
   let previewElement: HTMLDivElement;
 
   $effect(() => {
     const scrollHeight = previewElement.scrollHeight - previewElement.clientHeight;
-    previewElement.scrollTop = (previewScrollTop / 100) * scrollHeight;
+    previewElement.scrollTop = (textareaScrollTop.value / 100) * scrollHeight;
   });
 </script>
 
@@ -66,9 +63,12 @@
 
 <div class="preview" bind:this={previewElement}>
   {#if fullPreview}
-    <iframe src={previewContent} title="Preview"></iframe>
+    <iframe src={previewContent.value} title="Preview"></iframe>
   {:else}
-    {@html md(previewContent, Object.keys($page.params).length > 1 ? true : false)}
+    {@html md(
+      previewContent.value || "Write some markdown content to see a live preview here",
+      Object.keys($page.params).length > 1 ? true : false
+    )}
   {/if}
 </div>
 

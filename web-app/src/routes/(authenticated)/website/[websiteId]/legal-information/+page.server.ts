@@ -1,74 +1,61 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { LegalInformation, LegalInformationInput } from "$lib/db-schema";
+import type { LegalInformation } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ parent, fetch, params, cookies }) => {
-  const legalInformationData = await fetch(
-    `${API_BASE_PREFIX}/legal_information?website_id=eq.${params.websiteId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
-        Accept: "application/vnd.pgrst.object+json"
+export const load: PageServerLoad = async ({ parent, fetch, params }) => {
+  const legalInformation: LegalInformation = (
+    await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/legal_information?website_id=eq.${params.websiteId}`,
+      "GET",
+      {
+        headers: {
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        returnData: true
       }
-    }
-  );
+    )
+  ).data;
 
-  const legalInformation: LegalInformation = await legalInformationData.json();
   const { website } = await parent();
 
   return {
     legalInformation,
-    website
+    website,
+    API_BASE_PREFIX
   };
 };
 
 export const actions: Actions = {
-  createUpdateLegalInformation: async ({ request, fetch, cookies, params }) => {
+  createUpdateLegalInformation: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const res = await fetch(`${API_BASE_PREFIX}/legal_information`, {
-      method: "POST",
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/legal_information`, "POST", {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cookies.get("session_token")}`,
         Prefer: "resolution=merge-duplicates",
         Accept: "application/vnd.pgrst.object+json"
       },
-      body: JSON.stringify({
+      body: {
         website_id: params.websiteId,
-        main_content: data.get("main-content") as string
-      } satisfies LegalInformationInput)
+        main_content: data.get("main-content")
+      },
+      successMessage: "Successfully created/updated legal information"
     });
-
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
-    }
-
-    return {
-      success: true,
-      message: `Successfully ${res.status === 201 ? "created" : "updated"} legal information`
-    };
   },
-  deleteLegalInformation: async ({ fetch, cookies, params }) => {
-    const res = await fetch(
+  deleteLegalInformation: async ({ fetch, params }) => {
+    const deleteLegalInformation = await apiRequest(
+      fetch,
       `${API_BASE_PREFIX}/legal_information?website_id=eq.${params.websiteId}`,
+      "DELETE",
       {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.get("session_token")}`
-        }
+        successMessage: "Successfully deleted legal information"
       }
     );
 
-    if (!res.ok) {
-      const response = await res.json();
-      return { success: false, message: response.message };
+    if (!deleteLegalInformation.success) {
+      return deleteLegalInformation;
     }
 
     await rm(
@@ -76,6 +63,6 @@ export const actions: Actions = {
       { force: true }
     );
 
-    return { success: true, message: `Successfully deleted legal information` };
+    return deleteLegalInformation;
   }
 };

@@ -30,7 +30,8 @@ BEGIN
   RETURN COALESCE(NEW, OLD);
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql
+SECURITY DEFINER;
 
 CREATE TRIGGER update_website_last_modified
   BEFORE UPDATE ON internal.website
@@ -68,7 +69,7 @@ CREATE TRIGGER update_footer_last_modified
   EXECUTE FUNCTION internal.update_last_modified ();
 
 CREATE TRIGGER update_legal_information_last_modified
-  BEFORE INSERT OR DELETE ON internal.legal_information
+  BEFORE INSERT OR UPDATE OR DELETE ON internal.legal_information
   FOR EACH ROW
   EXECUTE FUNCTION internal.update_last_modified ();
 

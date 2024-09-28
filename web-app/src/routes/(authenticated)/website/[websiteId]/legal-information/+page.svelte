@@ -4,25 +4,19 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import Modal from "$lib/components/Modal.svelte";
+  import { enhanceForm } from "$lib/utils";
+  import { sending, previewContent } from "$lib/runes.svelte";
   import type { ActionData, PageServerData } from "./$types";
+  import MarkdownEditor from "$lib/components/MarkdownEditor.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-  let previewContent = $state(data.legalInformation.main_content);
-  let mainContentTextarea: HTMLTextAreaElement;
-  let textareaScrollTop = $state(0);
-
-  const updateScrollPercentage = () => {
-    const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
-    textareaScrollTop = (scrollTop / (scrollHeight - clientHeight)) * 100;
-  };
-
-  let sending = $state(false);
+  previewContent.value = data.legalInformation?.main_content ?? "";
 </script>
 
 <SuccessOrError success={form?.success} message={form?.message} />
 
-{#if sending}
+{#if sending.value}
   <LoadingSpinner />
 {/if}
 
@@ -30,9 +24,6 @@
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
-  previewContent={previewContent ||
-    "Put some markdown content in main content to see a live preview here"}
-  previewScrollTop={textareaScrollTop}
 >
   <section id="legal-information">
     <h2>
@@ -61,45 +52,24 @@
     <form
       method="POST"
       action="?/createUpdateLegalInformation"
-      use:enhance={() => {
-        sending = true;
-        return async ({ update }) => {
-          await update({ reset: false });
-          sending = false;
-        };
-      }}
+      use:enhance={enhanceForm({ reset: false })}
     >
-      <label>
-        Main content:
-        <textarea
-          name="main-content"
-          rows="20"
-          placeholder="## Impressum
-
-## Privacy policy"
-          bind:value={previewContent}
-          bind:this={mainContentTextarea}
-          onscroll={updateScrollPercentage}
-          required>{data.legalInformation.main_content ?? ""}</textarea
-        >
-      </label>
+      <MarkdownEditor
+        apiPrefix={data.API_BASE_PREFIX}
+        label="Main content"
+        name="main-content"
+        content={data.legalInformation?.main_content ?? ""}
+      />
 
       <button type="submit">Submit</button>
     </form>
 
-    {#if data.legalInformation.main_content}
+    {#if data.legalInformation?.main_content}
       <Modal id="delete-legal-information" text="Delete">
         <form
           action="?/deleteLegalInformation"
           method="post"
-          use:enhance={() => {
-            sending = true;
-            return async ({ update }) => {
-              await update();
-              window.location.hash = "!";
-              sending = false;
-            };
-          }}
+          use:enhance={enhanceForm({ closeModal: true })}
         >
           <h3>Delete legal information</h3>
           <p>
