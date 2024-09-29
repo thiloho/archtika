@@ -33,6 +33,11 @@ footer {
   padding-block: var(--space-s);
 }
 
+footer {
+  margin-block-start: auto;
+  text-align: center;
+}
+
 .articles ul {
   display: flex;
   flex-direction: column;

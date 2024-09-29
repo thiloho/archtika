@@ -49,6 +49,8 @@
           dev-vm = self.nixosConfigurations.dev-vm.config.system.build.vm;
 
           default = pkgs.callPackage ./nix/package.nix { };
+
+          docker = pkgs.callPackage ./nix/docker.nix { };
         }
       );
 

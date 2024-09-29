@@ -32,6 +32,11 @@ footer {
   padding-block: var(--space-s);
 }
 
+footer {
+  margin-block-start: auto;
+  text-align: center;
+}
+
 section {
   scroll-margin-block-start: var(--space-xl);
 }
