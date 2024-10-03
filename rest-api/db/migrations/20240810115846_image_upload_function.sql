@@ -21,7 +21,7 @@ BEGIN
         SELECT
           UNNEST(_allowed_mimetypes))) THEN
     RAISE invalid_parameter_value
-    USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp';
+    USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp, avif, gif, svg';
   ELSIF OCTET_LENGTH($1) > _max_file_size THEN
     RAISE program_limit_exceeded
     USING message = FORMAT('File size exceeds the maximum limit of %s MB', _max_file_size / (1024 * 1024));
@@ -56,7 +56,7 @@ BEGIN
   SELECT
     m.blob
   FROM
-    internal.media m
+    internal.media AS m
   WHERE
     m.id = retrieve_file.id INTO _blob;
   IF FOUND THEN

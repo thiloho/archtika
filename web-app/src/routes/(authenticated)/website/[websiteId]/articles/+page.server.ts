@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params, fetch, url, parent, locals 
   const parameters = new URLSearchParams();
 
   if (searchQuery) {
-    parameters.append("title_description_search", `wfts(english).${searchQuery}`);
+    parameters.append("title", `wfts.${searchQuery}`);
   }
 
   switch (filterBy) {

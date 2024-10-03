@@ -24,6 +24,8 @@
 
   virtualisation = {
     graphics = false;
+    memorySize = 2048;
+    cores = 2;
     sharedDirectories = {
       websites = {
         source = "/var/www/archtika-websites";
@@ -59,6 +61,11 @@
     };
     nginx = {
       enable = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings = true;
+      recommendedZstdSettings = true;
+      recommendedOptimisation = true;
+
       virtualHosts."_" = {
         listen = [
           {
@@ -67,13 +74,15 @@
           }
         ];
         locations = {
+          "/previews/" = {
+            alias = "/var/www/archtika-websites/previews/";
+            index = "index.html";
+            tryFiles = "$uri $uri/ $uri.html =404";
+          };
           "/" = {
             root = "/var/www/archtika-websites";
             index = "index.html";
             tryFiles = "$uri $uri/ $uri.html =404";
-            extraConfig = ''
-              autoindex on;
-            '';
           };
         };
       };

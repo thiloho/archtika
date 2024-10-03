@@ -7,11 +7,11 @@ DECLARE
 BEGIN
   IF (NOT EXISTS (
     SELECT
-      id
+      u.id
     FROM
-      internal.user
+      internal.user AS u
     WHERE
-      id = _user_id)) THEN
+      u.id = _user_id)) THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
   IF TG_OP != 'DELETE' THEN

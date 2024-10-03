@@ -7,7 +7,7 @@
   import { page } from "$app/stores";
   import { tables } from "$lib/db-schema";
   import { previewContent } from "$lib/runes.svelte";
-  import { sanitize } from "isomorphic-dompurify";
+  import DOMPurify from "isomorphic-dompurify";
 
   const { data }: { data: PageServerData } = $props();
 
@@ -156,9 +156,12 @@
                     <p>{table_name} &mdash; {operation}</p>
                   </hgroup>
 
-                  <pre style="white-space: pre-wrap">{@html sanitize(htmlDiff(oldValue, newValue), {
-                      ALLOWED_TAGS: ["ins", "del"]
-                    })}</pre>
+                  <pre style="white-space: pre-wrap">{@html DOMPurify.sanitize(
+                      htmlDiff(oldValue, newValue),
+                      {
+                        ALLOWED_TAGS: ["ins", "del"]
+                      }
+                    )}</pre>
                 </Modal>
               </td>
             </tr>

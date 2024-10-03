@@ -19,7 +19,7 @@
 <svelte:head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title}</title>
+  <title>{websiteOverview.title === title ? title : `${websiteOverview.title} | ${title}`}</title>
   <meta name="description" content={metaDescription ?? title} />
   <link rel="stylesheet" href={`${"../".repeat(nestingLevel)}styles.css`} />
   {#if websiteOverview.settings.favicon_image}

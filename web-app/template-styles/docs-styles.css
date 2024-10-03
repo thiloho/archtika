@@ -41,11 +41,6 @@ section {
   scroll-margin-block-start: var(--space-xl);
 }
 
-label[for="toggle-sidebar"] {
-  display: inline-grid;
-  place-content: center;
-}
-
 .docs-navigation {
   display: none;
   position: fixed;

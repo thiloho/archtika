@@ -13,6 +13,12 @@ nav {
   border-block-end: var(--border-primary);
 }
 
+nav > .container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
 header > .container {
   display: flex;
   flex-direction: column;

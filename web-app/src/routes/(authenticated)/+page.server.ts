@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ fetch, url, locals }) => {
   const baseFetchUrl = `${API_BASE_PREFIX}/website?order=last_modified_at.desc,created_at.desc`;
 
   if (searchQuery) {
-    params.append("title_search", `wfts(english).${searchQuery}`);
+    params.append("title", `wfts.${searchQuery}`);
   }
 
   switch (filterBy) {

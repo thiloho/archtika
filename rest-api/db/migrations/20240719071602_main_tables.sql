@@ -37,8 +37,7 @@ CREATE TABLE internal.website (
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
-  title_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', title)) STORED
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
 
 CREATE TABLE internal.media (
@@ -107,7 +106,6 @@ CREATE TABLE internal.article (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
-  title_description_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', COALESCE(title, '') || ' ' || COALESCE(meta_description, ''))) STORED,
   UNIQUE (website_id, category, article_weight)
 );
 

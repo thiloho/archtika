@@ -24,6 +24,16 @@
     const scrollHeight = previewElement.scrollHeight - previewElement.clientHeight;
     previewElement.scrollTop = (textareaScrollTop.value / 100) * scrollHeight;
   });
+
+  const tabs = [
+    "settings",
+    "articles",
+    "categories",
+    "collaborators",
+    "legal-information",
+    "publish",
+    "logs"
+  ];
 </script>
 
 <input type="checkbox" id="toggle-mobile-preview" hidden />
@@ -34,27 +44,17 @@
 
   <nav class="operations__nav">
     <ul class="unpadded">
-      <li>
-        <a href="/website/{id}">Settings</a>
-      </li>
-      <li>
-        <a href="/website/{id}/articles">Articles</a>
-      </li>
-      {#if contentType === "Docs"}
-        <a href="/website/{id}/categories">Categories</a>
-      {/if}
-      <li>
-        <a href="/website/{id}/collaborators">Collaborators</a>
-      </li>
-      <li>
-        <a href="/website/{id}/legal-information">Legal information</a>
-      </li>
-      <li>
-        <a href="/website/{id}/publish">Publish</a>
-      </li>
-      <li>
-        <a href="/website/{id}/logs">Logs</a>
-      </li>
+      {#each tabs.filter((tab) => (tab !== "categories" && contentType === "Blog") || contentType === "Docs") as tab}
+        <li>
+          <a
+            href="/website/{id}{tab === 'settings' ? '' : `/${tab}`}"
+            class:active={tab === "settings"
+              ? $page.url.pathname === `/website/${id}`
+              : $page.url.pathname.includes(tab)}
+            >{(tab.charAt(0).toUpperCase() + tab.slice(1)).replace("-", " ") || "Settings"}</a
+          >
+        </li>
+      {/each}
     </ul>
   </nav>
 
@@ -115,6 +115,11 @@
     display: none;
     flex-direction: column;
     gap: var(--space-s);
+  }
+
+  .active {
+    text-underline-offset: 0.375rem;
+    text-decoration-thickness: 0.25rem;
   }
 
   @media (min-width: 640px) {

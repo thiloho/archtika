@@ -22,11 +22,11 @@ DECLARE
 BEGIN
   IF (NOT EXISTS (
     SELECT
-      id
+      u.id
     FROM
-      internal.user
+      internal.user AS u
     WHERE
-      id = _user_id) OR (to_jsonb (OLD.*) - 'last_modified_at' - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_at' - 'last_modified_by')) THEN
+      u.id = _user_id) OR (to_jsonb (OLD.*) - 'last_modified_at' - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_at' - 'last_modified_by')) THEN
     RETURN NULL;
   END IF;
   IF TG_TABLE_NAME = 'website' THEN
@@ -40,21 +40,21 @@ BEGIN
   ELSIF (TG_OP = 'UPDATE'
       AND EXISTS (
         SELECT
-          id
+          w.id
         FROM
-          internal.website
+          internal.website AS w
         WHERE
-          id = _website_id)) THEN
+          w.id = _website_id)) THEN
     INSERT INTO internal.change_log (website_id, table_name, operation, old_value, new_value)
       VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD) - HSTORE (NEW), HSTORE (NEW) - HSTORE (OLD));
   ELSIF (TG_OP = 'DELETE'
       AND EXISTS (
         SELECT
-          id
+          w.id
         FROM
-          internal.website
+          internal.website AS w
         WHERE
-          id = _website_id)) THEN
+          w.id = _website_id)) THEN
     INSERT INTO internal.change_log (website_id, table_name, operation, old_value)
       VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (OLD));
   END IF;

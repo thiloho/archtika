@@ -27,7 +27,6 @@ export interface Article {
   created_at: Date;
   last_modified_at: Date;
   last_modified_by: string | null;
-  title_description_search: any | null;
 }
 export interface ArticleInput {
   id?: string;
@@ -44,7 +43,6 @@ export interface ArticleInput {
   created_at?: Date;
   last_modified_at?: Date;
   last_modified_by?: string | null;
-  title_description_search?: any | null;
 }
 const article = {
   tableName: "article",
@@ -62,8 +60,7 @@ const article = {
     "article_weight",
     "created_at",
     "last_modified_at",
-    "last_modified_by",
-    "title_description_search"
+    "last_modified_by"
   ],
   requiredForInsert: ["website_id", "title"],
   primaryKey: "id",
@@ -463,7 +460,6 @@ export interface Website {
   created_at: Date;
   last_modified_at: Date;
   last_modified_by: string | null;
-  title_search: any | null;
 }
 export interface WebsiteInput {
   id?: string;
@@ -474,7 +470,6 @@ export interface WebsiteInput {
   created_at?: Date;
   last_modified_at?: Date;
   last_modified_by?: string | null;
-  title_search?: any | null;
 }
 const website = {
   tableName: "website",
@@ -486,8 +481,7 @@ const website = {
     "is_published",
     "created_at",
     "last_modified_at",
-    "last_modified_by",
-    "title_search"
+    "last_modified_by"
   ],
   requiredForInsert: ["content_type", "title"],
   primaryKey: "id",

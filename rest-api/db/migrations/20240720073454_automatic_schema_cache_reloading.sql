@@ -1,5 +1,5 @@
 -- migrate:up
-CREATE FUNCTION pgrst_watch ()
+CREATE FUNCTION internal.pgrst_watch ()
   RETURNS EVENT_TRIGGER
   AS $$
 BEGIN
@@ -10,10 +10,10 @@ $$
 LANGUAGE plpgsql;
 
 CREATE EVENT TRIGGER pgrst_watch ON ddl_command_end
-  EXECUTE FUNCTION pgrst_watch ();
+  EXECUTE FUNCTION internal.pgrst_watch ();
 
 -- migrate:down
 DROP EVENT TRIGGER pgrst_watch;
 
-DROP FUNCTION pgrst_watch ();
+DROP FUNCTION internal.pgrst_watch ();
 

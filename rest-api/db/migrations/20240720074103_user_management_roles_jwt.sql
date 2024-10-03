@@ -48,7 +48,7 @@ CREATE FUNCTION internal.user_role (username TEXT, pass TEXT, OUT role_name NAME
 AS $$
 BEGIN
   SELECT
-    ROLE INTO role_name
+    u.role INTO role_name
   FROM
     internal.user AS u
   WHERE
@@ -111,7 +111,7 @@ AS $$
 DECLARE
   _role NAME;
   _user_id UUID;
-  _exp INTEGER;
+  _exp INTEGER := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INTEGER + 86400;
 BEGIN
   SELECT
     internal.user_role (login.username, login.pass) INTO _role;
@@ -120,12 +120,11 @@ BEGIN
     USING message = 'Invalid username or password';
   ELSE
     SELECT
-      id INTO _user_id
+      u.id INTO _user_id
     FROM
       internal.user AS u
     WHERE
       u.username = login.username;
-    _exp := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INTEGER + 86400;
     SELECT
       SIGN(JSON_BUILD_OBJECT('role', _role, 'user_id', _user_id, 'username', login.username, 'exp', _exp), CURRENT_SETTING('app.jwt_secret')) INTO token;
   END IF;
