@@ -134,7 +134,8 @@ export const actions: Actions = {
       "PATCH",
       {
         body: {
-          main_content: data.get("main-content")
+          main_content: data.get("main-content"),
+          meta_description: data.get("description")
         },
         successMessage: "Successfully updated home"
       }

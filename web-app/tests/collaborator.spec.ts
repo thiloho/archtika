@@ -53,7 +53,14 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByLabel("Title:").click();
     await page.getByLabel("Title:").fill("Blog");
     await page.getByRole("button", { name: "Submit" }).click();
+    await page.getByRole("link", { name: "Blog" }).click();
+    await page.getByRole("link", { name: "Publish" }).click();
+    await page.getByRole("button", { name: "Publish" }).click();
+    await page.getByLabel("Prefix:").click();
+    await page.getByLabel("Prefix:").fill("setup");
+    await page.getByRole("button", { name: "Submit" }).click();
 
+    await page.goto("/");
     await page.getByRole("button", { name: "Create website" }).click();
     await page.getByLabel("Type: BlogDocs").selectOption("Docs");
     await page.getByLabel("Title:").click();
@@ -146,7 +153,7 @@ test.describe.serial("Collaborator tests", () => {
         await page.locator("li").filter({ hasText: "Blog" }).getByRole("button").first().click();
         await page.getByRole("button", { name: "Submit" }).click();
 
-        if (permissionLevel === 10) {
+        if ([10, 20].includes(permissionLevel)) {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully updated website")).toBeVisible();
@@ -179,6 +186,8 @@ test.describe.serial("Collaborator tests", () => {
       });
       test("Update Home", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByLabel("Description:").click();
+        await page.getByLabel("Description:").fill("Description");
         await page.locator("#home").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -440,10 +449,35 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Publish" }).click();
         await page.getByRole("button", { name: "Publish" }).click();
 
-        if (permissionLevel === 10) {
+        if ([10, 20].includes(permissionLevel)) {
           await expect(page.getByText("Insufficient permissions")).toBeVisible();
         } else {
           await expect(page.getByText("Successfully published website")).toBeVisible();
+        }
+      });
+      test("Set custom domain prefix", async ({ page }) => {
+        await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByRole("link", { name: "Publish" }).click();
+        await page.getByLabel("Prefix:").click();
+        await page.getByLabel("Prefix:").fill("blog");
+        await page.getByRole("button", { name: "Submit" }).click();
+
+        if ([10, 20].includes(permissionLevel)) {
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
+        } else {
+          await expect(page.getByText("Successfully created/updated")).toBeVisible();
+        }
+      });
+      test("Remove custom domain prefix", async ({ page }) => {
+        await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByRole("link", { name: "Publish" }).click();
+        await page.getByRole("button", { name: "Delete" }).click();
+        await page.getByRole("button", { name: "Delete domain prefix" }).click();
+
+        if ([10, 20].includes(permissionLevel)) {
+          await expect(page.getByText("Insufficient permissions")).toBeVisible();
+        } else {
+          await expect(page.getByText("Successfully deleted domain")).toBeVisible();
         }
       });
     });

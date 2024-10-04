@@ -26,6 +26,7 @@
     graphics = false;
     memorySize = 2048;
     cores = 2;
+    diskSize = 10240;
     sharedDirectories = {
       websites = {
         source = "/var/www/archtika-websites";

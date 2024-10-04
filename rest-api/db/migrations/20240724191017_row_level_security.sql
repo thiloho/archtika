@@ -75,7 +75,7 @@ CREATE POLICY view_websites ON internal.website
 
 CREATE POLICY update_website ON internal.website
   FOR UPDATE
-    USING (internal.user_has_website_access (id, 20));
+    USING (internal.user_has_website_access (id, 30));
 
 CREATE POLICY delete_website ON internal.website
   FOR DELETE

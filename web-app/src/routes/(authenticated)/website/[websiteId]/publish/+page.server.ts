@@ -25,24 +25,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     )
   ).data;
 
-  generateStaticFiles(websiteOverview);
-
-  const websitePreviewUrl = `${
-    dev
-      ? "http://localhost:18000"
-      : process.env.ORIGIN
-        ? process.env.ORIGIN
-        : "http://localhost:18000"
-  }/previews/${websiteOverview.id}/`;
-
-  const websiteProdUrl = dev
-    ? `http://localhost:18000/${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}/`
-    : process.env.ORIGIN
-      ? process.env.ORIGIN.replace(
-          "//",
-          `//${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}.`
-        )
-      : `http://localhost:18000/${websiteOverview.domain_prefix?.prefix ?? websiteOverview.id}/`;
+  const { websitePreviewUrl, websiteProdUrl } = await generateStaticFiles(websiteOverview);
 
   return {
     websiteOverview,
@@ -67,7 +50,7 @@ export const actions: Actions = {
       )
     ).data;
 
-    generateStaticFiles(websiteOverview, false);
+    await generateStaticFiles(websiteOverview, false);
 
     return await apiRequest(
       fetch,
@@ -156,6 +139,23 @@ export const actions: Actions = {
 };
 
 const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = true) => {
+  const websitePreviewUrl = `${
+    dev
+      ? "http://localhost:18000"
+      : process.env.ORIGIN
+        ? process.env.ORIGIN
+        : "http://localhost:18000"
+  }/previews/${websiteData.id}/`;
+
+  const websiteProdUrl = dev
+    ? `http://localhost:18000/${websiteData.domain_prefix?.prefix ?? websiteData.id}/`
+    : process.env.ORIGIN
+      ? process.env.ORIGIN.replace(
+          "//",
+          `//${websiteData.domain_prefix?.prefix ?? websiteData.id}.`
+        )
+      : `http://localhost:18000/${websiteData.domain_prefix?.prefix ?? websiteData.id}/`;
+
   const fileContents = (head: string, body: string) => {
     return `
 <!DOCTYPE html>
@@ -173,7 +173,8 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
     props: {
       websiteOverview: websiteData,
       apiUrl: API_BASE_PREFIX,
-      isLegalPage: false
+      isLegalPage: false,
+      websiteUrl: isPreview ? websitePreviewUrl : websiteProdUrl
     }
   });
 
@@ -202,7 +203,8 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
       props: {
         websiteOverview: websiteData,
         article,
-        apiUrl: API_BASE_PREFIX
+        apiUrl: API_BASE_PREFIX,
+        websiteUrl: isPreview ? websitePreviewUrl : websiteProdUrl
       }
     });
 
@@ -217,13 +219,17 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
       props: {
         websiteOverview: websiteData,
         apiUrl: API_BASE_PREFIX,
-        isLegalPage: true
+        isLegalPage: true,
+        websiteUrl: isPreview ? websitePreviewUrl : websiteProdUrl
       }
     });
 
     await writeFile(join(uploadDir, "legal-information.html"), fileContents(head, body));
   }
 
+  const variableStyles = await readFile(`${process.cwd()}/template-styles/variables.css`, {
+    encoding: "utf-8"
+  });
   const commonStyles = await readFile(`${process.cwd()}/template-styles/common-styles.css`, {
     encoding: "utf-8"
   });
@@ -246,22 +252,43 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
   } = hexToHSL(websiteData.settings.background_color_light_theme);
 
   await writeFile(
-    join(uploadDir, "styles.css"),
-    commonStyles
-      .concat(specificStyles)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_H \*\/\s*).*(?=;)/, ` ${hDark}`)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_S \*\/\s*).*(?=;)/, ` ${sDark}%`)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_DARK_THEME_L \*\/\s*).*(?=;)/, ` ${lDark}%`)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_H \*\/\s*).*(?=;)/, ` ${hLight}`)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_S \*\/\s*).*(?=;)/, ` ${sLight}%`)
-      .replace(/(?<=\/\* BACKGROUND_COLOR_LIGHT_THEME_L \*\/\s*).*(?=;)/, ` ${lLight}%`)
-      .replace(
-        /(?<=\/\* ACCENT_COLOR_DARK_THEME \*\/\s*).*(?=;)/,
-        ` ${websiteData.settings.accent_color_dark_theme}`
+    join(uploadDir, "variables.css"),
+    variableStyles
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_DARK_THEME_H \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_DARK_THEME_H */ ${hDark};`
       )
-      .replace(
-        /(?<=\/\* ACCENT_COLOR_LIGHT_THEME \*\/\s*).*(?=;)/,
-        ` ${websiteData.settings.accent_color_light_theme}`
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_DARK_THEME_S \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_DARK_THEME_S */ ${sDark}%;`
+      )
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_DARK_THEME_L \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_DARK_THEME_L */ ${lDark}%;`
+      )
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_LIGHT_THEME_H \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_LIGHT_THEME_H */ ${hLight};`
+      )
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_LIGHT_THEME_S \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_LIGHT_THEME_S */ ${sLight}%;`
+      )
+      .replaceAll(
+        /\/\* BACKGROUND_COLOR_LIGHT_THEME_L \*\/\s*.*?;/g,
+        `/* BACKGROUND_COLOR_LIGHT_THEME_L */ ${lLight}%;`
+      )
+      .replaceAll(
+        /\/\* ACCENT_COLOR_DARK_THEME \*\/\s*.*?;/g,
+        `/* ACCENT_COLOR_DARK_THEME */ ${websiteData.settings.accent_color_dark_theme};`
+      )
+      .replaceAll(
+        /\/\* ACCENT_COLOR_LIGHT_THEME \*\/\s*.*?;/g,
+        `/* ACCENT_COLOR_LIGHT_THEME */ ${websiteData.settings.accent_color_light_theme};`
       )
   );
+  await writeFile(join(uploadDir, "common.css"), commonStyles);
+  await writeFile(join(uploadDir, "scoped.css"), specificStyles);
+
+  return { websitePreviewUrl, websiteProdUrl };
 };

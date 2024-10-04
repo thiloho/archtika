@@ -115,6 +115,8 @@ test.describe.serial("Website tests", () => {
 
       test("Home", async ({ authenticatedPage: page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
+        await page.getByLabel("Description:").click();
+        await page.getByLabel("Description:").fill("Description");
         await page.getByLabel("Main content:").click();
         await page.getByLabel("Main content:").press("Control+a");
         await page.getByLabel("Main content:").fill("## Some new content comes here");
@@ -345,6 +347,38 @@ test.describe.serial("Website tests", () => {
     await page.getByRole("button", { name: "Publish" }).click();
     await expect(page.getByText("Successfully published website")).toBeVisible();
     await expect(page.getByText("Your website is published at")).toBeVisible();
+  });
+
+  test("Set custom domain prefixes", async ({ authenticatedPage: page }) => {
+    await page.getByRole("link", { name: "Blog" }).click();
+    await page.getByRole("link", { name: "Publish" }).click();
+    await page.getByLabel("Prefix:").click();
+    await page.getByLabel("Prefix:").fill("blog");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Successfully created/updated")).toBeVisible();
+
+    await page.goto("/");
+    await page.getByRole("link", { name: "Documentation" }).click();
+    await page.getByRole("link", { name: "Publish" }).click();
+    await page.getByLabel("Prefix:").click();
+    await page.getByLabel("Prefix:").fill("docs");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Successfully created/updated")).toBeVisible();
+  });
+
+  test("Remove custom domain prefixes", async ({ authenticatedPage: page }) => {
+    await page.getByRole("link", { name: "Blog" }).click();
+    await page.getByRole("link", { name: "Publish" }).click();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await page.getByRole("button", { name: "Delete domain prefix" }).click();
+    await expect(page.getByText("Successfully deleted domain")).toBeVisible();
+
+    await page.goto("/");
+    await page.getByRole("link", { name: "Documentation" }).click();
+    await page.getByRole("link", { name: "Publish" }).click();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await page.getByRole("button", { name: "Delete domain prefix" }).click();
+    await expect(page.getByText("Successfully deleted domain")).toBeVisible();
   });
 
   test("Delete websites", async ({ authenticatedPage: page }) => {

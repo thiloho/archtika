@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "../../template-styles/variables.css";
   import "../../template-styles/common-styles.css";
   import { page } from "$app/stores";
   import type { LayoutServerData } from "./$types";

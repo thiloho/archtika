@@ -149,6 +149,12 @@
     </h2>
 
     <form action="?/updateHome" method="POST" use:enhance={enhanceForm({ reset: false })}>
+      <label>
+        Description:
+        <textarea name="description" rows="5" maxlength="250" required
+          >{data.home.meta_description}</textarea
+        >
+      </label>
       <MarkdownEditor
         apiPrefix={data.API_BASE_PREFIX}
         label="Main content"

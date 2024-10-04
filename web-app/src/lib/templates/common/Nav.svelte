@@ -70,7 +70,7 @@
         </ul>
       </section>
     {/if}
-    <a href={isIndexPage ? "." : ".."}>
+    <svelte:element this={isIndexPage ? "span" : "a"} href="..">
       {#if websiteOverview.header.logo_type === "text"}
         <strong>{websiteOverview.header.logo_text}</strong>
       {:else}
@@ -81,7 +81,7 @@
           alt=""
         />
       {/if}
-    </a>
+    </svelte:element>
     <label style="margin-inline-start: auto;" for="toggle-theme">
       <input type="checkbox" id="toggle-theme" hidden />
       <svg

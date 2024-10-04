@@ -129,7 +129,7 @@ GRANT SELECT, UPDATE (logo_type, logo_text, logo_image) ON internal.header TO au
 
 GRANT SELECT, UPDATE ON api.header TO authenticated_user;
 
-GRANT SELECT, UPDATE (main_content) ON internal.home TO authenticated_user;
+GRANT SELECT, UPDATE (main_content, meta_description) ON internal.home TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.home TO authenticated_user;
 

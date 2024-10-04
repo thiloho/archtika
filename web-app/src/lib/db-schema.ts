@@ -299,18 +299,26 @@ const header = {
 export interface Home {
   website_id: string;
   main_content: string;
+  meta_description: string | null;
   last_modified_at: Date;
   last_modified_by: string | null;
 }
 export interface HomeInput {
   website_id: string;
   main_content: string;
+  meta_description?: string | null;
   last_modified_at?: Date;
   last_modified_by?: string | null;
 }
 const home = {
   tableName: "home",
-  columns: ["website_id", "main_content", "last_modified_at", "last_modified_by"],
+  columns: [
+    "website_id",
+    "main_content",
+    "meta_description",
+    "last_modified_at",
+    "last_modified_by"
+  ],
   requiredForInsert: ["website_id", "main_content"],
   primaryKey: "website_id",
   foreignKeys: {

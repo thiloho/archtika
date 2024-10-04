@@ -8,8 +8,10 @@
   const {
     websiteOverview,
     article,
-    apiUrl
-  }: { websiteOverview: WebsiteOverview; article: Article; apiUrl: string } = $props();
+    apiUrl,
+    websiteUrl
+  }: { websiteOverview: WebsiteOverview; article: Article; apiUrl: string; websiteUrl: string } =
+    $props();
 </script>
 
 <Head
@@ -18,6 +20,7 @@
   {apiUrl}
   title={article.title}
   metaDescription={article.meta_description}
+  {websiteUrl}
 />
 
 <Nav {websiteOverview} isDocsTemplate={false} isIndexPage={false} {apiUrl} />

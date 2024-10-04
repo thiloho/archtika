@@ -13,6 +13,23 @@ CREATE TABLE internal.change_log (
   new_value HSTORE
 );
 
+CREATE VIEW api.change_log WITH ( security_invoker = ON
+) AS
+SELECT
+  *
+FROM
+  internal.change_log;
+
+GRANT SELECT ON internal.change_log TO authenticated_user;
+
+GRANT SELECT ON api.change_log TO authenticated_user;
+
+ALTER TABLE internal.change_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY view_change_log ON internal.change_log
+  FOR SELECT
+    USING (internal.user_has_website_access (website_id, 10));
+
 CREATE FUNCTION internal.track_changes ()
   RETURNS TRIGGER
   AS $$
@@ -108,17 +125,6 @@ CREATE TRIGGER collab_track_changes
   AFTER INSERT OR UPDATE OR DELETE ON internal.collab
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
-
-CREATE VIEW api.change_log WITH ( security_invoker = ON
-) AS
-SELECT
-  *
-FROM
-  internal.change_log;
-
-GRANT SELECT ON internal.change_log TO authenticated_user;
-
-GRANT SELECT ON api.change_log TO authenticated_user;
 
 -- migrate:down
 DROP TRIGGER website_track_changes ON internal.website;

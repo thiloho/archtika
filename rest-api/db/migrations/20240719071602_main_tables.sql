@@ -74,6 +74,7 @@ CREATE TABLE internal.header (
 CREATE TABLE internal.home (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
   main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );

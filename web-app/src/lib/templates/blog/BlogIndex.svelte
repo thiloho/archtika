@@ -7,8 +7,14 @@
   const {
     websiteOverview,
     apiUrl,
-    isLegalPage
-  }: { websiteOverview: WebsiteOverview; apiUrl: string; isLegalPage: boolean } = $props();
+    isLegalPage,
+    websiteUrl
+  }: {
+    websiteOverview: WebsiteOverview;
+    apiUrl: string;
+    isLegalPage: boolean;
+    websiteUrl: string;
+  } = $props();
 </script>
 
 <Head
@@ -16,6 +22,8 @@
   nestingLevel={0}
   {apiUrl}
   title={isLegalPage ? "Legal information" : websiteOverview.title}
+  metaDescription={websiteOverview.home.meta_description}
+  {websiteUrl}
 />
 
 <Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {apiUrl} />
