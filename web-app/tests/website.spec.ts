@@ -9,6 +9,8 @@ const __dirname = dirname(__filename);
 
 const username = randomBytes(8).toString("hex");
 const collabUsername = randomBytes(8).toString("hex");
+const customPrefix = Buffer.from(randomBytes(16).map((byte) => (byte % 26) + 97)).toString();
+const customPrefix2 = Buffer.from(randomBytes(16).map((byte) => (byte % 26) + 97)).toString();
 const password = "T3stuser??!!";
 
 const test = base.extend<{ authenticatedPage: Page }>({
@@ -189,12 +191,12 @@ test.describe.serial("Website tests", () => {
 
         const clipPage = await context.newPage();
         await clipPage.goto("https://picsum.photos/400/400.jpg");
-        await clipPage.keyboard.press(`${modifier}+KeyC`);
+        await clipPage.keyboard.press(`${modifier}+C`);
 
         await page.bringToFront();
         await page.keyboard.press("Enter");
         await page.keyboard.press("Enter");
-        await page.keyboard.press(`${modifier}+KeyV`);
+        await page.keyboard.press(`${modifier}+V`);
 
         await expect(page.getByText("Successfully uploaded image")).toBeVisible();
       });
@@ -353,7 +355,7 @@ test.describe.serial("Website tests", () => {
     await page.getByRole("link", { name: "Blog" }).click();
     await page.getByRole("link", { name: "Publish" }).click();
     await page.getByLabel("Prefix:").click();
-    await page.getByLabel("Prefix:").fill("blog");
+    await page.getByLabel("Prefix:").fill(customPrefix);
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Successfully created/updated")).toBeVisible();
 
@@ -361,7 +363,7 @@ test.describe.serial("Website tests", () => {
     await page.getByRole("link", { name: "Documentation" }).click();
     await page.getByRole("link", { name: "Publish" }).click();
     await page.getByLabel("Prefix:").click();
-    await page.getByLabel("Prefix:").fill("docs");
+    await page.getByLabel("Prefix:").fill(customPrefix2);
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Successfully created/updated")).toBeVisible();
   });

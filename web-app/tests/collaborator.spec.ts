@@ -1,11 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { randomBytes } from "node:crypto";
+import { platform } from "node:os";
 
 const username = randomBytes(8).toString("hex");
 const collabUsername = randomBytes(8).toString("hex");
 const collabUsername2 = randomBytes(8).toString("hex");
 const collabUsername3 = randomBytes(8).toString("hex");
 const collabUsername4 = randomBytes(8).toString("hex");
+const customPrefix = Buffer.from(randomBytes(16).map((byte) => (byte % 26) + 97)).toString();
+const customPrefix2 = Buffer.from(randomBytes(16).map((byte) => (byte % 26) + 97)).toString();
 const password = "T3stuser??!!";
 
 const permissionLevels = [10, 20, 30];
@@ -57,7 +60,7 @@ test.describe.serial("Collaborator tests", () => {
     await page.getByRole("link", { name: "Publish" }).click();
     await page.getByRole("button", { name: "Publish" }).click();
     await page.getByLabel("Prefix:").click();
-    await page.getByLabel("Prefix:").fill("setup");
+    await page.getByLabel("Prefix:").fill(customPrefix);
     await page.getByRole("button", { name: "Submit" }).click();
 
     await page.goto("/");
@@ -458,8 +461,13 @@ test.describe.serial("Collaborator tests", () => {
       test("Set custom domain prefix", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Publish" }).click();
+
+        const isMac = platform() === "darwin";
+        const modifier = isMac ? "Meta" : "Control";
         await page.getByLabel("Prefix:").click();
-        await page.getByLabel("Prefix:").fill("blog");
+        await page.keyboard.press(`${modifier}+A`);
+        await page.keyboard.press(`Backspace`);
+        await page.getByLabel("Prefix:").fill(customPrefix2);
         await page.getByRole("button", { name: "Submit" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
