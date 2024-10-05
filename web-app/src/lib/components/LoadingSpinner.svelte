@@ -25,7 +25,7 @@
     margin-inline-start: -2rem;
     border-radius: 50%;
     border: var(--border-primary);
-    border-width: 0.125rem;
+    border-width: 0.25rem;
     border-block-start-color: var(--color-accent);
     animation: spinner 500ms linear infinite;
   }

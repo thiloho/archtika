@@ -1,13 +1,14 @@
-import type { PageServerLoad } from "./$types";
+import type { PageServerLoad, Actions } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { ChangeLog, User, Collab } from "$lib/db-schema";
+import DiffMatchPatch from "diff-match-patch";
 
 export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const userFilter = url.searchParams.get("logs_filter_user");
   const resourceFilter = url.searchParams.get("logs_filter_resource");
   const operationFilter = url.searchParams.get("logs_filter_operation");
   const currentPage = Number.parseInt(url.searchParams.get("logs_results_page") ?? "1");
-  const resultOffset = (currentPage - 1) * 50;
+  const resultOffset = (currentPage - 1) * 20;
 
   const searchParams = new URLSearchParams();
 
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
     searchParams.append("operation", `eq.${operationFilter.toUpperCase()}`);
   }
 
-  const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=50&offset=${resultOffset}`;
+  const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=20&offset=${resultOffset}`;
 
   const changeLog: (ChangeLog & { user: { username: User["username"] } })[] = (
     await apiRequest(fetch, constructedFetchUrl, "GET", { returnData: true })
@@ -60,4 +61,47 @@ export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
     home,
     collaborators
   };
+};
+
+export const actions: Actions = {
+  computeDiff: async ({ request, fetch }) => {
+    const data = await request.formData();
+
+    const dmp = new DiffMatchPatch();
+
+    const htmlDiff = (oldValue: string, newValue: string) => {
+      const diff = dmp.diff_main(oldValue, newValue);
+      dmp.diff_cleanupSemantic(diff);
+
+      return diff
+        .map(([op, text]) => {
+          switch (op) {
+            case 1:
+              return `<ins>${text}</ins>`;
+            case -1:
+              return `<del>${text}</del>`;
+            default:
+              return text;
+          }
+        })
+        .join("");
+    };
+
+    const log: ChangeLog = (
+      await apiRequest(
+        fetch,
+        `${API_BASE_PREFIX}/change_log?id=eq.${data.get("id")}&select=old_value,new_value`,
+        "GET",
+        { headers: { Accept: "application/vnd.pgrst.object+json" }, returnData: true }
+      )
+    ).data;
+
+    return {
+      logId: data.get("id"),
+      currentDiff: htmlDiff(
+        JSON.stringify(log.old_value, null, 2),
+        JSON.stringify(log.new_value, null, 2)
+      )
+    };
+  }
 };

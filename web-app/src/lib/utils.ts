@@ -152,7 +152,7 @@ export const md = (markdownContent: string, showToc = true) => {
   return html;
 };
 
-export const LOADING_DELAY = 500;
+export const LOADING_DELAY = 250;
 let loadingDelay: number;
 
 export const enhanceForm = (options?: {

@@ -21,7 +21,7 @@
   let loadingDelay: number;
 
   $effect(() => {
-    if ($navigating && ["link", "goto"].includes($navigating.type)) {
+    if ($navigating) {
       loadingDelay = window.setTimeout(() => (loading = true), LOADING_DELAY);
     } else {
       window.clearTimeout(loadingDelay);
