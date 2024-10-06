@@ -73,7 +73,7 @@ CREATE TABLE internal.header (
 
 CREATE TABLE internal.home (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
@@ -101,7 +101,7 @@ CREATE TABLE internal.article (
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
   publication_date DATE,
-  main_content TEXT CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) CHECK (TRIM(main_content) != ''),
   category UUID REFERENCES internal.docs_category (id) ON DELETE SET NULL,
   article_weight INTEGER CHECK (article_weight IS NULL OR article_weight >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
@@ -119,7 +119,7 @@ CREATE TABLE internal.footer (
 
 CREATE TABLE internal.legal_information (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL

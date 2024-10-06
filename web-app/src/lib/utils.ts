@@ -147,7 +147,13 @@ const createMarkdownParser = (showToc = true) => {
 
 export const md = (markdownContent: string, showToc = true) => {
   const marked = createMarkdownParser(showToc);
-  const html = DOMPurify.sanitize(marked.parse(markdownContent) as string);
+  let html = "";
+
+  try {
+    html = DOMPurify.sanitize(marked.parse(markdownContent, { async: false }));
+  } catch (_) {
+    html = "Failed to parse markdown";
+  }
 
   return html;
 };

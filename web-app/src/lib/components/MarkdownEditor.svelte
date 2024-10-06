@@ -63,6 +63,7 @@
   <textarea
     {name}
     rows="20"
+    maxlength="200000"
     bind:value={previewContent.value}
     bind:this={mainContentTextarea}
     onscroll={updateScrollPercentage}

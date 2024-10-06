@@ -155,14 +155,12 @@
 
                   {#if new_value && !old_value}
                     <h4>New value</h4>
-                    <pre style="white-space: pre-wrap">{@html (DOMPurify.sanitize(newValue),
-                      { ALLOWED_TAGS: ["ins", "del"] })}</pre>
+                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(newValue)}</pre>
                   {/if}
 
                   {#if old_value && !new_value}
                     <h4>Old value</h4>
-                    <pre style="white-space: pre-wrap">{@html (DOMPurify.sanitize(oldValue),
-                      { ALLOWED_TAGS: ["ins", "del"] })}</pre>
+                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(oldValue)}</pre>
                   {/if}
                 </Modal>
               </td>

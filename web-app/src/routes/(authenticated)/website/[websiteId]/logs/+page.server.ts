@@ -29,7 +29,10 @@ export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=20&offset=${resultOffset}`;
 
   const changeLog: (ChangeLog & { user: { username: User["username"] } })[] = (
-    await apiRequest(fetch, constructedFetchUrl, "GET", { returnData: true })
+    await apiRequest(fetch, constructedFetchUrl, "GET", {
+      headers: { Accept: "application/vnd.pgrst.array+json;nulls=stripped" },
+      returnData: true
+    })
   ).data;
 
   const resultChangeLogData = await apiRequest(fetch, constructedFetchUrl, "HEAD", {
@@ -92,7 +95,10 @@ export const actions: Actions = {
         fetch,
         `${API_BASE_PREFIX}/change_log?id=eq.${data.get("id")}&select=old_value,new_value`,
         "GET",
-        { headers: { Accept: "application/vnd.pgrst.object+json" }, returnData: true }
+        {
+          headers: { Accept: "application/vnd.pgrst.object+json;nulls=stripped" },
+          returnData: true
+        }
       )
     ).data;
 
