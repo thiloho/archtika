@@ -100,7 +100,7 @@
             <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
           </label>
           {#if data.article.cover_image}
-            <Modal id="preview-cover-article-{data.article.id}" text="Preview">
+            <Modal id="preview-cover-article-{data.article.id}" text="Preview" isWider={true}>
               <img
                 src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
                 alt=""

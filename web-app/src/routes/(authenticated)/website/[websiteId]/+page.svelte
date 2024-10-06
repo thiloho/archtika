@@ -83,7 +83,11 @@
           <input type="file" name="favicon" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.globalSettings.favicon_image}
-          <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
+          <Modal
+            id="preview-favicon-global-{data.globalSettings.website_id}"
+            text="Preview"
+            isWider={true}
+          >
             <img
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
               alt=""
@@ -130,7 +134,7 @@
           <input type="file" name="logo-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.header.logo_image}
-          <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
+          <Modal id="preview-logo-header-{data.header.website_id}" text="Preview" isWider={true}>
             <img
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.header.logo_image}`}
               alt=""

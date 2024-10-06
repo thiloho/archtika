@@ -15,6 +15,12 @@
     isLegalPage: boolean;
     websiteUrl: string;
   } = $props();
+
+  const sortedArticles = websiteOverview.article.sort((a, b) => {
+    if (!a.publication_date) return 1;
+    if (!b.publication_date) return -1;
+    return new Date(b.publication_date).getTime() - new Date(a.publication_date).getTime();
+  });
 </script>
 
 <Head
@@ -49,7 +55,7 @@
         </h2>
 
         <ul class="unpadded">
-          {#each websiteOverview.article as article}
+          {#each sortedArticles as article}
             <li>
               {#if article.publication_date}
                 <p>{article.publication_date}</p>
