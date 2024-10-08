@@ -33,6 +33,30 @@
   </ul>
 </section>
 
+{#if data.storageSizes.data.length > 0}
+  <section id="storage">
+    <h2>
+      <a href="#storage">Storage</a>
+    </h2>
+    <ul class="unpadded storage-grid">
+      {#each data.storageSizes.data as { website_title, storage_size_bytes, max_storage_bytes, max_storage_pretty, diff_storage_pretty }}
+        <li>
+          <strong>{website_title}</strong>
+          <label>
+            {max_storage_pretty} total &mdash; {diff_storage_pretty} free<br />
+            <meter
+              value={storage_size_bytes}
+              min="0"
+              max={max_storage_bytes}
+              high={max_storage_bytes * 0.75}
+            ></meter>
+          </label>
+        </li>
+      {/each}
+    </ul>
+  </section>
+{/if}
+
 <section id="logout">
   <h2>
     <a href="#logout">Logout</a>
@@ -70,5 +94,23 @@
 <style>
   form[action="?/logout"] > button {
     max-inline-size: fit-content;
+  }
+
+  .storage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 35ch), 1fr));
+    row-gap: var(--space-s);
+    column-gap: var(--space-m);
+  }
+
+  .storage-grid > li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  meter {
+    inline-size: min(512px, 100%);
+    block-size: 2rem;
   }
 </style>

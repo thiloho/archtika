@@ -151,8 +151,8 @@ export const md = (markdownContent: string, showToc = true) => {
 
   try {
     html = DOMPurify.sanitize(marked.parse(markdownContent, { async: false }));
-  } catch (_) {
-    html = "Failed to parse markdown";
+  } catch (error) {
+    html = JSON.stringify(error);
   }
 
   return html;

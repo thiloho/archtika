@@ -81,71 +81,71 @@ $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
 
-CREATE TRIGGER website_track_changes
+CREATE TRIGGER track_changes_website
   AFTER UPDATE ON internal.website
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER settings_track_changes
+CREATE TRIGGER track_changes_settings
   AFTER UPDATE ON internal.settings
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER header_track_changes
+CREATE TRIGGER track_changes_header
   AFTER UPDATE ON internal.header
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER home_track_changes
+CREATE TRIGGER track_changes_home
   AFTER UPDATE ON internal.home
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER article_track_changes
+CREATE TRIGGER track_changes_article
   AFTER INSERT OR UPDATE OR DELETE ON internal.article
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER docs_category_track_changes
+CREATE TRIGGER track_changes_docs_category
   AFTER INSERT OR UPDATE OR DELETE ON internal.docs_category
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER footer_track_changes
+CREATE TRIGGER track_changes_footer
   AFTER UPDATE ON internal.footer
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER legal_information_track_changes
+CREATE TRIGGER track_changes_legal_information
   AFTER INSERT OR UPDATE OR DELETE ON internal.legal_information
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER collab_track_changes
+CREATE TRIGGER track_changes_collab
   AFTER INSERT OR UPDATE OR DELETE ON internal.collab
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
 -- migrate:down
-DROP TRIGGER website_track_changes ON internal.website;
+DROP TRIGGER track_changes_website ON internal.website;
 
-DROP TRIGGER settings_track_changes ON internal.settings;
+DROP TRIGGER track_changes_settings ON internal.settings;
 
-DROP TRIGGER header_track_changes ON internal.header;
+DROP TRIGGER track_changes_header ON internal.header;
 
-DROP TRIGGER home_track_changes ON internal.home;
+DROP TRIGGER track_changes_home ON internal.home;
 
-DROP TRIGGER article_track_changes ON internal.article;
+DROP TRIGGER track_changes_article ON internal.article;
 
-DROP TRIGGER docs_category_track_changes ON internal.docs_category;
+DROP TRIGGER track_changes_docs_category ON internal.docs_category;
 
-DROP TRIGGER footer_track_changes ON internal.footer;
+DROP TRIGGER track_changes_footer ON internal.footer;
 
-DROP TRIGGER legal_information_track_changes ON internal.legal_information;
+DROP TRIGGER track_changes_legal_information ON internal.legal_information;
 
-DROP TRIGGER collab_track_changes ON internal.collab;
+DROP TRIGGER track_changes_collab ON internal.collab;
 
-DROP FUNCTION internal.track_changes ();
+DROP FUNCTION internal.track_changes;
 
 DROP VIEW api.change_log;
 

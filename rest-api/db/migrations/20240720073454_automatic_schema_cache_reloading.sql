@@ -15,5 +15,5 @@ CREATE EVENT TRIGGER pgrst_watch ON ddl_command_end
 -- migrate:down
 DROP EVENT TRIGGER pgrst_watch;
 
-DROP FUNCTION internal.pgrst_watch ();
+DROP FUNCTION internal.pgrst_watch;
 

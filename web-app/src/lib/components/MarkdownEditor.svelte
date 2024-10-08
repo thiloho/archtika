@@ -46,12 +46,16 @@
       const fileUrl = `${apiPrefix}/rpc/retrieve_file?id=${fileId}`;
 
       const target = event.target as HTMLTextAreaElement;
-      const newContent =
-        target.value.slice(0, target.selectionStart) +
-        `![](${fileUrl})` +
-        target.value.slice(target.selectionStart);
+      const markdownToInsert = `![](${fileUrl})`;
+      const cursorPosition = target.selectionStart;
+      const newContent = target.value.slice(0, target.selectionStart) + markdownToInsert;
+      target.value.slice(target.selectionStart);
 
       previewContent.value = newContent;
+
+      const newCursorPosition = cursorPosition + markdownToInsert.length;
+      target.setSelectionRange(newCursorPosition, newCursorPosition);
+      target.focus();
     } else {
       return;
     }

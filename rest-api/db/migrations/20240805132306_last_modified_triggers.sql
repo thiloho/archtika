@@ -97,5 +97,5 @@ DROP TRIGGER update_legal_information_last_modified ON internal.legal_informatio
 
 DROP TRIGGER update_collab_last_modified ON internal.collab;
 
-DROP FUNCTION internal.update_last_modified ();
+DROP FUNCTION internal.update_last_modified;
 

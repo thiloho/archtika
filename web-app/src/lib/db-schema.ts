@@ -438,19 +438,21 @@ export interface User {
   id: string;
   username: string;
   password_hash: string;
-  role: string;
+  user_role: string;
+  max_number_websites: number;
   created_at: Date;
 }
 export interface UserInput {
   id?: string;
   username: string;
   password_hash: string;
-  role?: string;
+  user_role?: string;
+  max_number_websites?: number;
   created_at?: Date;
 }
 const user = {
   tableName: "user",
-  columns: ["id", "username", "password_hash", "role", "created_at"],
+  columns: ["id", "username", "password_hash", "user_role", "max_number_websites", "created_at"],
   requiredForInsert: ["username", "password_hash"],
   primaryKey: "id",
   foreignKeys: {},
@@ -464,6 +466,7 @@ export interface Website {
   user_id: string;
   content_type: string;
   title: string;
+  max_storage_size: number;
   is_published: boolean;
   created_at: Date;
   last_modified_at: Date;
@@ -474,6 +477,7 @@ export interface WebsiteInput {
   user_id?: string;
   content_type: string;
   title: string;
+  max_storage_size?: number;
   is_published?: boolean;
   created_at?: Date;
   last_modified_at?: Date;
@@ -486,6 +490,7 @@ const website = {
     "user_id",
     "content_type",
     "title",
+    "max_storage_size",
     "is_published",
     "created_at",
     "last_modified_at",

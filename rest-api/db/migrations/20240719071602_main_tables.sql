@@ -9,9 +9,15 @@ CREATE ROLE anon NOLOGIN NOINHERIT;
 
 CREATE ROLE authenticated_user NOLOGIN NOINHERIT;
 
+CREATE ROLE administrator NOLOGIN;
+
 GRANT anon TO authenticator;
 
 GRANT authenticated_user TO authenticator;
+
+GRANT administrator TO authenticator;
+
+GRANT authenticated_user TO administrator;
 
 GRANT USAGE ON SCHEMA api TO anon;
 
@@ -25,7 +31,8 @@ CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3),
   password_hash CHAR(60) NOT NULL,
-  role NAME NOT NULL DEFAULT 'authenticated_user',
+  user_role NAME NOT NULL DEFAULT 'authenticated_user',
+  max_number_websites INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_number_user') ::INT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP()
 );
 
@@ -34,6 +41,7 @@ CREATE TABLE internal.website (
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
+  max_storage_size INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_storage_size') ::INT,
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
@@ -84,7 +92,7 @@ CREATE TABLE internal.docs_category (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
-  category_weight INTEGER CHECK (category_weight >= 0) NOT NULL,
+  category_weight INT CHECK (category_weight >= 0) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
@@ -103,7 +111,7 @@ CREATE TABLE internal.article (
   publication_date DATE,
   main_content VARCHAR(200000) CHECK (TRIM(main_content) != ''),
   category UUID REFERENCES internal.docs_category (id) ON DELETE SET NULL,
-  article_weight INTEGER CHECK (article_weight IS NULL OR article_weight >= 0),
+  article_weight INT CHECK (article_weight IS NULL OR article_weight >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
@@ -128,7 +136,7 @@ CREATE TABLE internal.legal_information (
 CREATE TABLE internal.collab (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE,
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE,
-  permission_level INTEGER CHECK (permission_level IN (10, 20, 30)) NOT NULL DEFAULT 10,
+  permission_level INT CHECK (permission_level IN (10, 20, 30)) NOT NULL DEFAULT 10,
   added_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
@@ -165,6 +173,8 @@ DROP SCHEMA internal;
 DROP ROLE anon;
 
 DROP ROLE authenticated_user;
+
+DROP ROLE administrator;
 
 DROP ROLE authenticator;
 

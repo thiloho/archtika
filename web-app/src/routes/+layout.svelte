@@ -53,6 +53,11 @@
   {/if}
   <ul class="link-wrapper unpadded">
     {#if data.user}
+      {#if data.user.user_role === "administrator"}
+        <li>
+          <a href="/manage">Manage</a>
+        </li>
+      {/if}
       <li>
         <a href="/account">Account</a>
       </li>

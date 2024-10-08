@@ -46,8 +46,7 @@
         <a href="#publication-status">Publication status</a>
       </h2>
       <p>
-        Your website is published at:
-        <br />
+        Your website is published at:<br />
         <a href={data.websiteProdUrl}>{data.websiteProdUrl}</a>
       </p>
     </section>

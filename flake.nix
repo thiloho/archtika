@@ -67,8 +67,12 @@
             type = "app";
             program = "${pkgs.writeShellScriptBin "api-setup" ''
               JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
+              WEBSITE_MAX_STORAGE_SIZE=100
+              WEBSITE_MAX_NUMBER_USER=3
 
               ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
+              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_storage_size\" TO $WEBSITE_MAX_STORAGE_SIZE"
+              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_number_user\" TO $WEBSITE_MAX_NUMBER_USER"
 
               ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${self.outPath}/rest-api/db/migrations up
 

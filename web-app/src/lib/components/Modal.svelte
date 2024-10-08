@@ -51,8 +51,7 @@
     background-color: var(--bg-primary);
     border-radius: var(--border-radius);
     border: var(--border-primary);
-    inline-size: var(--modal-width);
-    max-inline-size: 100%;
+    inline-size: min(var(--modal-width), 100%);
     max-block-size: calc(100vh - var(--space-m));
     overflow-y: auto;
     z-index: 20;

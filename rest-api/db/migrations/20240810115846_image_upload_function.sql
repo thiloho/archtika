@@ -9,7 +9,7 @@ DECLARE
   _mimetype TEXT := _headers ->> 'x-mimetype';
   _original_filename TEXT := _headers ->> 'x-original-filename';
   _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/gif', 'image/svg+xml'];
-  _max_file_size INT := 5 * 1024 * 1024;
+  _max_file_size BIGINT := 5 * 1024 * 1024;
   _has_access BOOLEAN;
 BEGIN
   _has_access = internal.user_has_website_access (_website_id, 20);
@@ -24,7 +24,7 @@ BEGIN
     USING message = 'Invalid MIME type. Allowed types are: png, jpg, webp, avif, gif, svg';
   ELSIF OCTET_LENGTH($1) > _max_file_size THEN
     RAISE program_limit_exceeded
-    USING message = FORMAT('File size exceeds the maximum limit of %s MB', _max_file_size / (1024 * 1024));
+    USING message = FORMAT('File size exceeds the maximum limit of %s', PG_SIZE_PRETTY(_max_file_size));
   ELSE
     INSERT INTO internal.media (website_id, blob, mimetype, original_name)
       VALUES (_website_id, $1, _mimetype, _original_filename)
@@ -70,16 +70,16 @@ $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION api.upload_file (BYTEA) TO authenticated_user;
+GRANT EXECUTE ON FUNCTION api.upload_file TO authenticated_user;
 
-GRANT EXECUTE ON FUNCTION api.retrieve_file (UUID) TO anon;
+GRANT EXECUTE ON FUNCTION api.retrieve_file TO anon;
 
-GRANT EXECUTE ON FUNCTION api.retrieve_file (UUID) TO authenticated_user;
+GRANT EXECUTE ON FUNCTION api.retrieve_file TO authenticated_user;
 
 -- migrate:down
-DROP FUNCTION api.upload_file (BYTEA);
+DROP FUNCTION api.upload_file;
 
-DROP FUNCTION api.retrieve_file (UUID);
+DROP FUNCTION api.retrieve_file;
 
 DROP DOMAIN "*/*";
 
