@@ -1,12 +1,13 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { apiRequest } from "$lib/server/utils";
+import type { Website, User } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ fetch }) => {
-  const allUsers = (
+  const usersWithWebsites: (User & { website: Website[] })[] = (
     await apiRequest(
       fetch,
-      `${API_BASE_PREFIX}/all_user_websites?order=user_created_at.desc`,
+      `${API_BASE_PREFIX}/user?select=*,website!user_id(*)&order=created_at`,
       "GET",
       {
         returnData: true
@@ -15,7 +16,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
   ).data;
 
   return {
-    allUsers,
+    usersWithWebsites,
     API_BASE_PREFIX
   };
 };
@@ -38,8 +39,6 @@ export const actions: Actions = {
   },
   updateStorageLimit: async ({ request, fetch }) => {
     const data = await request.formData();
-
-    console.log(`${API_BASE_PREFIX}/website?id=eq.${data.get("website-id")}`);
 
     return await apiRequest(
       fetch,

@@ -52,6 +52,15 @@
     postgresql = {
       enable = true;
       package = pkgs.postgresql_16;
+      /*
+        PL/Perl:
+        overrideAttrs (
+          finalAttrs: previousAttrs: {
+            buildInputs = previousAttrs.buildInputs ++ [ pkgs.perl ];
+            configureFlags = previousAttrs.configureFlags ++ [ "--with-perl" ];
+          }
+        );
+      */
       ensureDatabases = [ "archtika" ];
       authentication = lib.mkForce ''
         local all all trust

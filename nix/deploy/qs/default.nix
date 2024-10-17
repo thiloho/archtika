@@ -15,6 +15,10 @@
     acmeEmail = "thilo.hohlt@tutanota.com";
     dnsProvider = "porkbun";
     dnsEnvironmentFile = /var/lib/porkbun.env;
-    disableRegistration = true;
+    settings = {
+      disableRegistration = true;
+      maxWebsiteStorageSize = 250;
+      maxUserWebsites = 3;
+    };
   };
 }

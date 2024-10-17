@@ -6,12 +6,14 @@
     websiteOverview,
     isDocsTemplate,
     isIndexPage,
-    apiUrl
+    apiUrl,
+    isLegalPage
   }: {
     websiteOverview: WebsiteOverview;
     isDocsTemplate: boolean;
     isIndexPage: boolean;
     apiUrl: string;
+    isLegalPage?: boolean;
   } = $props();
 
   const categorizedArticles = Object.fromEntries(
@@ -70,7 +72,10 @@
         </ul>
       </section>
     {/if}
-    <svelte:element this={isIndexPage ? "span" : "a"} href="..">
+    <svelte:element
+      this={isIndexPage && !isLegalPage ? "span" : "a"}
+      href={`${isLegalPage ? "./" : "../"}`}
+    >
       {#if websiteOverview.header.logo_type === "text"}
         <strong>{websiteOverview.header.logo_text}</strong>
       {:else}

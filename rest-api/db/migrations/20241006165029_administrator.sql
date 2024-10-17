@@ -146,22 +146,6 @@ CREATE TRIGGER _prevent_storage_excess_settings
   FOR EACH ROW
   EXECUTE FUNCTION internal.prevent_website_storage_size_excess ();
 
-CREATE VIEW api.all_user_websites AS
-SELECT
-  u.id AS user_id,
-  u.username,
-  u.created_at AS user_created_at,
-  u.max_number_websites,
-  COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', w.id, 'title', w.title, 'max_storage_size', w.max_storage_size)
-    ORDER BY w.created_at DESC) FILTER (WHERE w.id IS NOT NULL), '[]'::JSONB) AS websites
-FROM
-  internal.user AS u
-  LEFT JOIN internal.website AS w ON u.id = w.user_id
-GROUP BY
-  u.id;
-
-GRANT SELECT ON api.all_user_websites TO administrator;
-
 GRANT UPDATE (max_storage_size) ON internal.website TO administrator;
 
 GRANT UPDATE, DELETE ON internal.user TO administrator;
@@ -192,8 +176,6 @@ DROP TRIGGER _prevent_storage_excess_media ON internal.media;
 DROP TRIGGER _prevent_storage_excess_settings ON internal.settings;
 
 DROP FUNCTION internal.prevent_website_storage_size_excess;
-
-DROP VIEW api.all_user_websites;
 
 REVOKE UPDATE (max_storage_size) ON internal.website FROM administrator;
 

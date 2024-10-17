@@ -44,14 +44,16 @@
           <input type="number" name="article-weight" value={data.article.article_weight} min="0" />
         </label>
 
-        <label>
-          Category:
-          <select name="category">
-            {#each data.categories as { id, category_name }}
-              <option value={id} selected={id === data.article.category}>{category_name}</option>
-            {/each}
-          </select>
-        </label>
+        {#if data.categories.length > 0}
+          <label>
+            Category:
+            <select name="category">
+              {#each data.categories as { id, category_name }}
+                <option value={id} selected={id === data.article.category}>{category_name}</option>
+              {/each}
+            </select>
+          </label>
+        {/if}
       {/if}
 
       <label>

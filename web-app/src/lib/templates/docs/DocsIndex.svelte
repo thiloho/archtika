@@ -26,7 +26,7 @@
   {websiteUrl}
 />
 
-<Nav {websiteOverview} isDocsTemplate={true} isIndexPage={true} {apiUrl} />
+<Nav {websiteOverview} isDocsTemplate={true} isIndexPage={true} {isLegalPage} {apiUrl} />
 
 <header>
   <div class="container">

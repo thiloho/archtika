@@ -38,7 +38,14 @@
     <form method="POST" use:enhance={enhanceForm()}>
       <label>
         Username:
-        <input type="text" name="username" minlength="3" maxlength="16" required />
+        <input
+          type="text"
+          name="username"
+          minlength="3"
+          maxlength="16"
+          pattern="^[a-zA-Z0-9_\-]+$"
+          required
+        />
       </label>
       <label>
         Password:

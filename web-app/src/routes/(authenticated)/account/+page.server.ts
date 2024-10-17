@@ -21,7 +21,7 @@ export const actions: Actions = {
   logout: async ({ cookies }) => {
     cookies.delete("session_token", { path: "/" });
 
-    return { success: true, message: "Successfully logged out" };
+    return { success: true, message: "Successfully logged out, you can refresh the page" };
   },
   deleteAccount: async ({ request, fetch, cookies }) => {
     const data = await request.formData();

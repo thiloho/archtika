@@ -32,7 +32,7 @@
   {websiteUrl}
 />
 
-<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {apiUrl} />
+<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {isLegalPage} {apiUrl} />
 
 <header>
   <div class="container">

@@ -29,7 +29,7 @@ ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-  username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3),
+  username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3 AND username ~ '^[a-zA-Z0-9_-]+$'),
   password_hash CHAR(60) NOT NULL,
   user_role NAME NOT NULL DEFAULT 'authenticated_user',
   max_number_websites INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_number_user') ::INT,

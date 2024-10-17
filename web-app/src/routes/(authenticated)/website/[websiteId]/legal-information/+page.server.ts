@@ -1,7 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
-import { rm } from "node:fs/promises";
-import { join } from "node:path";
 import type { LegalInformation } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ parent, fetch, params }) => {
@@ -57,11 +55,6 @@ export const actions: Actions = {
     if (!deleteLegalInformation.success) {
       return deleteLegalInformation;
     }
-
-    await rm(
-      join("/", "var", "www", "archtika-websites", params.websiteId, "legal-information.html"),
-      { force: true }
-    );
 
     return deleteLegalInformation;
   }

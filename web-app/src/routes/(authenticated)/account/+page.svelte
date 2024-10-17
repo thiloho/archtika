@@ -33,7 +33,7 @@
   </ul>
 </section>
 
-{#if data.storageSizes.data.length > 0}
+{#if (data.storageSizes.data ?? []).length > 0}
   <section id="storage">
     <h2>
       <a href="#storage">Storage</a>

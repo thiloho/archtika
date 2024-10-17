@@ -4,37 +4,24 @@ import { apiRequest } from "$lib/server/utils";
 import type { Settings, Header, Footer } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
-  const globalSettings: Settings = (
-    await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`,
-      "GET",
-      {
-        headers: {
-          Accept: "application/vnd.pgrst.object+json"
-        },
-        returnData: true
-      }
-    )
-  ).data;
-
-  const header: Header = (
-    await apiRequest(fetch, `${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, "GET", {
-      headers: {
-        Accept: "application/vnd.pgrst.object+json"
-      },
+  const [globalSettingsResponse, headerResponse, footerResponse] = await Promise.all([
+    apiRequest(fetch, `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
+      returnData: true
+    }),
+    apiRequest(fetch, `${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
+      returnData: true
+    }),
+    apiRequest(fetch, `${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
       returnData: true
     })
-  ).data;
+  ]);
 
-  const footer: Footer = (
-    await apiRequest(fetch, `${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, "GET", {
-      headers: {
-        Accept: "application/vnd.pgrst.object+json"
-      },
-      returnData: true
-    })
-  ).data;
+  const globalSettings: Settings = globalSettingsResponse.data;
+  const header: Header = headerResponse.data;
+  const footer: Footer = footerResponse.data;
 
   return {
     globalSettings,

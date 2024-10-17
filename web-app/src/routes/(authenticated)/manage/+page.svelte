@@ -32,15 +32,15 @@
         </tr>
       </thead>
       <tbody>
-        {#each data.allUsers as { user_id, user_created_at, username, max_number_websites, websites }}
+        {#each data.usersWithWebsites as { id, created_at, username, max_number_websites, website }}
           <tr>
             <td>
-              <DateTime date={user_created_at} />
+              <DateTime date={created_at} />
             </td>
-            <td>{user_id}</td>
+            <td>{id}</td>
             <td>{username}</td>
             <td>
-              <Modal id="manage-user-{user_id}" text="Manage">
+              <Modal id="manage-user-{id}" text="Manage">
                 <hgroup>
                   <h3>Manage user</h3>
                   <p>User "{username}"</p>
@@ -51,7 +51,7 @@
                   action="?/updateMaxWebsiteAmount"
                   use:enhance={enhanceForm({ reset: false })}
                 >
-                  <input type="hidden" name="user-id" value={user_id} />
+                  <input type="hidden" name="user-id" value={id} />
                   <label>
                     Number of websites allowed:
                     <input
@@ -64,9 +64,9 @@
                   <button type="submit">Submit</button>
                 </form>
 
-                {#if websites.length > 0}
+                {#if website.length > 0}
                   <h4>Websites</h4>
-                  {#each websites as { id, title, max_storage_size }}
+                  {#each website as { id, title, max_storage_size }}
                     <details>
                       <summary>{title}</summary>
                       <div>
@@ -105,7 +105,7 @@
                       action="?/deleteUser"
                       use:enhance={enhanceForm({ closeModal: true })}
                     >
-                      <input type="hidden" name="user-id" value={user_id} />
+                      <input type="hidden" name="user-id" value={id} />
                       <button type="submit">Delete user</button>
                     </form>
                   </div>

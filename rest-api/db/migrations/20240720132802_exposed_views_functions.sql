@@ -26,19 +26,7 @@ CREATE VIEW api.website WITH ( security_invoker = ON
 SELECT
   *
 FROM
-  internal.website AS w
-WHERE
-  w.user_id = (
-    CURRENT_SETTING(
-      'request.jwt.claims', TRUE
-)::JSON ->> 'user_id')::UUID
-  OR w.id IN (
-    SELECT
-      c.website_id
-    FROM
-      internal.collab AS c
-    WHERE
-      c.user_id = (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID);
+  internal.website;
 
 CREATE VIEW api.settings WITH ( security_invoker = ON
 ) AS

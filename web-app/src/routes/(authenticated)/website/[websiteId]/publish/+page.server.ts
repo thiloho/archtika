@@ -5,7 +5,7 @@ import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
 import { type WebsiteOverview, hexToHSL, slugify } from "$lib/utils";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile, chmod, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { render } from "svelte/server";
 import type { Actions, PageServerLoad } from "./$types";
@@ -290,5 +290,20 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
   await writeFile(join(uploadDir, "common.css"), commonStyles);
   await writeFile(join(uploadDir, "scoped.css"), specificStyles);
 
+  await setPermissions(isPreview ? join(uploadDir, "../") : uploadDir);
+
   return { websitePreviewUrl, websiteProdUrl };
+};
+
+const setPermissions = async (dir: string) => {
+  await chmod(dir, 0o777);
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await setPermissions(fullPath);
+    } else {
+      await chmod(fullPath, 0o777);
+    }
+  }
 };
