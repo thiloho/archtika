@@ -7,6 +7,7 @@
   import { enhanceForm } from "$lib/utils";
   import { sending } from "$lib/runes.svelte";
   import DateTime from "$lib/components/DateTime.svelte";
+  import Pagination from "$lib/components/Pagination.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
@@ -18,9 +19,15 @@
 {/if}
 
 <section id="all-users">
-  <h2>
-    <a href="#all-users">All users</a>
-  </h2>
+  <hgroup>
+    <h2>
+      <a href="#all-users">All users</a>
+    </h2>
+    <p>
+      <strong>{data.resultUsersCount.toLocaleString("en", { useGrouping: true })}</strong>
+      <small>result(s)</small>
+    </p>
+  </hgroup>
   <div class="scroll-container">
     <table>
       <thead>
@@ -117,6 +124,7 @@
       </tbody>
     </table>
   </div>
+  <Pagination resultCount={data.resultUsersCount} />
 </section>
 
 <style>

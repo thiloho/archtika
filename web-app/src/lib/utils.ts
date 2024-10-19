@@ -179,6 +179,8 @@ export const enhanceForm = (options?: {
   };
 };
 
+export const PAGINATION_MAX_ITEMS = 20;
+
 export const hexToHSL = (hex: string) => {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;

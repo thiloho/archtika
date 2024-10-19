@@ -11,6 +11,7 @@
   import { enhance } from "$app/forms";
   import { sending } from "$lib/runes.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import Pagination from "$lib/components/Pagination.svelte";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -162,79 +163,9 @@
         </tbody>
       </table>
     </div>
-    <div class="pagination">
-      {#snippet commonFilterInputs()}
-        <input type="hidden" name="user" value={$page.url.searchParams.get("user")} />
-        <input type="hidden" name="resource" value={$page.url.searchParams.get("resource")} />
-        <input type="hidden" name="operation" value={$page.url.searchParams.get("operation")} />
-      {/snippet}
-      <p>
-        {$page.url.searchParams.get("page") ?? 1} / {Math.max(
-          Math.ceil(data.resultChangeLogCount / 20),
-          1
-        )}
-      </p>
-      <form method="GET">
-        <input type="hidden" name="page" value={1} />
-        {@render commonFilterInputs()}
-        <button type="submit" disabled={($page.url.searchParams.get("page") ?? "1") === "1"}
-          >First</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="page"
-          value={Math.max(1, Number.parseInt($page.url.searchParams.get("page") ?? "1") - 1)}
-        />
-        {@render commonFilterInputs()}
-        <button type="submit" disabled={($page.url.searchParams.get("page") ?? "1") === "1"}
-          >Previous</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="page"
-          value={Math.min(
-            Math.max(Math.ceil(data.resultChangeLogCount / 20), 1),
-            Number.parseInt($page.url.searchParams.get("page") ?? "1") + 1
-          )}
-        />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("page") ?? "1") ===
-            Math.max(Math.ceil(data.resultChangeLogCount / 20), 1).toString()}>Next</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="page"
-          value={Math.max(Math.ceil(data.resultChangeLogCount / 20), 1)}
-        />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("page") ?? "1") ===
-            Math.max(Math.ceil(data.resultChangeLogCount / 20), 1).toString()}>Last</button
-        >
-      </form>
-    </div>
+    <Pagination
+      commonFilters={["user", "resource", "operation"]}
+      resultCount={data.resultChangeLogCount}
+    />
   </section>
 </WebsiteEditor>
-
-<style>
-  .pagination {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    justify-content: end;
-  }
-
-  .pagination > form:first-of-type {
-    margin-inline-start: auto;
-  }
-</style>

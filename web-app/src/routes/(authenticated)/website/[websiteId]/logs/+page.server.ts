@@ -2,13 +2,14 @@ import type { PageServerLoad, Actions } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { ChangeLog, User, Collab } from "$lib/db-schema";
 import DiffMatchPatch from "diff-match-patch";
+import { PAGINATION_MAX_ITEMS } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const userFilter = url.searchParams.get("user");
   const resourceFilter = url.searchParams.get("resource");
   const operationFilter = url.searchParams.get("operation");
   const currentPage = Number.parseInt(url.searchParams.get("page") ?? "1");
-  const resultOffset = (currentPage - 1) * 20;
+  const resultOffset = (currentPage - 1) * PAGINATION_MAX_ITEMS;
 
   const searchParams = new URLSearchParams();
 
@@ -26,7 +27,7 @@ export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
     searchParams.append("operation", `eq.${operationFilter.toUpperCase()}`);
   }
 
-  const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=20&offset=${resultOffset}`;
+  const constructedFetchUrl = `${baseFetchUrl}&${searchParams.toString()}&limit=${PAGINATION_MAX_ITEMS}&offset=${resultOffset}`;
 
   const changeLog: (ChangeLog & { user: { username: User["username"] } })[] = (
     await apiRequest(fetch, constructedFetchUrl, "GET", {

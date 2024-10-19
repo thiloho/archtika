@@ -1,13 +1,16 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { API_BASE_PREFIX } from "$lib/server/utils";
-import { apiRequest } from "$lib/server/utils";
+import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { Website, User } from "$lib/db-schema";
+import { PAGINATION_MAX_ITEMS } from "$lib/utils";
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
+  const currentPage = Number.parseInt(url.searchParams.get("page") ?? "1");
+  const resultOffset = (currentPage - 1) * PAGINATION_MAX_ITEMS;
+
   const usersWithWebsites: (User & { website: Website[] })[] = (
     await apiRequest(
       fetch,
-      `${API_BASE_PREFIX}/user?select=*,website!user_id(*)&order=created_at`,
+      `${API_BASE_PREFIX}/user?select=*,website!user_id(*)&order=created_at&limit=${PAGINATION_MAX_ITEMS}&offset=${resultOffset}`,
       "GET",
       {
         returnData: true
@@ -15,9 +18,19 @@ export const load: PageServerLoad = async ({ fetch }) => {
     )
   ).data;
 
+  const resultUsers = await apiRequest(fetch, `${API_BASE_PREFIX}/user`, "HEAD", {
+    headers: {
+      Prefer: "count=exact"
+    },
+    returnData: true
+  });
+
+  const resultUsersCount = Number(resultUsers.data.headers.get("content-range")?.split("/").at(-1));
+
   return {
     usersWithWebsites,
-    API_BASE_PREFIX
+    API_BASE_PREFIX,
+    resultUsersCount
   };
 };
 
