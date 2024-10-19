@@ -119,7 +119,7 @@
         content={data.article.main_content ?? ""}
       />
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
     </form>
   </section>
 </WebsiteEditor>

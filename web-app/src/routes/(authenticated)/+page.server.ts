@@ -1,15 +1,15 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { apiRequest } from "$lib/server/utils";
 import { API_BASE_PREFIX } from "$lib/server/utils";
-import type { Website } from "$lib/db-schema";
+import type { Collab, Website } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ fetch, url, locals }) => {
-  const searchQuery = url.searchParams.get("website_search_query");
-  const filterBy = url.searchParams.get("website_filter");
+  const searchQuery = url.searchParams.get("query");
+  const filterBy = url.searchParams.get("filter");
 
   const params = new URLSearchParams();
 
-  const baseFetchUrl = `${API_BASE_PREFIX}/website?select=*,collab(user_id)&collab.user_id=eq.${locals.user.id}&or=(user_id.eq.${locals.user.id},collab.not.is.null)&order=last_modified_at.desc,created_at.desc`;
+  const baseFetchUrl = `${API_BASE_PREFIX}/website?select=*,collab(user_id,permission_level)&collab.user_id=eq.${locals.user.id}&or=(user_id.eq.${locals.user.id},collab.not.is.null)&order=last_modified_at.desc,created_at.desc`;
 
   if (searchQuery) {
     params.append("title", `wfts.${searchQuery}`);
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ fetch, url, locals }) => {
     totalWebsites.data.headers.get("content-range")?.split("/").at(-1)
   );
 
-  const websites: Website[] = (
+  const websites: (Website & { collab: Collab[] })[] = (
     await apiRequest(fetch, constructedFetchUrl, "GET", {
       returnData: true
     })
@@ -45,7 +45,8 @@ export const load: PageServerLoad = async ({ fetch, url, locals }) => {
 
   return {
     totalWebsiteCount,
-    websites
+    websites,
+    user: locals.user
   };
 };
 

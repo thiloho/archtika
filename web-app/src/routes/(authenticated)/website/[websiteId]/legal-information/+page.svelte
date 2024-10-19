@@ -61,7 +61,7 @@
         content={data.legalInformation?.main_content ?? ""}
       />
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}>Submit</button>
     </form>
 
     {#if data.legalInformation?.main_content}
@@ -76,7 +76,9 @@
             <strong>Caution!</strong>
             This action will remove the legal information page from the website and delete all data.
           </p>
-          <button type="submit">Delete legal information</button>
+          <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+            >Delete legal information</button
+          >
         </form>
       </Modal>
     {/if}

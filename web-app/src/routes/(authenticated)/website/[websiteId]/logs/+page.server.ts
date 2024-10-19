@@ -4,10 +4,10 @@ import type { ChangeLog, User, Collab } from "$lib/db-schema";
 import DiffMatchPatch from "diff-match-patch";
 
 export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
-  const userFilter = url.searchParams.get("logs_filter_user");
-  const resourceFilter = url.searchParams.get("logs_filter_resource");
-  const operationFilter = url.searchParams.get("logs_filter_operation");
-  const currentPage = Number.parseInt(url.searchParams.get("logs_results_page") ?? "1");
+  const userFilter = url.searchParams.get("user");
+  const resourceFilter = url.searchParams.get("resource");
+  const operationFilter = url.searchParams.get("operation");
+  const currentPage = Number.parseInt(url.searchParams.get("page") ?? "1");
   const resultOffset = (currentPage - 1) * 20;
 
   const searchParams = new URLSearchParams();

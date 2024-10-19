@@ -3,7 +3,7 @@ import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import { error } from "@sveltejs/kit";
 import type { Website, Home, User } from "$lib/db-schema";
 
-export const load: LayoutServerLoad = async ({ params, fetch }) => {
+export const load: LayoutServerLoad = async ({ locals, params, fetch }) => {
   const websiteData = await apiRequest(
     fetch,
     `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,user!user_id(username)`,
@@ -31,8 +31,27 @@ export const load: LayoutServerLoad = async ({ params, fetch }) => {
     })
   ).data;
 
+  let permissionLevel = 40;
+
+  if (website.user_id !== locals.user.id) {
+    permissionLevel = (
+      await apiRequest(
+        fetch,
+        `${API_BASE_PREFIX}/collab?select=permission_level&website_id=eq.${params.websiteId}&user_id=eq.${locals.user.id}`,
+        "GET",
+        {
+          headers: {
+            Accept: "application/vnd.pgrst.object+json"
+          },
+          returnData: true
+        }
+      )
+    ).data.permission_level;
+  }
+
   return {
     website,
-    home
+    home,
+    permissionLevel
   };
 };

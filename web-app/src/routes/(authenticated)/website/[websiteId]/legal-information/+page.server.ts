@@ -17,12 +17,13 @@ export const load: PageServerLoad = async ({ parent, fetch, params }) => {
     )
   ).data;
 
-  const { website } = await parent();
+  const { website, permissionLevel } = await parent();
 
   return {
     legalInformation,
     website,
-    API_BASE_PREFIX
+    API_BASE_PREFIX,
+    permissionLevel
   };
 };
 
@@ -57,5 +58,22 @@ export const actions: Actions = {
     }
 
     return deleteLegalInformation;
+  },
+  pasteImage: async ({ request, fetch, params }) => {
+    const data = await request.formData();
+    const file = data.get("file") as File;
+
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/upload_file`, "POST", {
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Accept: "application/vnd.pgrst.object+json",
+        "X-Website-Id": params.websiteId,
+        "X-Mimetype": file.type,
+        "X-Original-Filename": file.name
+      },
+      body: await file.arrayBuffer(),
+      successMessage: "Successfully uploaded image",
+      returnData: true
+    });
   }
 };

@@ -57,8 +57,8 @@
           Username:
           <input
             list="users-{data.website.id}"
-            name="logs_filter_user"
-            value={$page.url.searchParams.get("logs_filter_user")}
+            name="user"
+            value={$page.url.searchParams.get("user")}
           />
           <datalist id="users-{data.website.id}">
             <option value={data.website.user.username}></option>
@@ -69,39 +69,32 @@
         </label>
         <label>
           Resource:
-          <select name="logs_filter_resource">
+          <select name="resource">
             <option value="all">Show all</option>
             {#each Object.keys(resources) as resource}
               <option
                 value={resource}
-                selected={resource === $page.url.searchParams.get("logs_filter_resource")}
-                >{resource}</option
+                selected={resource === $page.url.searchParams.get("resource")}>{resource}</option
               >
             {/each}
           </select>
         </label>
         <label>
           Operation:
-          <select name="logs_filter_operation">
+          <select name="operation">
             <option value="all">Show all</option>
-            <option
-              value="insert"
-              selected={"insert" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="insert" selected={"insert" === $page.url.searchParams.get("operation")}
               >Insert</option
             >
-            <option
-              value="update"
-              selected={"update" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="update" selected={"update" === $page.url.searchParams.get("operation")}
               >Update</option
             >
-            <option
-              value="delete"
-              selected={"delete" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="delete" selected={"delete" === $page.url.searchParams.get("operation")}
               >Delete</option
             >
           </select>
         </label>
-        <input type="hidden" name="logs_results_page" value={1} />
+        <input type="hidden" name="page" value={1} />
         <button type="submit">Submit</button>
       </form>
     </details>
@@ -112,7 +105,7 @@
             <th>User</th>
             <th>Resource</th>
             <th>Operation</th>
-            <th>Date and time</th>
+            <th>Date & Time</th>
             <th>Changes</th>
           </tr>
         </thead>
@@ -171,78 +164,60 @@
     </div>
     <div class="pagination">
       {#snippet commonFilterInputs()}
-        <input
-          type="hidden"
-          name="logs_filter_user"
-          value={$page.url.searchParams.get("logs_filter_user")}
-        />
-        <input
-          type="hidden"
-          name="logs_filter_resource"
-          value={$page.url.searchParams.get("logs_filter_resource")}
-        />
-        <input
-          type="hidden"
-          name="logs_filter_operation"
-          value={$page.url.searchParams.get("logs_filter_operation")}
-        />
+        <input type="hidden" name="user" value={$page.url.searchParams.get("user")} />
+        <input type="hidden" name="resource" value={$page.url.searchParams.get("resource")} />
+        <input type="hidden" name="operation" value={$page.url.searchParams.get("operation")} />
       {/snippet}
       <p>
-        {$page.url.searchParams.get("logs_results_page") ?? 1} / {Math.max(
+        {$page.url.searchParams.get("page") ?? 1} / {Math.max(
           Math.ceil(data.resultChangeLogCount / 20),
           1
         )}
       </p>
       <form method="GET">
-        <input type="hidden" name="logs_results_page" value={1} />
+        <input type="hidden" name="page" value={1} />
         {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}>First</button
+        <button type="submit" disabled={($page.url.searchParams.get("page") ?? "1") === "1"}
+          >First</button
         >
       </form>
       <form method="GET">
         <input
           type="hidden"
-          name="logs_results_page"
-          value={Math.max(
-            1,
-            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") - 1
-          )}
+          name="page"
+          value={Math.max(1, Number.parseInt($page.url.searchParams.get("page") ?? "1") - 1)}
         />
         {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
+        <button type="submit" disabled={($page.url.searchParams.get("page") ?? "1") === "1"}
           >Previous</button
         >
       </form>
       <form method="GET">
         <input
           type="hidden"
-          name="logs_results_page"
+          name="page"
           value={Math.min(
             Math.max(Math.ceil(data.resultChangeLogCount / 20), 1),
-            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") + 1
+            Number.parseInt($page.url.searchParams.get("page") ?? "1") + 1
           )}
         />
         {@render commonFilterInputs()}
         <button
           type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+          disabled={($page.url.searchParams.get("page") ?? "1") ===
             Math.max(Math.ceil(data.resultChangeLogCount / 20), 1).toString()}>Next</button
         >
       </form>
       <form method="GET">
         <input
           type="hidden"
-          name="logs_results_page"
+          name="page"
           value={Math.max(Math.ceil(data.resultChangeLogCount / 20), 1)}
         />
         {@render commonFilterInputs()}
         <button
           type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
+          disabled={($page.url.searchParams.get("page") ?? "1") ===
             Math.max(Math.ceil(data.resultChangeLogCount / 20), 1).toString()}>Last</button
         >
       </form>
@@ -261,10 +236,5 @@
 
   .pagination > form:first-of-type {
     margin-inline-start: auto;
-  }
-
-  button:disabled {
-    pointer-events: none;
-    color: hsl(0 0% 50%);
   }
 </style>

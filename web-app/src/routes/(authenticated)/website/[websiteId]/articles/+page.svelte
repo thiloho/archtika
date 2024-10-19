@@ -40,7 +40,7 @@
           <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
         </label>
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
       </form>
     </Modal>
   </section>
@@ -56,26 +56,20 @@
         <form method="GET">
           <label>
             Search:
-            <input
-              type="text"
-              name="article_search_query"
-              value={$page.url.searchParams.get("article_search_query")}
-            />
+            <input type="text" name="query" value={$page.url.searchParams.get("query")} />
           </label>
           <label>
             Filter:
-            <select name="article_filter">
-              <option value="all" selected={"all" === $page.url.searchParams.get("article_filter")}
+            <select name="filter">
+              <option value="all" selected={"all" === $page.url.searchParams.get("filter")}
                 >Show all</option
               >
               <option
                 value="creations"
-                selected={"creations" === $page.url.searchParams.get("article_filter")}
+                selected={"creations" === $page.url.searchParams.get("filter")}
                 >Created by you</option
               >
-              <option
-                value="shared"
-                selected={"shared" === $page.url.searchParams.get("article_filter")}
+              <option value="shared" selected={"shared" === $page.url.searchParams.get("filter")}
                 >Created by others</option
               >
             </select>
@@ -85,7 +79,7 @@
       </details>
 
       <ul class="unpadded">
-        {#each data.articles as { id, title, article_weight, docs_category } (id)}
+        {#each data.articles as { id, user_id, title, article_weight, docs_category } (id)}
           <li class="article-card">
             <p>
               <strong>{title} {article_weight ? `(${article_weight})` : ""}</strong>
@@ -129,7 +123,12 @@
                 >
                   <input type="hidden" name="id" value={id} />
 
-                  <button type="submit">Delete article</button>
+                  <button
+                    type="submit"
+                    disabled={data.permissionLevel === 10 ||
+                      (data.permissionLevel === 20 && user_id !== data.user.id)}
+                    >Delete article</button
+                  >
                 </form>
               </Modal>
             </div>

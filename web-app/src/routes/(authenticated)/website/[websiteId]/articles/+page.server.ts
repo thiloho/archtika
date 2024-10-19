@@ -4,12 +4,12 @@ import { apiRequest } from "$lib/server/utils";
 import type { Article, DocsCategory } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch, url, parent, locals }) => {
-  const searchQuery = url.searchParams.get("article_search_query");
-  const filterBy = url.searchParams.get("article_filter");
+  const searchQuery = url.searchParams.get("query");
+  const filterBy = url.searchParams.get("filter");
 
-  const { website, home } = await parent();
+  const { website, home, permissionLevel } = await parent();
 
-  let baseFetchUrl = `${API_BASE_PREFIX}/article?website_id=eq.${params.websiteId}&select=id,title`;
+  let baseFetchUrl = `${API_BASE_PREFIX}/article?website_id=eq.${params.websiteId}&select=id,user_id,title`;
   if (website.content_type === "Docs") {
     baseFetchUrl +=
       ",article_weight,docs_category(category_name,category_weight)&order=docs_category(category_weight).desc.nullslast,article_weight.desc.nullslast";
@@ -56,7 +56,9 @@ export const load: PageServerLoad = async ({ params, fetch, url, parent, locals 
     totalArticleCount,
     articles,
     website,
-    home
+    home,
+    permissionLevel,
+    user: locals.user
   };
 };
 

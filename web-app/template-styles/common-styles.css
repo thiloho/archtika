@@ -105,6 +105,12 @@ label[for="toggle-theme"] svg:last-of-type {
   background-color: var(--bg-tertiary);
 }
 
+button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: -10;
+}
+
 :is(button, input, textarea, select, a, summary, pre):focus,
 :is(#toggle-mobile-preview, #toggle-sidebar):checked + label {
   outline: 0.125rem solid var(--color-accent);

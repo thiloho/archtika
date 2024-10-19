@@ -154,6 +154,10 @@ test.describe.serial("Collaborator tests", () => {
 
       test("Update website", async ({ page }) => {
         await page.locator("li").filter({ hasText: "Blog" }).getByRole("button").first().click();
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -164,11 +168,18 @@ test.describe.serial("Collaborator tests", () => {
       });
       test("Delete website", async ({ page }) => {
         await page.locator("li").filter({ hasText: "Blog" }).getByRole("button").nth(1).click();
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Delete website" }).click();
         await expect(page.getByText("Insufficient permissions")).toBeVisible();
       });
       test("Update Global", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
+        await page
+          .locator('#global button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.locator("#global").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -179,6 +190,9 @@ test.describe.serial("Collaborator tests", () => {
       });
       test("Update Header", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
+        await page
+          .locator('#header button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.locator("#header").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -191,6 +205,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByLabel("Description:").click();
         await page.getByLabel("Description:").fill("Description");
+        await page
+          .locator('#home button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.locator("#home").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -201,6 +218,9 @@ test.describe.serial("Collaborator tests", () => {
       });
       test("Update Footer", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
+        await page
+          .locator('#footer button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.locator("#footer").getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -215,6 +235,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Create article" }).click();
         await page.getByLabel("Title:").click();
         await page.getByLabel("Title:").fill(`Article-${permissionLevel}`);
+        await page
+          .locator('form[action="?/createArticle"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -237,6 +260,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByLabel("Author:").fill("Author");
         await page.getByLabel("Main content:").click();
         await page.getByLabel("Main content:").fill("## Main content");
+        await page
+          .locator('form button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -253,6 +279,10 @@ test.describe.serial("Collaborator tests", () => {
           .filter({ hasText: `Article-${permissionLevel}` })
           .getByRole("button")
           .click();
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Delete article" }).click();
 
         if (permissionLevel === 10) {
@@ -262,6 +292,10 @@ test.describe.serial("Collaborator tests", () => {
           await expect(page.getByText("Successfully deleted article")).toBeVisible();
 
           await page.locator("li").filter({ hasText: `Article-10` }).getByRole("button").click();
+          const modalName = page.url().split("#")[1];
+          await page
+            .locator(`div[id="${modalName}"] button[type="submit"]`)
+            .evaluate((node) => node.removeAttribute("disabled"));
           await page.getByRole("button", { name: "Delete article" }).click();
 
           if (permissionLevel === 20) {
@@ -277,6 +311,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("button", { name: "Add collaborator" }).click();
         await page.getByLabel("Username:").click();
         await page.getByLabel("Username:").fill(collabUsername4);
+        await page
+          .locator('form[action="?/addCollaborator"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -295,6 +332,10 @@ test.describe.serial("Collaborator tests", () => {
           .first()
           .click();
         await page.getByRole("combobox").selectOption("20");
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Update collaborator" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -322,6 +363,10 @@ test.describe.serial("Collaborator tests", () => {
           .getByRole("button")
           .nth(1)
           .click();
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Remove collaborator" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -344,16 +389,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Legal information" }).click();
         await page.getByLabel("Main content:").click();
         await page.getByLabel("Main content:").fill("## Content");
-        await page.getByRole("button", { name: "Submit" }).click();
-
-        if (permissionLevel === 30) {
-          await expect(page.getByText("Successfully created/updated legal")).toBeVisible();
-        } else {
-          await expect(page.getByText("Insufficient permissions")).toBeVisible();
-        }
-
-        await page.getByLabel("Main content:").click();
-        await page.getByLabel("Main content:").fill("## Content updated");
+        await page
+          .locator('form[action="?/createUpdateLegalInformation"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 30) {
@@ -370,6 +408,9 @@ test.describe.serial("Collaborator tests", () => {
           .click();
         await page.getByRole("link", { name: "Legal information" }).click();
         await page.getByRole("button", { name: "Delete" }).click();
+        await page
+          .locator('form[action="?/deleteLegalInformation"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Delete legal information" }).click();
 
         if (permissionLevel === 30) {
@@ -386,6 +427,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByLabel("Name:").nth(0).fill(`Category-${permissionLevel}`);
         await page.getByRole("spinbutton", { name: "Weight:" }).click();
         await page.getByRole("spinbutton", { name: "Weight:" }).fill(permissionLevel.toString());
+        await page
+          .locator('form[action="?/createCategory"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if (permissionLevel === 10) {
@@ -407,6 +451,10 @@ test.describe.serial("Collaborator tests", () => {
         await page
           .getByRole("spinbutton", { name: "Weight:" })
           .fill((permissionLevel * 2).toString());
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Update category" }).click();
 
         if (permissionLevel === 10) {
@@ -424,6 +472,10 @@ test.describe.serial("Collaborator tests", () => {
           .getByRole("button")
           .nth(1)
           .click();
+        const modalName = page.url().split("#")[1];
+        await page
+          .locator(`div[id="${modalName}"] button[type="submit"]`)
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Delete category" }).click();
 
         if (permissionLevel === 10) {
@@ -438,6 +490,10 @@ test.describe.serial("Collaborator tests", () => {
             .getByRole("button")
             .nth(1)
             .click();
+          const modalName = page.url().split("#")[1];
+          await page
+            .locator(`div[id="${modalName}"] button[type="submit"]`)
+            .evaluate((node) => node.removeAttribute("disabled"));
           await page.getByRole("button", { name: "Delete category" }).click();
 
           if (permissionLevel === 20) {
@@ -450,6 +506,9 @@ test.describe.serial("Collaborator tests", () => {
       test("Publish website", async ({ page }) => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Publish" }).click();
+        await page
+          .locator('form[action="?/publishWebsite"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Publish" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -468,6 +527,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.keyboard.press(`${modifier}+A`);
         await page.keyboard.press(`Backspace`);
         await page.getByLabel("Prefix:").fill(customPrefix2);
+        await page
+          .locator('form[action="?/createUpdateCustomDomainPrefix"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Submit" }).click();
 
         if ([10, 20].includes(permissionLevel)) {
@@ -480,6 +542,9 @@ test.describe.serial("Collaborator tests", () => {
         await page.getByRole("link", { name: "Blog" }).click();
         await page.getByRole("link", { name: "Publish" }).click();
         await page.getByRole("button", { name: "Delete" }).click();
+        await page
+          .locator('form[action="?/deleteCustomDomainPrefix"] button[type="submit"]')
+          .evaluate((node) => node.removeAttribute("disabled"));
         await page.getByRole("button", { name: "Delete domain prefix" }).click();
 
         if ([10, 20].includes(permissionLevel)) {

@@ -10,7 +10,6 @@
   import { sending } from "$lib/runes.svelte";
   import MarkdownEditor from "$lib/components/MarkdownEditor.svelte";
   import { previewContent } from "$lib/runes.svelte";
-
   const { data, form }: { data: PageServerData & LayoutServerData; form: ActionData } = $props();
 
   previewContent.value = data.home.main_content;
@@ -96,7 +95,7 @@
         {/if}
       </div>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
     </form>
   </section>
 
@@ -143,7 +142,7 @@
         {/if}
       </div>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
     </form>
   </section>
 
@@ -166,7 +165,7 @@
         content={data.home.main_content}
       />
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
     </form>
   </section>
 
@@ -183,7 +182,7 @@
         >
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
     </form>
   </section>
 </WebsiteEditor>

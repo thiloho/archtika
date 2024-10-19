@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { render } from "svelte/server";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, parent }) => {
   const websiteOverview: WebsiteOverview = (
     await apiRequest(
       fetch,
@@ -27,10 +27,13 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
   const { websitePreviewUrl, websiteProdUrl } = await generateStaticFiles(websiteOverview);
 
+  const { permissionLevel } = await parent();
+
   return {
     websiteOverview,
     websitePreviewUrl,
-    websiteProdUrl
+    websiteProdUrl,
+    permissionLevel
   };
 };
 

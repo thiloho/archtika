@@ -44,7 +44,7 @@
           <input name="category-weight" type="number" min="0" required />
         </label>
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
       </form>
     </Modal>
   </section>
@@ -56,7 +56,7 @@
       </h2>
 
       <ul class="unpadded">
-        {#each data.categories as { id, website_id, category_name, category_weight } (`${website_id}-${id}`)}
+        {#each data.categories as { id, website_id, user_id, category_name, category_weight } (`${website_id}-${id}`)}
           <li class="category-card">
             <p>
               <strong>{category_name} ({category_weight})</strong>
@@ -89,7 +89,9 @@
                     <input type="number" name="category-weight" value={category_weight} min="0" />
                   </label>
 
-                  <button type="submit">Update category</button>
+                  <button type="submit" disabled={data.permissionLevel === 10}
+                    >Update category</button
+                  >
                 </form>
               </Modal>
               <Modal id="delete-category-{id}" text="Delete">
@@ -104,7 +106,12 @@
                 >
                   <input type="hidden" name="category-id" value={id} />
 
-                  <button type="submit">Delete category</button>
+                  <button
+                    type="submit"
+                    disabled={data.permissionLevel === 10 ||
+                      (data.permissionLevel === 20 && user_id !== data.user.id)}
+                    >Delete category</button
+                  >
                 </form>
               </Modal>
             </div>

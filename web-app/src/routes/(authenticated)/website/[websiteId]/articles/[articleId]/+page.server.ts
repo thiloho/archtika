@@ -23,9 +23,9 @@ export const load: PageServerLoad = async ({ parent, params, fetch }) => {
     )
   ).data;
 
-  const { website } = await parent();
+  const { website, permissionLevel } = await parent();
 
-  return { website, article, categories, API_BASE_PREFIX };
+  return { website, article, categories, API_BASE_PREFIX, permissionLevel };
 };
 
 export const actions: Actions = {
