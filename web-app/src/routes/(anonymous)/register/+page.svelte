@@ -52,7 +52,7 @@
         <input type="password" name="password" minlength="12" maxlength="128" required />
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit">Register</button>
     </form>
 
     <details>

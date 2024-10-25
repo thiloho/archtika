@@ -32,6 +32,7 @@ input,
 button,
 textarea,
 select,
+input[type="file"]::file-selector-button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
 label[for="toggle-sidebar"],
@@ -59,6 +60,11 @@ input[type="file"] {
   inline-size: 100%;
 }
 
+input[type="file"]::file-selector-button {
+  padding-block: calc(var(--space-3xs) / 4);
+  margin-inline-end: var(--space-2xs);
+}
+
 input[type="color"] {
   padding: 0;
 }
@@ -73,6 +79,7 @@ summary {
 }
 
 button,
+input[type="file"]::file-selector-button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
 label[for="toggle-sidebar"],
@@ -226,12 +233,14 @@ pre {
   flex-shrink: 0;
 }
 
-code {
+code,
+kbd {
   font-family: monospace;
   font-size: var(--font-size--1);
 }
 
-:not(pre) > code {
+:not(pre) > code,
+kbd {
   background-color: var(--bg-secondary);
   border: var(--border-primary);
   padding-inline: var(--space-3xs);
@@ -276,6 +285,16 @@ ins {
 del {
   background-color: var(--color-error);
   color: var(--color-text-invert);
+}
+
+blockquote {
+  border-inline-start: var(--border-primary);
+  border-width: 0.25rem;
+  padding-inline-start: var(--space-xs);
+}
+
+meter {
+  inline-size: min(512px, 100%);
 }
 
 .hljs {

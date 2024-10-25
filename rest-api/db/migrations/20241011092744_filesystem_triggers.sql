@@ -5,27 +5,29 @@ CREATE FUNCTION internal.cleanup_filesystem ()
 DECLARE
   _website_id UUID;
   _domain_prefix VARCHAR(16);
+  _base_path CONSTANT TEXT := '/var/www/archtika-websites/';
+  _preview_path TEXT;
+  _prod_path TEXT;
 BEGIN
   IF TG_TABLE_NAME = 'website' THEN
     _website_id := OLD.id;
-    SELECT
-      d.prefix INTO _domain_prefix
-    FROM
-      internal.domain_prefix AS d
-    WHERE
-      d.website_id = _website_id;
-    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf /var/www/archtika-websites/previews/%s''', _website_id);
-    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf /var/www/archtika-websites/%s''', COALESCE(_domain_prefix, _website_id::VARCHAR));
   ELSE
     _website_id := OLD.website_id;
-    SELECT
-      d.prefix INTO _domain_prefix
-    FROM
-      internal.domain_prefix AS d
-    WHERE
-      d.website_id = _website_id;
-    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf /var/www/archtika-websites/previews/%s/legal-information.html''', _website_id);
-    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf /var/www/archtika-websites/%s/legal-information.html''', COALESCE(_domain_prefix, _website_id::VARCHAR));
+  END IF;
+  SELECT
+    d.prefix INTO _domain_prefix
+  FROM
+    internal.domain_prefix d
+  WHERE
+    d.website_id = _website_id;
+  _preview_path := _base_path || 'previews/' || _website_id;
+  _prod_path := _base_path || COALESCE(_domain_prefix, _website_id::TEXT);
+  IF TG_TABLE_NAME = 'website' THEN
+    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf %s''', _preview_path);
+    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -rf %s''', _prod_path);
+  ELSE
+    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -f %s/legal-information.html''', _preview_path);
+    EXECUTE FORMAT('COPY (SELECT '''') TO PROGRAM ''rm -f %s/legal-information.html''', _prod_path);
   END IF;
   RETURN OLD;
 END;

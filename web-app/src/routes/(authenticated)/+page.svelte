@@ -39,7 +39,7 @@
         <input type="text" name="title" maxlength="50" pattern="\S(.*\S)?" required />
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit">Create website</button>
     </form>
   </Modal>
 </section>
@@ -72,7 +72,7 @@
             >
           </select>
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit">Apply</button>
       </form>
     </details>
 
@@ -105,7 +105,7 @@
               >
                 <input type="hidden" name="id" value={id} />
                 <label>
-                  Title
+                  Title:
                   <input
                     type="text"
                     name="title"
@@ -119,7 +119,7 @@
                 <button
                   type="submit"
                   disabled={data.user.id !== user_id && collab[0].permission_level !== 30}
-                  >Submit</button
+                  >Update website</button
                 >
               </form>
             </Modal>

@@ -68,7 +68,6 @@ export const actions: Actions = {
         "Content-Type": "application/octet-stream",
         Accept: "application/vnd.pgrst.object+json",
         "X-Website-Id": params.websiteId,
-        "X-Mimetype": file.type,
         "X-Original-Filename": file.name
       },
       body: await file.arrayBuffer(),

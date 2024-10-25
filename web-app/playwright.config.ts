@@ -9,15 +9,36 @@ const config: PlaywrightTestConfig = {
     baseURL: "http://localhost:4173",
     video: "retain-on-failure"
   },
-  testDir: "tests",
+  testDir: "./tests",
   testMatch: /(.+\.)?(test|spec)\.ts/,
-  retries: 3,
-  // Firefox and Webkit are not packaged yet, see https://github.com/NixOS/nixpkgs/issues/288826
+  // https://github.com/NixOS/nixpkgs/issues/288826
   projects: [
     {
+      name: "Register users",
+      testMatch: /global-setup\.ts/,
+      teardown: "Delete users"
+    },
+    {
+      name: "Delete users",
+      testMatch: /global-teardown\.ts/
+    },
+    {
       name: "Chromium",
-      use: { ...devices["Desktop Chrome"] }
+      use: { ...devices["Desktop Chrome"] },
+      dependencies: ["Register users"]
+    },
+    {
+      name: "Firefox",
+      use: { ...devices["Desktop Firefox"] },
+      dependencies: ["Register users"]
     }
+    /*
+    Upstream bug "Error: browserContext.newPage: Target page, context or browser has been closed"
+    {
+      name: "Webkit",
+      use: { ...devices["Desktop Safari"] },
+      dependencies: ["Register users"]
+    } */
   ]
 };
 

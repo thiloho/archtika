@@ -6,13 +6,31 @@ AS $$
 DECLARE
   _headers JSON := CURRENT_SETTING('request.headers', TRUE)::JSON;
   _website_id UUID := (_headers ->> 'x-website-id')::UUID;
-  _mimetype TEXT := _headers ->> 'x-mimetype';
   _original_filename TEXT := _headers ->> 'x-original-filename';
   _allowed_mimetypes TEXT[] := ARRAY['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/gif', 'image/svg+xml'];
   _max_file_size BIGINT := 5 * 1024 * 1024;
   _has_access BOOLEAN;
+  _mimetype TEXT;
 BEGIN
   _has_access = internal.user_has_website_access (_website_id, 20);
+  _mimetype := CASE WHEN SUBSTRING($1 FROM 1 FOR 8) = '\x89504E470D0A1A0A'::BYTEA THEN
+    'image/png'
+  WHEN SUBSTRING($1 FROM 1 FOR 3) = '\xFFD8FF'::BYTEA THEN
+    'image/jpeg'
+  WHEN SUBSTRING($1 FROM 1 FOR 4) = '\x52494646'::BYTEA
+    AND SUBSTRING($1 FROM 9 FOR 4) = '\x57454250'::BYTEA THEN
+    'image/webp'
+  WHEN SUBSTRING($1 FROM 5 FOR 7) = '\x66747970617669'::BYTEA THEN
+    'image/avif'
+  WHEN SUBSTRING($1 FROM 1 FOR 6) = '\x474946383761'::BYTEA
+    OR SUBSTRING($1 FROM 1 FOR 6) = '\x474946383961'::BYTEA THEN
+    'image/gif'
+  WHEN SUBSTRING($1 FROM 1 FOR 5) = '\x3C3F786D6C'::BYTEA
+    OR SUBSTRING($1 FROM 1 FOR 4) = '\x3C737667'::BYTEA THEN
+    'image/svg+xml'
+  ELSE
+    NULL
+  END;
   IF OCTET_LENGTH($1) = 0 THEN
     RAISE invalid_parameter_value
     USING message = 'No file data was provided';

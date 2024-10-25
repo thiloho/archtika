@@ -108,9 +108,4 @@
     flex-direction: column;
     gap: var(--space-3xs);
   }
-
-  meter {
-    inline-size: min(512px, 100%);
-    block-size: 2rem;
-  }
 </style>

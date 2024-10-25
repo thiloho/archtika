@@ -36,7 +36,9 @@
       be published on the Internet.
     </p>
     <form method="POST" action="?/publishWebsite" use:enhance={enhanceForm()}>
-      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}>Publish</button>
+      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+        >Publish website</button
+      >
     </form>
   </section>
 
@@ -73,7 +75,9 @@
             required
           />
         </label>
-        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}>Submit</button>
+        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+          >Update domain prefix</button
+        >
       </form>
       {#if data.websiteOverview.domain_prefix?.prefix}
         <Modal id="delete-domain-prefix" text="Delete">

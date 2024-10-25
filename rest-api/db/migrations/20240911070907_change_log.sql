@@ -36,6 +36,7 @@ CREATE FUNCTION internal.track_changes ()
 DECLARE
   _website_id UUID;
   _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
+  _new_value HSTORE;
 BEGIN
   IF (NOT EXISTS (
     SELECT
@@ -43,7 +44,7 @@ BEGIN
     FROM
       internal.user AS u
     WHERE
-      u.id = _user_id) OR (to_jsonb (OLD.*) - 'last_modified_at' - 'last_modified_by') = (to_jsonb (NEW.*) - 'last_modified_at' - 'last_modified_by')) THEN
+      u.id = _user_id) OR REGEXP_REPLACE((to_jsonb (OLD.*) - 'last_modified_at' - 'last_modified_by')::TEXT, '\r\n|\r', '\n', 'g') = REGEXP_REPLACE((to_jsonb (NEW.*) - 'last_modified_at' - 'last_modified_by')::TEXT, '\r\n|\r', '\n', 'g')) THEN
     RETURN NULL;
   END IF;
   IF TG_TABLE_NAME = 'website' THEN
@@ -52,8 +53,13 @@ BEGIN
     _website_id := COALESCE(NEW.website_id, OLD.website_id);
   END IF;
   IF TG_OP = 'INSERT' THEN
+    _new_value := CASE WHEN TG_TABLE_NAME = 'media' THEN
+      HSTORE (NEW) - 'blob'::TEXT
+    ELSE
+      HSTORE (NEW)
+    END;
     INSERT INTO internal.change_log (website_id, table_name, operation, new_value)
-      VALUES (_website_id, TG_TABLE_NAME, TG_OP, HSTORE (NEW));
+      VALUES (_website_id, TG_TABLE_NAME, TG_OP, _new_value);
   ELSIF (TG_OP = 'UPDATE'
       AND EXISTS (
         SELECT
@@ -83,6 +89,11 @@ SECURITY DEFINER;
 
 CREATE TRIGGER track_changes_website
   AFTER UPDATE ON internal.website
+  FOR EACH ROW
+  EXECUTE FUNCTION internal.track_changes ();
+
+CREATE TRIGGER track_changes_media
+  AFTER INSERT ON internal.media
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
@@ -128,6 +139,8 @@ CREATE TRIGGER track_changes_collab
 
 -- migrate:down
 DROP TRIGGER track_changes_website ON internal.website;
+
+DROP TRIGGER track_changes_media ON internal.media;
 
 DROP TRIGGER track_changes_settings ON internal.settings;
 

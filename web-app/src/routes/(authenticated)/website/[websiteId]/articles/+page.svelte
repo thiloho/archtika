@@ -40,7 +40,7 @@
           <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
         </label>
 
-        <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+        <button type="submit" disabled={data.permissionLevel === 10}>Create article</button>
       </form>
     </Modal>
   </section>
@@ -74,7 +74,7 @@
               >
             </select>
           </label>
-          <button type="submit">Submit</button>
+          <button type="submit">Apply</button>
         </form>
       </details>
 

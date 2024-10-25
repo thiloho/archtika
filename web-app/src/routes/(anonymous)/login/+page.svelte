@@ -25,5 +25,5 @@
     <input type="password" name="password" required />
   </label>
 
-  <button type="submit">Submit</button>
+  <button type="submit">Login</button>
 </form>

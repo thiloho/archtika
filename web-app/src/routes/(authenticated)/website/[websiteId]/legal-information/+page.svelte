@@ -61,7 +61,9 @@
         content={data.legalInformation?.main_content ?? ""}
       />
 
-      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}>Submit</button>
+      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+        >Update legal information</button
+      >
     </form>
 
     {#if data.legalInformation?.main_content}

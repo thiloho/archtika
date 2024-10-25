@@ -44,7 +44,7 @@
           <input name="category-weight" type="number" min="0" required />
         </label>
 
-        <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+        <button type="submit" disabled={data.permissionLevel === 10}>Create category</button>
       </form>
     </Modal>
   </section>

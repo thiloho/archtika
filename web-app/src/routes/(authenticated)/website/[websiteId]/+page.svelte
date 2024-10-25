@@ -95,7 +95,7 @@
         {/if}
       </div>
 
-      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update global</button>
     </form>
   </section>
 
@@ -142,7 +142,7 @@
         {/if}
       </div>
 
-      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update header</button>
     </form>
   </section>
 
@@ -165,7 +165,7 @@
         content={data.home.main_content}
       />
 
-      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update home</button>
     </form>
   </section>
 
@@ -182,7 +182,7 @@
         >
       </label>
 
-      <button type="submit" disabled={data.permissionLevel === 10}>Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update footer</button>
     </form>
   </section>
 </WebsiteEditor>

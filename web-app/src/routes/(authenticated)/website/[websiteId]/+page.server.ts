@@ -43,7 +43,6 @@ export const actions: Actions = {
     };
 
     if (faviconFile) {
-      headers["X-Mimetype"] = faviconFile.type;
       headers["X-Original-Filename"] = faviconFile.name;
     }
 
@@ -84,7 +83,6 @@ export const actions: Actions = {
     };
 
     if (logoImage) {
-      headers["X-Mimetype"] = logoImage.type;
       headers["X-Original-Filename"] = logoImage.name;
     }
 
@@ -152,7 +150,6 @@ export const actions: Actions = {
         "Content-Type": "application/octet-stream",
         Accept: "application/vnd.pgrst.object+json",
         "X-Website-Id": params.websiteId,
-        "X-Mimetype": file.type,
         "X-Original-Filename": file.name
       },
       body: await file.arrayBuffer(),

@@ -68,7 +68,7 @@
                       value={max_number_websites}
                     />
                   </label>
-                  <button type="submit">Submit</button>
+                  <button type="submit">Update website limit</button>
                 </form>
 
                 {#if website.length > 0}
@@ -92,7 +92,7 @@
                               value={max_storage_size}
                             />
                           </label>
-                          <button type="submit">Submit</button>
+                          <button type="submit">Update storage limit</button>
                         </form>
                       </div>
                     </details>

@@ -19,13 +19,13 @@
 
   if (data.website.content_type === "Blog") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, change_log, media, docs_category, ...restTables } = tables;
+    const { user, change_log, docs_category, ...restTables } = tables;
     resources = restTables;
   }
 
   if (data.website.content_type === "Docs") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, change_log, media, ...restTables } = tables;
+    const { user, change_log, ...restTables } = tables;
     resources = restTables;
   }
 
@@ -96,7 +96,7 @@
           </select>
         </label>
         <input type="hidden" name="page" value={1} />
-        <button type="submit">Submit</button>
+        <button type="submit">Apply</button>
       </form>
     </details>
     <div class="scroll-container">

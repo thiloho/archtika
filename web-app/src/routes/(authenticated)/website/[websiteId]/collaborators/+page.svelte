@@ -51,7 +51,9 @@
           </select>
         </label>
 
-        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}>Submit</button>
+        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+          >Add collaborator</button
+        >
       </form>
     </Modal>
   </section>
