@@ -39,7 +39,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each data.usersWithWebsites as { id, created_at, username, max_number_websites, website }}
+        {#each data.usersWithWebsites as { id, created_at, username, max_number_websites, website } (id)}
           <tr>
             <td>
               <DateTime date={created_at} />
@@ -73,7 +73,7 @@
 
                 {#if website.length > 0}
                   <h4>Websites</h4>
-                  {#each website as { id, title, max_storage_size }}
+                  {#each website as { id, title, max_storage_size } (id)}
                     <details>
                       <summary>{title}</summary>
                       <div>

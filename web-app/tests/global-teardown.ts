@@ -1,21 +1,25 @@
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { password, authenticate, userOwner } from "./shared";
 
 test.beforeEach(async ({ page }) => {
   await authenticate(userOwner, page);
 });
 
-/* test("Delete all regular users", async ({ page }) => {
+test("Delete all regular users", async ({ page }) => {
   await page.getByRole("link", { name: "Manage" }).click();
 
   await page.waitForSelector("tbody");
-  const userRows = await page.locator("tbody > tr").filter({ hasNotText: userOwner }).all();
+  const userRows = page.locator("tbody > tr").filter({ hasNotText: userOwner });
 
-  for (const row of userRows) {
-    await row.getByRole("button", { name: "Manage" }).click();
+  while ((await userRows.count()) > 0) {
+    const currentCount = await userRows.count();
+
+    await userRows.first().getByRole("button", { name: "Manage" }).click();
     const modalName = page.url().split("#")[1];
     await page.locator(`#${modalName}`).locator('summary:has-text("Delete")').click();
     await page.locator(`#${modalName}`).getByRole("button", { name: "Delete user" }).click();
+
+    await expect(userRows).toHaveCount(currentCount - 1);
   }
 });
 
@@ -28,4 +32,4 @@ test("Delete admin account", async ({ page }) => {
     .locator("#delete-account-modal")
     .getByRole("button", { name: "Delete account" })
     .click();
-}); */
+});
