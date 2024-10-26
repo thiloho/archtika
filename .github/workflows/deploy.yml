@@ -13,7 +13,10 @@ jobs:
     outputs:
       env_name: ${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }}
     steps:
-      - run: echo "Determining environment..."
+      - name: Determine and print environment
+        run: |
+          echo "Determining environment..."
+          echo "Environment name: ${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }}"
 
   deploy:
     needs: environment-check
