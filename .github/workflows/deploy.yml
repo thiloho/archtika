@@ -10,7 +10,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
-    environment: ${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }}
+    environment:
+      name: ${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }}
 
     steps:
     - uses: actions/checkout@v4
