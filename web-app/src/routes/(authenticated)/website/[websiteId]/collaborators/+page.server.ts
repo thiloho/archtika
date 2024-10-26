@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { Collab, User } from "$lib/db-schema";
 
-export const load: PageServerLoad = async ({ parent, params, fetch }) => {
+export const load: PageServerLoad = async ({ parent, params, fetch, locals }) => {
   const collaborators: (Collab & { user: User })[] = (
     await apiRequest(
       fetch,
@@ -14,12 +14,14 @@ export const load: PageServerLoad = async ({ parent, params, fetch }) => {
     )
   ).data;
 
-  const { website, home } = await parent();
+  const { website, home, permissionLevel } = await parent();
 
   return {
     website,
     home,
-    collaborators
+    collaborators,
+    permissionLevel,
+    user: locals.user
   };
 };
 

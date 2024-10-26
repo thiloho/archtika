@@ -51,7 +51,9 @@
           </select>
         </label>
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+          >Add collaborator</button
+        >
       </form>
     </Modal>
   </section>
@@ -89,7 +91,11 @@
                     </select>
                   </label>
 
-                  <button type="submit">Update collaborator</button>
+                  <button
+                    type="submit"
+                    disabled={[10, 20].includes(data.permissionLevel) || user_id === data.user.id}
+                    >Update collaborator</button
+                  >
                 </form>
               </Modal>
               <Modal id="remove-collaborator-{user_id}" text="Remove">
@@ -104,7 +110,11 @@
                 >
                   <input type="hidden" name="user-id" value={user_id} />
 
-                  <button type="submit">Remove collaborator</button>
+                  <button
+                    type="submit"
+                    disabled={[10, 20].includes(data.permissionLevel) || user_id === data.user.id}
+                    >Remove collaborator</button
+                  >
                 </form>
               </Modal>
             </div>

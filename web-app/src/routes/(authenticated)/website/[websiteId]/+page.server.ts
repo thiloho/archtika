@@ -4,37 +4,24 @@ import { apiRequest } from "$lib/server/utils";
 import type { Settings, Header, Footer } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
-  const globalSettings: Settings = (
-    await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`,
-      "GET",
-      {
-        headers: {
-          Accept: "application/vnd.pgrst.object+json"
-        },
-        returnData: true
-      }
-    )
-  ).data;
-
-  const header: Header = (
-    await apiRequest(fetch, `${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, "GET", {
-      headers: {
-        Accept: "application/vnd.pgrst.object+json"
-      },
+  const [globalSettingsResponse, headerResponse, footerResponse] = await Promise.all([
+    apiRequest(fetch, `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
+      returnData: true
+    }),
+    apiRequest(fetch, `${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
+      returnData: true
+    }),
+    apiRequest(fetch, `${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, "GET", {
+      headers: { Accept: "application/vnd.pgrst.object+json" },
       returnData: true
     })
-  ).data;
+  ]);
 
-  const footer: Footer = (
-    await apiRequest(fetch, `${API_BASE_PREFIX}/footer?website_id=eq.${params.websiteId}`, "GET", {
-      headers: {
-        Accept: "application/vnd.pgrst.object+json"
-      },
-      returnData: true
-    })
-  ).data;
+  const globalSettings: Settings = globalSettingsResponse.data;
+  const header: Header = headerResponse.data;
+  const footer: Footer = footerResponse.data;
 
   return {
     globalSettings,
@@ -56,7 +43,6 @@ export const actions: Actions = {
     };
 
     if (faviconFile) {
-      headers["X-Mimetype"] = faviconFile.type;
       headers["X-Original-Filename"] = faviconFile.name;
     }
 
@@ -97,7 +83,6 @@ export const actions: Actions = {
     };
 
     if (logoImage) {
-      headers["X-Mimetype"] = logoImage.type;
       headers["X-Original-Filename"] = logoImage.name;
     }
 
@@ -134,7 +119,8 @@ export const actions: Actions = {
       "PATCH",
       {
         body: {
-          main_content: data.get("main-content")
+          main_content: data.get("main-content"),
+          meta_description: data.get("description")
         },
         successMessage: "Successfully updated home"
       }
@@ -164,7 +150,6 @@ export const actions: Actions = {
         "Content-Type": "application/octet-stream",
         Accept: "application/vnd.pgrst.object+json",
         "X-Website-Id": params.websiteId,
-        "X-Mimetype": file.type,
         "X-Original-Filename": file.name
       },
       body: await file.arrayBuffer(),

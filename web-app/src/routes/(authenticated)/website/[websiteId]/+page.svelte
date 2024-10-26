@@ -10,7 +10,6 @@
   import { sending } from "$lib/runes.svelte";
   import MarkdownEditor from "$lib/components/MarkdownEditor.svelte";
   import { previewContent } from "$lib/runes.svelte";
-
   const { data, form }: { data: PageServerData & LayoutServerData; form: ActionData } = $props();
 
   previewContent.value = data.home.main_content;
@@ -83,7 +82,11 @@
           <input type="file" name="favicon" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.globalSettings.favicon_image}
-          <Modal id="preview-favicon-global-{data.globalSettings.website_id}" text="Preview">
+          <Modal
+            id="preview-favicon-global-{data.globalSettings.website_id}"
+            text="Preview"
+            isWider={true}
+          >
             <img
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
               alt=""
@@ -92,7 +95,7 @@
         {/if}
       </div>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update global</button>
     </form>
   </section>
 
@@ -130,7 +133,7 @@
           <input type="file" name="logo-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.header.logo_image}
-          <Modal id="preview-logo-header-{data.header.website_id}" text="Preview">
+          <Modal id="preview-logo-header-{data.header.website_id}" text="Preview" isWider={true}>
             <img
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.header.logo_image}`}
               alt=""
@@ -139,7 +142,7 @@
         {/if}
       </div>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update header</button>
     </form>
   </section>
 
@@ -149,6 +152,12 @@
     </h2>
 
     <form action="?/updateHome" method="POST" use:enhance={enhanceForm({ reset: false })}>
+      <label>
+        Description:
+        <textarea name="description" rows="5" maxlength="250" required
+          >{data.home.meta_description}</textarea
+        >
+      </label>
       <MarkdownEditor
         apiPrefix={data.API_BASE_PREFIX}
         label="Main content"
@@ -156,7 +165,7 @@
         content={data.home.main_content}
       />
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update home</button>
     </form>
   </section>
 
@@ -173,7 +182,7 @@
         >
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update footer</button>
     </form>
   </section>
 </WebsiteEditor>

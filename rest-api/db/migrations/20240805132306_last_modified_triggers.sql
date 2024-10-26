@@ -7,11 +7,11 @@ DECLARE
 BEGIN
   IF (NOT EXISTS (
     SELECT
-      id
+      u.id
     FROM
-      internal.user
+      internal.user AS u
     WHERE
-      id = _user_id)) THEN
+      u.id = _user_id)) THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
   IF TG_OP != 'DELETE' THEN
@@ -97,5 +97,5 @@ DROP TRIGGER update_legal_information_last_modified ON internal.legal_informatio
 
 DROP TRIGGER update_collab_last_modified ON internal.collab;
 
-DROP FUNCTION internal.update_last_modified ();
+DROP FUNCTION internal.update_last_modified;
 

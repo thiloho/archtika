@@ -3,7 +3,6 @@ import type { Renderer, Token } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import DOMPurify from "isomorphic-dompurify";
-import { applyAction, deserialize } from "$app/forms";
 import type {
   Website,
   Settings,
@@ -148,12 +147,18 @@ const createMarkdownParser = (showToc = true) => {
 
 export const md = (markdownContent: string, showToc = true) => {
   const marked = createMarkdownParser(showToc);
-  const html = DOMPurify.sanitize(marked.parse(markdownContent) as string);
+  let html = "";
+
+  try {
+    html = DOMPurify.sanitize(marked.parse(markdownContent, { async: false }));
+  } catch (error) {
+    html = JSON.stringify(error);
+  }
 
   return html;
 };
 
-export const LOADING_DELAY = 500;
+export const LOADING_DELAY = 250;
 let loadingDelay: number;
 
 export const enhanceForm = (options?: {
@@ -173,6 +178,8 @@ export const enhanceForm = (options?: {
     };
   };
 };
+
+export const PAGINATION_MAX_ITEMS = 20;
 
 export const hexToHSL = (hex: string) => {
   const r = parseInt(hex.slice(1, 3), 16) / 255;

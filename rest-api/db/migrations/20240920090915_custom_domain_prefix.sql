@@ -41,13 +41,13 @@ CREATE TRIGGER update_domain_prefix_last_modified
   FOR EACH ROW
   EXECUTE FUNCTION internal.update_last_modified ();
 
-CREATE TRIGGER domain_prefix_track_changes
+CREATE TRIGGER track_changes_domain_prefix
   AFTER INSERT OR UPDATE OR DELETE ON internal.domain_prefix
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
 -- migrate:down
-DROP TRIGGER domain_prefix_track_changes ON internal.domain_prefix;
+DROP TRIGGER track_changes_domain_prefix ON internal.domain_prefix;
 
 DROP TRIGGER update_domain_prefix_last_modified ON internal.domain_prefix;
 

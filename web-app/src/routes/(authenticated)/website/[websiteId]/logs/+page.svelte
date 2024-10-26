@@ -2,62 +2,46 @@
   import WebsiteEditor from "$lib/components/WebsiteEditor.svelte";
   import DateTime from "$lib/components/DateTime.svelte";
   import Modal from "$lib/components/Modal.svelte";
-  import type { PageServerData } from "./$types";
-  import diff from "fast-diff";
+  import type { PageServerData, ActionData } from "./$types";
   import { page } from "$app/stores";
   import { tables } from "$lib/db-schema";
   import { previewContent } from "$lib/runes.svelte";
-  import { sanitize } from "isomorphic-dompurify";
+  import DOMPurify from "isomorphic-dompurify";
+  import { enhanceForm } from "$lib/utils";
+  import { enhance } from "$app/forms";
+  import { sending } from "$lib/runes.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import Pagination from "$lib/components/Pagination.svelte";
 
-  const { data }: { data: PageServerData } = $props();
-
-  const htmlDiff = (oldValue: string, newValue: string) => {
-    return diff(oldValue, newValue)
-      .map(([type, value]) => {
-        let newString = "";
-
-        switch (type) {
-          case 1:
-            newString += `<ins>${value}</ins>`;
-            break;
-          case 0:
-            newString += `${value}`;
-            break;
-          case -1:
-            newString += `<del>${value}</del>`;
-            break;
-        }
-
-        return newString;
-      })
-      .join("");
-  };
+  const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
   let resources = $state({});
 
   if (data.website.content_type === "Blog") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, change_log, media, docs_category, ...restTables } = tables;
+    const { user, change_log, docs_category, ...restTables } = tables;
     resources = restTables;
   }
 
   if (data.website.content_type === "Docs") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, change_log, media, ...restTables } = tables;
+    const { user, change_log, ...restTables } = tables;
     resources = restTables;
   }
 
   previewContent.value = data.home.main_content;
-
-  let logsSection: HTMLElement;
 </script>
+
+{#if sending.value}
+  <LoadingSpinner />
+{/if}
 
 <WebsiteEditor
   id={data.website.id}
   contentType={data.website.content_type}
   title={data.website.title}
 >
-  <section id="logs" bind:this={logsSection}>
+  <section id="logs">
     <hgroup>
       <h2>
         <a href="#logs">Logs</a>
@@ -74,8 +58,8 @@
           Username:
           <input
             list="users-{data.website.id}"
-            name="logs_filter_user"
-            value={$page.url.searchParams.get("logs_filter_user")}
+            name="user"
+            value={$page.url.searchParams.get("user")}
           />
           <datalist id="users-{data.website.id}">
             <option value={data.website.user.username}></option>
@@ -86,40 +70,33 @@
         </label>
         <label>
           Resource:
-          <select name="logs_filter_resource">
+          <select name="resource">
             <option value="all">Show all</option>
             {#each Object.keys(resources) as resource}
               <option
                 value={resource}
-                selected={resource === $page.url.searchParams.get("logs_filter_resource")}
-                >{resource}</option
+                selected={resource === $page.url.searchParams.get("resource")}>{resource}</option
               >
             {/each}
           </select>
         </label>
         <label>
           Operation:
-          <select name="logs_filter_operation">
+          <select name="operation">
             <option value="all">Show all</option>
-            <option
-              value="insert"
-              selected={"insert" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="insert" selected={"insert" === $page.url.searchParams.get("operation")}
               >Insert</option
             >
-            <option
-              value="update"
-              selected={"update" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="update" selected={"update" === $page.url.searchParams.get("operation")}
               >Update</option
             >
-            <option
-              value="delete"
-              selected={"delete" === $page.url.searchParams.get("logs_filter_operation")}
+            <option value="delete" selected={"delete" === $page.url.searchParams.get("operation")}
               >Delete</option
             >
           </select>
         </label>
-        <input type="hidden" name="logs_results_page" value={1} />
-        <button type="submit">Submit</button>
+        <input type="hidden" name="page" value={1} />
+        <button type="submit">Apply</button>
       </form>
     </details>
     <div class="scroll-container">
@@ -129,7 +106,7 @@
             <th>User</th>
             <th>Resource</th>
             <th>Operation</th>
-            <th>Date and time</th>
+            <th>Date & Time</th>
             <th>Changes</th>
           </tr>
         </thead>
@@ -153,12 +130,32 @@
 
                   <hgroup>
                     <h3>Log changes</h3>
-                    <p>{table_name} &mdash; {operation}</p>
+                    <p>{table_name} &mdash; {operation} &mdash; User "{username}"</p>
                   </hgroup>
 
-                  <pre style="white-space: pre-wrap">{@html sanitize(htmlDiff(oldValue, newValue), {
-                      ALLOWED_TAGS: ["ins", "del"]
-                    })}</pre>
+                  {#if old_value && new_value}
+                    <h4>Difference</h4>
+                    <form action="?/computeDiff" method="POST" use:enhance={enhanceForm()}>
+                      <input type="hidden" name="id" value={id} />
+                      <button type="submit">Compute diff</button>
+                    </form>
+                    {#if form?.logId === id && form?.currentDiff}
+                      <pre style="white-space: pre-wrap">{@html DOMPurify.sanitize(
+                          form.currentDiff,
+                          { ALLOWED_TAGS: ["ins", "del"] }
+                        )}</pre>
+                    {/if}
+                  {/if}
+
+                  {#if new_value && !old_value}
+                    <h4>New value</h4>
+                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(newValue)}</pre>
+                  {/if}
+
+                  {#if old_value && !new_value}
+                    <h4>Old value</h4>
+                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(oldValue)}</pre>
+                  {/if}
                 </Modal>
               </td>
             </tr>
@@ -166,102 +163,9 @@
         </tbody>
       </table>
     </div>
-    <div class="pagination">
-      {#snippet commonFilterInputs()}
-        <input
-          type="hidden"
-          name="logs_filter_user"
-          value={$page.url.searchParams.get("logs_filter_user")}
-        />
-        <input
-          type="hidden"
-          name="logs_filter_resource"
-          value={$page.url.searchParams.get("logs_filter_resource")}
-        />
-        <input
-          type="hidden"
-          name="logs_filter_operation"
-          value={$page.url.searchParams.get("logs_filter_operation")}
-        />
-      {/snippet}
-      <p>
-        {$page.url.searchParams.get("logs_results_page") ?? 1} / {Math.max(
-          Math.ceil(data.resultChangeLogCount / 50),
-          1
-        )}
-      </p>
-      <form method="GET">
-        <input type="hidden" name="logs_results_page" value={1} />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}>First</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="logs_results_page"
-          value={Math.max(
-            1,
-            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") - 1
-          )}
-        />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") === "1"}
-          >Previous</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="logs_results_page"
-          value={Math.min(
-            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1),
-            Number.parseInt($page.url.searchParams.get("logs_results_page") ?? "1") + 1
-          )}
-        />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
-            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Next</button
-        >
-      </form>
-      <form method="GET">
-        <input
-          type="hidden"
-          name="logs_results_page"
-          value={Math.max(Math.ceil(data.resultChangeLogCount / 50), 1)}
-        />
-        {@render commonFilterInputs()}
-        <button
-          type="submit"
-          disabled={($page.url.searchParams.get("logs_results_page") ?? "1") ===
-            Math.max(Math.ceil(data.resultChangeLogCount / 50), 1).toString()}>Last</button
-        >
-      </form>
-    </div>
+    <Pagination
+      commonFilters={["user", "resource", "operation"]}
+      resultCount={data.resultChangeLogCount}
+    />
   </section>
 </WebsiteEditor>
-
-<style>
-  .pagination {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    justify-content: end;
-  }
-
-  .pagination > form:first-of-type {
-    margin-inline-start: auto;
-  }
-
-  button:disabled {
-    pointer-events: none;
-    color: hsl(0 0% 50%);
-  }
-</style>

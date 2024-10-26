@@ -1,104 +1,3 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github.min.css")
-  screen and (prefers-color-scheme: light);
-@import url("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css")
-  screen and (prefers-color-scheme: dark);
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400;
-  src:
-    url(https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.woff2)
-      format("woff2"),
-    url(https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.woff)
-      format("woff");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-    U+FFFD;
-}
-
-:root {
-  --bg-primary-h: /* BACKGROUND_COLOR_LIGHT_THEME_H */ 0;
-  --bg-primary-s: /* BACKGROUND_COLOR_LIGHT_THEME_S */ 0%;
-  --bg-primary-l: /* BACKGROUND_COLOR_LIGHT_THEME_L */ 100%;
-  --bg-primary: hsl(var(--bg-primary-h) var(--bg-primary-s) var(--bg-primary-l));
-  --bg-secondary: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) - 5%));
-  --bg-tertiary: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) - 10%));
-  --bg-blurred: hsla(
-    var(--bg-primary-h) var(--bg-primary-s) var(--bg-primary-l) / calc(var(--bg-primary-l) - 20%)
-  );
-
-  --color-text: hsl(var(--bg-primary-h) var(--bg-primary-s) 0%);
-  --color-text-invert: var(--bg-primary);
-  --color-border: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) - 50%));
-  --color-accent: /* ACCENT_COLOR_LIGHT_THEME */ hsl(210 100% 30%);
-  --color-success: hsl(105 100% 30%);
-  --color-error: hsl(0 100% 30%);
-
-  --border-primary: 0.0625rem solid var(--color-border);
-  --border-radius: 0.125rem;
-
-  /* Step -1: 14.9953px → 14.2222px */
-  --font-size--1: clamp(0.8889rem, 0.9592rem + -0.1098cqi, 0.9372rem);
-  /* Step 0: 16px → 16px */
-  --font-size-0: clamp(1rem, 1rem + 0cqi, 1rem);
-  /* Step 1: 17.072px → 18px */
-  --font-size-1: clamp(1.067rem, 1.0406rem + 0.1318cqi, 1.125rem);
-  /* Step 2: 18.2158px → 20.25px */
-  --font-size-2: clamp(1.1385rem, 1.0807rem + 0.2889cqi, 1.2656rem);
-  /* Step 3: 19.4363px → 22.7813px */
-  --font-size-3: clamp(1.2148rem, 1.1197rem + 0.4751cqi, 1.4238rem);
-  /* Step 4: 20.7385px → 25.6289px */
-  --font-size-4: clamp(1.2962rem, 1.1572rem + 0.6947cqi, 1.6018rem);
-  /* Step 5: 22.128px → 28.8325px */
-  --font-size-5: clamp(1.383rem, 1.1925rem + 0.9523cqi, 1.802rem);
-
-  /* Space 3xs: 4px → 5px */
-  --space-3xs: clamp(0.25rem, 0.2336rem + 0.0822cqi, 0.3125rem);
-  /* Space 2xs: 8px → 10px */
-  --space-2xs: clamp(0.5rem, 0.4671rem + 0.1645cqi, 0.625rem);
-  /* Space xs: 12px → 15px */
-  --space-xs: clamp(0.75rem, 0.7007rem + 0.2467cqi, 0.9375rem);
-  /* Space s: 16px → 20px */
-  --space-s: clamp(1rem, 0.9342rem + 0.3289cqi, 1.25rem);
-  /* Space m: 24px → 30px */
-  --space-m: clamp(1.5rem, 1.4013rem + 0.4934cqi, 1.875rem);
-  /* Space l: 32px → 40px */
-  --space-l: clamp(2rem, 1.8684rem + 0.6579cqi, 2.5rem);
-  /* Space xl: 48px → 60px */
-  --space-xl: clamp(3rem, 2.8026rem + 0.9868cqi, 3.75rem);
-  /* Space 2xl: 64px → 80px */
-  --space-2xl: clamp(4rem, 3.7368rem + 1.3158cqi, 5rem);
-  /* Space 3xl: 96px → 120px */
-  --space-3xl: clamp(6rem, 5.6053rem + 1.9737cqi, 7.5rem);
-
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary-h: /* BACKGROUND_COLOR_DARK_THEME_H */ 0;
-    --bg-primary-s: /* BACKGROUND_COLOR_DARK_THEME_S */ 0%;
-    --bg-primary-l: /* BACKGROUND_COLOR_DARK_THEME_L */ 15%;
-    --bg-primary: hsl(var(--bg-primary-h) var(--bg-primary-s) var(--bg-primary-l));
-    --bg-secondary: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) + 5%));
-    --bg-tertiary: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) + 10%));
-    --bg-blurred: hsla(
-      var(--bg-primary-h) var(--bg-primary-s) var(--bg-primary-l) / calc(var(--bg-primary-l) + 20%)
-    );
-
-    --color-text: hsl(var(--bg-primary-h) var(--bg-primary-s) 100%);
-    --color-text-invert: var(--bg-primary);
-    --color-border: hsl(var(--bg-primary-h) var(--bg-primary-s) calc(var(--bg-primary-l) + 50%));
-    --color-accent: /* ACCENT_COLOR_DARK_THEME */ hsl(210 100% 80%);
-    --color-success: hsl(105 100% 80%);
-    --color-error: hsl(0 100% 80%);
-
-    color-scheme: dark;
-  }
-}
-
 *,
 *::before,
 *::after {
@@ -109,11 +8,12 @@
 
 body {
   line-height: 1.5;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui;
   background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
   min-block-size: 100vh;
+  color: var(--color-text);
 }
 
 button,
@@ -123,6 +23,7 @@ select,
 [role="option"],
 label[for="toggle-mobile-preview"],
 label[for="toggle-sidebar"],
+label[for="toggle-theme"],
 summary {
   cursor: pointer;
 }
@@ -131,9 +32,11 @@ input,
 button,
 textarea,
 select,
+input[type="file"]::file-selector-button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
 label[for="toggle-sidebar"],
+label[for="toggle-theme"],
 summary {
   font: inherit;
   color: inherit;
@@ -157,6 +60,11 @@ input[type="file"] {
   inline-size: 100%;
 }
 
+input[type="file"]::file-selector-button {
+  padding-block: calc(var(--space-3xs) / 4);
+  margin-inline-end: var(--space-2xs);
+}
+
 input[type="color"] {
   padding: 0;
 }
@@ -171,11 +79,26 @@ summary {
 }
 
 button,
+input[type="file"]::file-selector-button,
 a[role="button"],
 label[for="toggle-mobile-preview"],
 label[for="toggle-sidebar"],
+label[for="toggle-theme"],
 summary {
   background-color: var(--bg-secondary);
+}
+
+label:has(svg) {
+  display: inline-grid;
+  place-content: center;
+}
+
+label[for="toggle-theme"] svg:first-of-type {
+  display: var(--display-light);
+}
+
+label[for="toggle-theme"] svg:last-of-type {
+  display: var(--display-dark);
 }
 
 :is(
@@ -183,9 +106,16 @@ summary {
     a[role="button"],
     label[for="toggle-mobile-preview"],
     label[for="toggle-sidebar"],
+    label[for="toggle-theme"],
     summary
   ):hover {
   background-color: var(--bg-tertiary);
+}
+
+button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: -10;
 }
 
 :is(button, input, textarea, select, a, summary, pre):focus,
@@ -303,12 +233,14 @@ pre {
   flex-shrink: 0;
 }
 
-code {
-  font-family: "JetBrains Mono", monospace;
+code,
+kbd {
+  font-family: monospace;
   font-size: var(--font-size--1);
 }
 
-:not(pre) > code {
+:not(pre) > code,
+kbd {
   background-color: var(--bg-secondary);
   border: var(--border-primary);
   padding-inline: var(--space-3xs);
@@ -353,4 +285,106 @@ ins {
 del {
   background-color: var(--color-error);
   color: var(--color-text-invert);
+}
+
+blockquote {
+  border-inline-start: var(--border-primary);
+  border-width: 0.25rem;
+  padding-inline-start: var(--space-xs);
+}
+
+meter {
+  inline-size: min(512px, 100%);
+}
+
+.hljs {
+  color: var(--hl-color);
+  background: var(--hl-bg);
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  color: var(--hl-keyword);
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  color: var(--hl-title);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-variable {
+  color: var(--hl-attr);
+}
+
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-string {
+  color: var(--hl-string);
+}
+
+.hljs-built_in,
+.hljs-symbol {
+  color: var(--hl-built-in);
+}
+
+.hljs-code,
+.hljs-comment,
+.hljs-formula {
+  color: var(--hl-comment);
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-pseudo,
+.hljs-selector-tag {
+  color: var(--hl-tag);
+}
+
+.hljs-subst {
+  color: var(--hl-color);
+}
+
+.hljs-section {
+  color: var(--hl-section);
+  font-weight: bold;
+}
+
+.hljs-bullet {
+  color: var(--hl-bullet);
+}
+
+.hljs-emphasis {
+  color: var(--hl-emphasis);
+  font-style: italic;
+}
+
+.hljs-strong {
+  color: var(--hl-emphasis);
+  font-weight: bold;
+}
+
+.hljs-addition {
+  color: var(--hl-addition-text);
+  background-color: var(--hl-addition-bg);
+}
+
+.hljs-deletion {
+  color: var(--hl-deletion-text);
+  background-color: var(--hl-deletion-bg);
 }

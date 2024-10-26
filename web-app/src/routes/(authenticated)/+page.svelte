@@ -39,7 +39,7 @@
         <input type="text" name="title" maxlength="50" pattern="\S(.*\S)?" required />
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit">Create website</button>
     </form>
   </Modal>
 </section>
@@ -55,36 +55,29 @@
       <form method="GET">
         <label>
           Search:
-          <input
-            type="text"
-            name="website_search_query"
-            value={$page.url.searchParams.get("website_search_query")}
-          />
+          <input type="text" name="query" value={$page.url.searchParams.get("query")} />
         </label>
         <label>
           Filter:
-          <select name="website_filter">
-            <option value="all" selected={"all" === $page.url.searchParams.get("website_filter")}
+          <select name="filter">
+            <option value="all" selected={"all" === $page.url.searchParams.get("filter")}
               >Show all</option
             >
             <option
               value="creations"
-              selected={"creations" === $page.url.searchParams.get("website_filter")}
-              >Created by you</option
+              selected={"creations" === $page.url.searchParams.get("filter")}>Created by you</option
             >
-            <option
-              value="shared"
-              selected={"shared" === $page.url.searchParams.get("website_filter")}
+            <option value="shared" selected={"shared" === $page.url.searchParams.get("filter")}
               >Shared with you</option
             >
           </select>
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit">Apply</button>
       </form>
     </details>
 
     <ul class="website-grid unpadded">
-      {#each data.websites as { id, content_type, title, created_at } (id)}
+      {#each data.websites as { id, user_id, content_type, title, created_at, collab } (id)}
         <li class="website-card">
           <p>
             <strong>
@@ -112,7 +105,7 @@
               >
                 <input type="hidden" name="id" value={id} />
                 <label>
-                  Title
+                  Title:
                   <input
                     type="text"
                     name="title"
@@ -123,7 +116,11 @@
                   />
                 </label>
 
-                <button type="submit">Submit</button>
+                <button
+                  type="submit"
+                  disabled={data.user.id !== user_id && collab[0].permission_level !== 30}
+                  >Update website</button
+                >
               </form>
             </Modal>
             <Modal id="delete-website-{id}" text="Delete">
@@ -140,7 +137,7 @@
               >
                 <input type="hidden" name="id" value={id} />
 
-                <button type="submit">Delete website</button>
+                <button type="submit" disabled={data.user.id !== user_id}>Delete website</button>
               </form>
             </Modal>
           </div>

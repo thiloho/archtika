@@ -7,8 +7,20 @@
   const {
     websiteOverview,
     apiUrl,
-    isLegalPage
-  }: { websiteOverview: WebsiteOverview; apiUrl: string; isLegalPage: boolean } = $props();
+    isLegalPage,
+    websiteUrl
+  }: {
+    websiteOverview: WebsiteOverview;
+    apiUrl: string;
+    isLegalPage: boolean;
+    websiteUrl: string;
+  } = $props();
+
+  const sortedArticles = websiteOverview.article.sort((a, b) => {
+    if (!a.publication_date) return 1;
+    if (!b.publication_date) return -1;
+    return new Date(b.publication_date).getTime() - new Date(a.publication_date).getTime();
+  });
 </script>
 
 <Head
@@ -16,9 +28,11 @@
   nestingLevel={0}
   {apiUrl}
   title={isLegalPage ? "Legal information" : websiteOverview.title}
+  metaDescription={websiteOverview.home.meta_description}
+  {websiteUrl}
 />
 
-<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {apiUrl} />
+<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {isLegalPage} {apiUrl} />
 
 <header>
   <div class="container">
@@ -41,7 +55,7 @@
         </h2>
 
         <ul class="unpadded">
-          {#each websiteOverview.article as article}
+          {#each sortedArticles as article}
             <li>
               {#if article.publication_date}
                 <p>{article.publication_date}</p>

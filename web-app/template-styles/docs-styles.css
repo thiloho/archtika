@@ -32,13 +32,13 @@ footer {
   padding-block: var(--space-s);
 }
 
-section {
-  scroll-margin-block-start: var(--space-xl);
+footer {
+  margin-block-start: auto;
+  text-align: center;
 }
 
-label[for="toggle-sidebar"] {
-  display: inline-grid;
-  place-content: center;
+section {
+  scroll-margin-block-start: var(--space-xl);
 }
 
 .docs-navigation {

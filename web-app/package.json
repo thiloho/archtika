@@ -14,11 +14,12 @@
     "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal"
   },
   "devDependencies": {
-    "@playwright/test": "1.46.0",
+    "@playwright/test": "1.47.0",
     "@sveltejs/adapter-auto": "3.2.5",
     "@sveltejs/adapter-node": "5.2.3",
     "@sveltejs/kit": "2.5.28",
     "@sveltejs/vite-plugin-svelte": "4.0.0-next.6",
+    "@types/diff-match-patch": "1.0.36",
     "@types/eslint": "9.6.1",
     "@types/eslint__js": "8.42.3",
     "@types/eslint-config-prettier": "6.11.3",
@@ -38,7 +39,7 @@
   },
   "type": "module",
   "dependencies": {
-    "fast-diff": "1.3.0",
+    "diff-match-patch": "1.0.5",
     "highlight.js": "11.10.0",
     "isomorphic-dompurify": "2.15.0",
     "marked": "14.1.2",

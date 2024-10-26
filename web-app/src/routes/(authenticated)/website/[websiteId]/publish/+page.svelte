@@ -36,7 +36,9 @@
       be published on the Internet.
     </p>
     <form method="POST" action="?/publishWebsite" use:enhance={enhanceForm()}>
-      <button type="submit">Publish</button>
+      <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+        >Publish website</button
+      >
     </form>
   </section>
 
@@ -46,8 +48,7 @@
         <a href="#publication-status">Publication status</a>
       </h2>
       <p>
-        Your website is published at:
-        <br />
+        Your website is published at:<br />
         <a href={data.websiteProdUrl}>{data.websiteProdUrl}</a>
       </p>
     </section>
@@ -74,7 +75,9 @@
             required
           />
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+          >Update domain prefix</button
+        >
       </form>
       {#if data.websiteOverview.domain_prefix?.prefix}
         <Modal id="delete-domain-prefix" text="Delete">
@@ -88,7 +91,9 @@
               <strong>Caution!</strong>
               This action will remove the domain prefix and reset it to its initial value.
             </p>
-            <button type="submit">Delete domain prefix</button>
+            <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
+              >Delete domain prefix</button
+            >
           </form>
         </Modal>
       {/if}

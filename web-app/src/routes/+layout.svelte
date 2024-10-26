@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "../../template-styles/variables.css";
   import "../../template-styles/common-styles.css";
   import { page } from "$app/stores";
   import type { LayoutServerData } from "./$types";
@@ -20,7 +21,7 @@
   let loadingDelay: number;
 
   $effect(() => {
-    if ($navigating && ["link", "goto"].includes($navigating.type)) {
+    if ($navigating) {
       loadingDelay = window.setTimeout(() => (loading = true), LOADING_DELAY);
     } else {
       window.clearTimeout(loadingDelay);
@@ -52,6 +53,11 @@
   {/if}
   <ul class="link-wrapper unpadded">
     {#if data.user}
+      {#if data.user.user_role === "administrator"}
+        <li>
+          <a href="/manage">Manage</a>
+        </li>
+      {/if}
       <li>
         <a href="/account">Account</a>
       </li>

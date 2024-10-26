@@ -21,7 +21,7 @@ ALTER TABLE internal.legal_information ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.collab ENABLE ROW LEVEL SECURITY;
 
-CREATE FUNCTION internal.user_has_website_access (website_id UUID, required_permission INTEGER, collaborator_permission_level INTEGER DEFAULT NULL, collaborator_user_id UUID DEFAULT NULL, article_user_id UUID DEFAULT NULL, raise_error BOOLEAN DEFAULT TRUE, OUT has_access BOOLEAN)
+CREATE FUNCTION internal.user_has_website_access (website_id UUID, required_permission INT, collaborator_permission_level INT DEFAULT NULL, collaborator_user_id UUID DEFAULT NULL, article_user_id UUID DEFAULT NULL, raise_error BOOLEAN DEFAULT TRUE, OUT has_access BOOLEAN)
 AS $$
 DECLARE
   _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
@@ -63,19 +63,29 @@ $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION internal.user_has_website_access (UUID, INTEGER, INTEGER, UUID, UUID, BOOLEAN) TO authenticated_user;
+GRANT EXECUTE ON FUNCTION internal.user_has_website_access TO authenticated_user;
 
 CREATE POLICY view_user ON internal.user
   FOR SELECT
     USING (TRUE);
 
+CREATE POLICY update_user ON internal.user
+  FOR UPDATE
+    USING ((CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'role') = 'administrator');
+
+CREATE POLICY delete_user ON internal.user
+  FOR DELETE
+    USING ((CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'role') = 'administrator');
+
 CREATE POLICY view_websites ON internal.website
   FOR SELECT
-    USING (internal.user_has_website_access (id, 10, raise_error => FALSE));
+    USING ((CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'role') = 'administrator'
+      OR internal.user_has_website_access (id, 10, raise_error => FALSE));
 
 CREATE POLICY update_website ON internal.website
   FOR UPDATE
-    USING (internal.user_has_website_access (id, 20));
+    USING ((CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'role') = 'administrator'
+      OR internal.user_has_website_access (id, 30));
 
 CREATE POLICY delete_website ON internal.website
   FOR DELETE
@@ -180,6 +190,10 @@ CREATE POLICY delete_collaborations ON internal.collab
 -- migrate:down
 DROP POLICY view_user ON internal.user;
 
+DROP POLICY update_user ON internal.user;
+
+DROP POLICY delete_user ON internal.user;
+
 DROP POLICY view_websites ON internal.website;
 
 DROP POLICY delete_website ON internal.website;
@@ -234,7 +248,7 @@ DROP POLICY update_collaborations ON internal.collab;
 
 DROP POLICY delete_collaborations ON internal.collab;
 
-DROP FUNCTION internal.user_has_website_access (UUID, INTEGER, INTEGER, UUID, UUID, BOOLEAN);
+DROP FUNCTION internal.user_has_website_access;
 
 ALTER TABLE internal.user DISABLE ROW LEVEL SECURITY;
 

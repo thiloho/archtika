@@ -31,27 +31,68 @@
         clip-rule="evenodd"
       ></path>
     </svg>
-    Account registration is disabled on this instance
+    Registration is disabled
   </p>
 {:else}
-  <form method="POST" use:enhance={enhanceForm()}>
-    <label>
-      Username:
-      <input type="text" name="username" minlength="3" maxlength="16" required />
-    </label>
-    <label>
-      Password:
-      <input type="password" name="password" minlength="12" maxlength="128" required />
-    </label>
+  <div class="registration-wrapper">
+    <form method="POST" use:enhance={enhanceForm()}>
+      <label>
+        Username:
+        <input
+          type="text"
+          name="username"
+          minlength="3"
+          maxlength="16"
+          pattern="^[a-zA-Z0-9_\-]+$"
+          required
+        />
+      </label>
+      <label>
+        Password:
+        <input type="password" name="password" minlength="12" maxlength="128" required />
+      </label>
 
-    <button type="submit">Submit</button>
-  </form>
+      <button type="submit">Register</button>
+    </form>
+
+    <details>
+      <summary>Password requirements</summary>
+      <ul>
+        <li>Must be between 12 and 128 characters long</li>
+        <li>Must contain at least one lowercase letter</li>
+        <li>Must contain at least one uppercase letter</li>
+        <li>Must contain at least one number</li>
+        <li>Must contain at least one special character</li>
+      </ul>
+    </details>
+  </div>
 {/if}
 
 <style>
   .registration-disabled {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2xs);
     align-items: center;
+  }
+
+  .registration-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-l);
+  }
+
+  .registration-wrapper > form {
+    inline-size: 30ch;
+    flex-grow: 1;
+  }
+
+  .registration-wrapper > details {
+    inline-size: 35ch;
+  }
+
+  @media (max-width: 700px) {
+    .registration-wrapper > form {
+      order: 1;
+    }
   }
 </style>

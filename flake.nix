@@ -23,7 +23,10 @@
         in
         {
           api = pkgs.mkShell {
-            packages = with pkgs; [ postgresql_16 ];
+            packages = with pkgs; [
+              postgresql_16
+              postgrest
+            ];
             shellHook = ''
               alias dbmate="${pkgs.dbmate}/bin/dbmate --no-dump-schema --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
@@ -49,6 +52,8 @@
           dev-vm = self.nixosConfigurations.dev-vm.config.system.build.vm;
 
           default = pkgs.callPackage ./nix/package.nix { };
+
+          docker = pkgs.callPackage ./nix/docker.nix { };
         }
       );
 
@@ -62,8 +67,12 @@
             type = "app";
             program = "${pkgs.writeShellScriptBin "api-setup" ''
               JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
+              WEBSITE_MAX_STORAGE_SIZE=100
+              WEBSITE_MAX_NUMBER_USER=3
 
               ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
+              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_storage_size\" TO $WEBSITE_MAX_STORAGE_SIZE"
+              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_number_user\" TO $WEBSITE_MAX_NUMBER_USER"
 
               ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${self.outPath}/rest-api/db/migrations up
 

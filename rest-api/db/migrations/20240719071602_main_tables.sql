@@ -9,9 +9,15 @@ CREATE ROLE anon NOLOGIN NOINHERIT;
 
 CREATE ROLE authenticated_user NOLOGIN NOINHERIT;
 
+CREATE ROLE administrator NOLOGIN;
+
 GRANT anon TO authenticator;
 
 GRANT authenticated_user TO authenticator;
+
+GRANT administrator TO authenticator;
+
+GRANT authenticated_user TO administrator;
 
 GRANT USAGE ON SCHEMA api TO anon;
 
@@ -23,9 +29,10 @@ ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-  username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3),
+  username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3 AND username ~ '^[a-zA-Z0-9_-]+$'),
   password_hash CHAR(60) NOT NULL,
-  role NAME NOT NULL DEFAULT 'authenticated_user',
+  user_role NAME NOT NULL DEFAULT 'authenticated_user',
+  max_number_websites INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_number_user') ::INT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP()
 );
 
@@ -34,11 +41,11 @@ CREATE TABLE internal.website (
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
+  max_storage_size INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_storage_size') ::INT,
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
-  title_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', title)) STORED
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
 
 CREATE TABLE internal.media (
@@ -74,7 +81,8 @@ CREATE TABLE internal.header (
 
 CREATE TABLE internal.home (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
+  meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
@@ -84,7 +92,7 @@ CREATE TABLE internal.docs_category (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
-  category_weight INTEGER CHECK (category_weight >= 0) NOT NULL,
+  category_weight INT CHECK (category_weight >= 0) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
@@ -101,13 +109,12 @@ CREATE TABLE internal.article (
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
   publication_date DATE,
-  main_content TEXT CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) CHECK (TRIM(main_content) != ''),
   category UUID REFERENCES internal.docs_category (id) ON DELETE SET NULL,
-  article_weight INTEGER CHECK (article_weight IS NULL OR article_weight >= 0),
+  article_weight INT CHECK (article_weight IS NULL OR article_weight >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
-  title_description_search TSVECTOR GENERATED ALWAYS AS (TO_TSVECTOR('english', COALESCE(title, '') || ' ' || COALESCE(meta_description, ''))) STORED,
   UNIQUE (website_id, category, article_weight)
 );
 
@@ -120,7 +127,7 @@ CREATE TABLE internal.footer (
 
 CREATE TABLE internal.legal_information (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content TEXT NOT NULL CHECK (TRIM(main_content) != ''),
+  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
@@ -129,7 +136,7 @@ CREATE TABLE internal.legal_information (
 CREATE TABLE internal.collab (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE,
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE,
-  permission_level INTEGER CHECK (permission_level IN (10, 20, 30)) NOT NULL DEFAULT 10,
+  permission_level INT CHECK (permission_level IN (10, 20, 30)) NOT NULL DEFAULT 10,
   added_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
@@ -166,6 +173,8 @@ DROP SCHEMA internal;
 DROP ROLE anon;
 
 DROP ROLE authenticated_user;
+
+DROP ROLE administrator;
 
 DROP ROLE authenticator;
 

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { deserialize, applyAction } from "$app/forms";
   import { textareaScrollTop, previewContent } from "$lib/runes.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { LOADING_DELAY } from "$lib/utils";
 
   const {
     apiPrefix,
@@ -10,6 +12,8 @@
   }: { apiPrefix: string; label: string; name: string; content: string } = $props();
 
   let mainContentTextarea: HTMLTextAreaElement;
+  let loadingDelay: number;
+  let pasting = $state(false);
 
   const updateScrollPercentage = () => {
     const { scrollTop, scrollHeight, clientHeight } = mainContentTextarea;
@@ -27,6 +31,8 @@
     const fileObject = file.getAsFile();
 
     if (!fileObject) return;
+
+    loadingDelay = window.setTimeout(() => (pasting = true), LOADING_DELAY);
 
     const formData = new FormData();
     formData.append("file", fileObject);
@@ -46,23 +52,37 @@
       const fileUrl = `${apiPrefix}/rpc/retrieve_file?id=${fileId}`;
 
       const target = event.target as HTMLTextAreaElement;
+      const markdownToInsert = `![](${fileUrl})`;
+      const cursorPosition = target.selectionStart;
       const newContent =
-        target.value.slice(0, target.selectionStart) +
-        `![](${fileUrl})` +
-        target.value.slice(target.selectionStart);
+        target.value.slice(0, cursorPosition) +
+        markdownToInsert +
+        target.value.slice(cursorPosition);
 
+      target.value = newContent;
       previewContent.value = newContent;
-    } else {
-      return;
+
+      const newCursorPosition = cursorPosition + markdownToInsert.length;
+      target.setSelectionRange(newCursorPosition, newCursorPosition);
+      target.focus();
     }
+
+    window.clearTimeout(loadingDelay);
+    pasting = false;
+    return;
   };
 </script>
+
+{#if pasting}
+  <LoadingSpinner />
+{/if}
 
 <label>
   {label}:
   <textarea
     {name}
     rows="20"
+    maxlength="200000"
     bind:value={previewContent.value}
     bind:this={mainContentTextarea}
     onscroll={updateScrollPercentage}

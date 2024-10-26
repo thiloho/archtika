@@ -44,14 +44,16 @@
           <input type="number" name="article-weight" value={data.article.article_weight} min="0" />
         </label>
 
-        <label>
-          Category:
-          <select name="category">
-            {#each data.categories as { id, category_name }}
-              <option value={id} selected={id === data.article.category}>{category_name}</option>
-            {/each}
-          </select>
-        </label>
+        {#if data.categories.length > 0}
+          <label>
+            Category:
+            <select name="category">
+              {#each data.categories as { id, category_name }}
+                <option value={id} selected={id === data.article.category}>{category_name}</option>
+              {/each}
+            </select>
+          </label>
+        {/if}
       {/if}
 
       <label>
@@ -100,7 +102,7 @@
             <input type="file" name="cover-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
           </label>
           {#if data.article.cover_image}
-            <Modal id="preview-cover-article-{data.article.id}" text="Preview">
+            <Modal id="preview-cover-article-{data.article.id}" text="Preview" isWider={true}>
               <img
                 src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
                 alt=""
@@ -117,7 +119,7 @@
         content={data.article.main_content ?? ""}
       />
 
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={data.permissionLevel === 10}>Update article</button>
     </form>
   </section>
 </WebsiteEditor>

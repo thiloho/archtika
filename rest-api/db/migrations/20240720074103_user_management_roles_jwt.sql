@@ -13,9 +13,9 @@ BEGIN
     FROM
       pg_roles AS r
     WHERE
-      r.rolname = NEW.role)) THEN
+      r.rolname = NEW.user_role)) THEN
     RAISE foreign_key_violation
-    USING message = 'Unknown database role: ' || NEW.role;
+    USING message = 'Unknown database role: ' || NEW.user_role;
   END IF;
     RETURN NULL;
 END
@@ -48,7 +48,7 @@ CREATE FUNCTION internal.user_role (username TEXT, pass TEXT, OUT role_name NAME
 AS $$
 BEGIN
   SELECT
-    ROLE INTO role_name
+    u.user_role INTO role_name
   FROM
     internal.user AS u
   WHERE
@@ -96,8 +96,17 @@ BEGIN
     RAISE invalid_parameter_value
     USING message = 'Password must contain at least one special character';
   ELSE
-    INSERT INTO internal.user (username, password_hash)
-      VALUES (register.username, register.pass)
+    INSERT INTO internal.user (username, password_hash, user_role)
+    SELECT
+      register.username,
+      register.pass,
+      CASE WHEN COUNT(*) = 0 THEN
+        'administrator'
+      ELSE
+        'authenticated_user'
+      END
+    FROM
+      internal.user
     RETURNING
       id INTO user_id;
   END IF;
@@ -111,7 +120,7 @@ AS $$
 DECLARE
   _role NAME;
   _user_id UUID;
-  _exp INTEGER;
+  _exp INT := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INT + 86400;
 BEGIN
   SELECT
     internal.user_role (login.username, login.pass) INTO _role;
@@ -120,12 +129,11 @@ BEGIN
     USING message = 'Invalid username or password';
   ELSE
     SELECT
-      id INTO _user_id
+      u.id INTO _user_id
     FROM
       internal.user AS u
     WHERE
       u.username = login.username;
-    _exp := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INTEGER + 86400;
     SELECT
       SIGN(JSON_BUILD_OBJECT('role', _role, 'user_id', _user_id, 'username', login.username, 'exp', _exp), CURRENT_SETTING('app.jwt_secret')) INTO token;
   END IF;
@@ -155,28 +163,28 @@ $$
 LANGUAGE plpgsql
 SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION api.register (TEXT, TEXT) TO anon;
+GRANT EXECUTE ON FUNCTION api.register TO anon;
 
-GRANT EXECUTE ON FUNCTION api.login (TEXT, TEXT) TO anon;
+GRANT EXECUTE ON FUNCTION api.login TO anon;
 
-GRANT EXECUTE ON FUNCTION api.delete_account (TEXT) TO authenticated_user;
+GRANT EXECUTE ON FUNCTION api.delete_account TO authenticated_user;
 
 -- migrate:down
 DROP TRIGGER encrypt_pass ON internal.user;
 
 DROP TRIGGER ensure_user_role_exists ON internal.user;
 
-DROP FUNCTION api.register (TEXT, TEXT);
+DROP FUNCTION api.register;
 
-DROP FUNCTION api.login (TEXT, TEXT);
+DROP FUNCTION api.login;
 
-DROP FUNCTION api.delete_account (TEXT);
+DROP FUNCTION api.delete_account;
 
-DROP FUNCTION internal.user_role (TEXT, TEXT);
+DROP FUNCTION internal.user_role;
 
-DROP FUNCTION internal.encrypt_pass ();
+DROP FUNCTION internal.encrypt_pass;
 
-DROP FUNCTION internal.check_role_exists ();
+DROP FUNCTION internal.check_role_exists;
 
 DROP EXTENSION pgjwt;
 

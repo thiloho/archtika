@@ -27,7 +27,6 @@ export interface Article {
   created_at: Date;
   last_modified_at: Date;
   last_modified_by: string | null;
-  title_description_search: any | null;
 }
 export interface ArticleInput {
   id?: string;
@@ -44,7 +43,6 @@ export interface ArticleInput {
   created_at?: Date;
   last_modified_at?: Date;
   last_modified_by?: string | null;
-  title_description_search?: any | null;
 }
 const article = {
   tableName: "article",
@@ -62,8 +60,7 @@ const article = {
     "article_weight",
     "created_at",
     "last_modified_at",
-    "last_modified_by",
-    "title_description_search"
+    "last_modified_by"
   ],
   requiredForInsert: ["website_id", "title"],
   primaryKey: "id",
@@ -302,18 +299,26 @@ const header = {
 export interface Home {
   website_id: string;
   main_content: string;
+  meta_description: string | null;
   last_modified_at: Date;
   last_modified_by: string | null;
 }
 export interface HomeInput {
   website_id: string;
   main_content: string;
+  meta_description?: string | null;
   last_modified_at?: Date;
   last_modified_by?: string | null;
 }
 const home = {
   tableName: "home",
-  columns: ["website_id", "main_content", "last_modified_at", "last_modified_by"],
+  columns: [
+    "website_id",
+    "main_content",
+    "meta_description",
+    "last_modified_at",
+    "last_modified_by"
+  ],
   requiredForInsert: ["website_id", "main_content"],
   primaryKey: "website_id",
   foreignKeys: {
@@ -433,19 +438,21 @@ export interface User {
   id: string;
   username: string;
   password_hash: string;
-  role: string;
+  user_role: string;
+  max_number_websites: number;
   created_at: Date;
 }
 export interface UserInput {
   id?: string;
   username: string;
   password_hash: string;
-  role?: string;
+  user_role?: string;
+  max_number_websites?: number;
   created_at?: Date;
 }
 const user = {
   tableName: "user",
-  columns: ["id", "username", "password_hash", "role", "created_at"],
+  columns: ["id", "username", "password_hash", "user_role", "max_number_websites", "created_at"],
   requiredForInsert: ["username", "password_hash"],
   primaryKey: "id",
   foreignKeys: {},
@@ -459,22 +466,22 @@ export interface Website {
   user_id: string;
   content_type: string;
   title: string;
+  max_storage_size: number;
   is_published: boolean;
   created_at: Date;
   last_modified_at: Date;
   last_modified_by: string | null;
-  title_search: any | null;
 }
 export interface WebsiteInput {
   id?: string;
   user_id?: string;
   content_type: string;
   title: string;
+  max_storage_size?: number;
   is_published?: boolean;
   created_at?: Date;
   last_modified_at?: Date;
   last_modified_by?: string | null;
-  title_search?: any | null;
 }
 const website = {
   tableName: "website",
@@ -483,11 +490,11 @@ const website = {
     "user_id",
     "content_type",
     "title",
+    "max_storage_size",
     "is_published",
     "created_at",
     "last_modified_at",
-    "last_modified_by",
-    "title_search"
+    "last_modified_by"
   ],
   requiredForInsert: ["content_type", "title"],
   primaryKey: "id",

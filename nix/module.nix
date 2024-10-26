@@ -76,10 +76,26 @@ in
       description = "API secrets for the DNS-01 challenge (required for wildcard domains).";
     };
 
-    disableRegistration = mkOption {
-      type = types.bool;
-      default = false;
-      description = "By default any user can create an account. That behavior can be disabled by using this option.";
+    settings = mkOption {
+      type = types.submodule {
+        options = {
+          disableRegistration = mkOption {
+            type = types.bool;
+            default = false;
+            description = "By default any user can create an account. That behavior can be disabled by using this option.";
+          };
+          maxUserWebsites = mkOption {
+            type = types.int;
+            default = 2;
+            description = "Maximum number of websites allowed per user by default.";
+          };
+          maxWebsiteStorageSize = mkOption {
+            type = types.int;
+            default = 500;
+            description = "Maximum amount of disk space in MB allowed per user website by default.";
+          };
+        };
+      };
     };
   };
 
@@ -91,7 +107,7 @@ in
 
     users.groups.${cfg.group} = { };
 
-    systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0755 ${cfg.user} ${cfg.group} -" ];
+    systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0777 ${cfg.user} ${cfg.group} -" ];
 
     systemd.services.archtika-api = {
       description = "archtika API service";
@@ -105,12 +121,15 @@ in
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
+        WorkingDirectory = "${cfg.package}/rest-api";
       };
 
       script = ''
         JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
 
         ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '$JWT_SECRET'"
+        ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}"
+        ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:5432/${cfg.databaseName} -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
         ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:5432/archtika?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
@@ -131,7 +150,7 @@ in
       };
 
       script = ''
-        REGISTRATION_IS_DISABLED=${toString cfg.disableRegistration} BODY_SIZE_LIMIT=10M ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
+        REGISTRATION_IS_DISABLED=${toString cfg.settings.disableRegistration} BODY_SIZE_LIMIT=10M ORIGIN=https://${cfg.domain} PORT=${toString cfg.webAppPort} ${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app
       '';
     };
 
@@ -188,7 +207,7 @@ in
                 default_type application/json;
               '';
             };
-            "/api/rpc/register" = mkIf cfg.disableRegistration {
+            "/api/rpc/register" = mkIf cfg.settings.disableRegistration {
               extraConfig = ''
                 deny all;
               '';

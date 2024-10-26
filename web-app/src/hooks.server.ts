@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
+import type { User } from "$lib/db-schema";
 
 export const handle = async ({ event, resolve }) => {
   if (!event.url.pathname.startsWith("/api/")) {
@@ -17,6 +18,13 @@ export const handle = async ({ event, resolve }) => {
 
     if (userData.success) {
       if (["/login", "/register"].includes(event.url.pathname)) {
+        throw redirect(303, "/");
+      }
+
+      if (
+        (userData.data as User).user_role !== "administrator" &&
+        event.url.pathname.includes("/manage")
+      ) {
         throw redirect(303, "/");
       }
 

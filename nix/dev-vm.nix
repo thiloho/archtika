@@ -24,6 +24,9 @@
 
   virtualisation = {
     graphics = false;
+    memorySize = 2048;
+    cores = 2;
+    diskSize = 10240;
     sharedDirectories = {
       websites = {
         source = "/var/www/archtika-websites";
@@ -49,6 +52,15 @@
     postgresql = {
       enable = true;
       package = pkgs.postgresql_16;
+      /*
+        PL/Perl:
+        overrideAttrs (
+          finalAttrs: previousAttrs: {
+            buildInputs = previousAttrs.buildInputs ++ [ pkgs.perl ];
+            configureFlags = previousAttrs.configureFlags ++ [ "--with-perl" ];
+          }
+        );
+      */
       ensureDatabases = [ "archtika" ];
       authentication = lib.mkForce ''
         local all all trust
@@ -59,6 +71,11 @@
     };
     nginx = {
       enable = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings = true;
+      recommendedZstdSettings = true;
+      recommendedOptimisation = true;
+
       virtualHosts."_" = {
         listen = [
           {
@@ -67,13 +84,15 @@
           }
         ];
         locations = {
+          "/previews/" = {
+            alias = "/var/www/archtika-websites/previews/";
+            index = "index.html";
+            tryFiles = "$uri $uri/ $uri.html =404";
+          };
           "/" = {
             root = "/var/www/archtika-websites";
             index = "index.html";
             tryFiles = "$uri $uri/ $uri.html =404";
-            extraConfig = ''
-              autoindex on;
-            '';
           };
         };
       };
