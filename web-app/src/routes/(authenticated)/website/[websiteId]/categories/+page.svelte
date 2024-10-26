@@ -56,7 +56,7 @@
       </h2>
 
       <ul class="unpadded">
-        {#each data.categories as { id, website_id, user_id, category_name, category_weight } (`${website_id}-${id}`)}
+        {#each data.categories as { id, user_id, category_name, category_weight } (id)}
           <li class="category-card">
             <p>
               <strong>{category_name} ({category_weight})</strong>

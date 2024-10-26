@@ -5,15 +5,13 @@ on:
     workflows: [ 'Playwright tests' ]
     types: [ completed ]
     branches: [ devel, main ]
-env:
-  SERVER_USER: root
-  QS_SERVER_IP: 128.140.75.240
-  PROD_SERVER_IP: 116.203.122.75
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    environment: ${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }}
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -27,14 +25,14 @@ jobs:
     - name: Install SSH Key
       uses: shimataro/ssh-key-action@v2
       with:
-        key: ${{ github.event.workflow_run.head_branch == 'devel' && secrets.QS_SSH_KEY || secrets.PROD_SSH_KEY }}
-        known_hosts: ${{ github.event.workflow_run.head_branch == 'devel' && secrets.QS_KNOWN_HOSTS || secrets.PROD_KNOWN_HOSTS }}
+        key: ${{ secrets.SSH_KEY }}
+        known_hosts: ${{ vars.KNOWN_HOSTS }}
 
     - name: Deploy to demo server
       run: |
         nix run nixpkgs#nixos-rebuild -- switch \
-          --flake .#${{ github.event.workflow_run.head_branch == 'devel' && 'qs' || 'prod' }} \
+          --flake .#${{ vars.FLAKE_CONFIGURATION_NAME }} \
           --fast \
-          --build-host ${{ env.SERVER_USER }}@${{ github.event.workflow_run.head_branch == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
-          --target-host ${{ env.SERVER_USER }}@${{ github.event.workflow_run.head_branch == 'devel' && env.QS_SERVER_IP || env.PROD_SERVER_IP }} \
+          --build-host ${{ vars.SERVER_DEPLOY_USER }}@${{ vars.PUBLIC_SERVER_IP }} \
+          --target-host ${{ vars.SERVER_DEPLOY_USER }}@${{ vars.PUBLIC_SERVER_IP }} \
           --use-remote-sudo

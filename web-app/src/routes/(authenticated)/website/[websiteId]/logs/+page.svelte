@@ -111,7 +111,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each data.changeLog as { id, table_name, operation, tstamp, old_value, new_value, user_id, username }}
+          {#each data.changeLog as { id, table_name, operation, tstamp, old_value, new_value, user_id, username } (id)}
             <tr>
               <td>
                 <span style:text-decoration={user_id ? "" : "line-through"}>
