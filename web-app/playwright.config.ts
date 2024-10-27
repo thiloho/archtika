@@ -11,6 +11,7 @@ const config: PlaywrightTestConfig = {
   },
   testDir: "./tests",
   testMatch: /(.+\.)?(test|spec)\.ts/,
+  workers: 1,
   retries: 3,
   // https://github.com/NixOS/nixpkgs/issues/288826
   projects: [
