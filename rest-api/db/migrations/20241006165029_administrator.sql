@@ -42,9 +42,7 @@ BEGIN
       w.user_id = $1
     GROUP BY
       w.id,
-      w.title
-    ORDER BY
-      storage_size_bytes DESC', _union_queries);
+      w.title', _union_queries);
   RETURN QUERY EXECUTE _query
   USING _user_id;
 END;

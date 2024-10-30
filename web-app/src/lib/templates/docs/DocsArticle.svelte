@@ -19,6 +19,7 @@
   nestingLevel={1}
   {apiUrl}
   title={article.title}
+  slug={article.slug as string}
   metaDescription={article.meta_description}
   {websiteUrl}
 />

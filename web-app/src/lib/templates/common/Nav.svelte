@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type WebsiteOverview, slugify } from "../../utils";
+  import { type WebsiteOverview } from "../../utils";
   import type { Article } from "../../db-schema";
 
   const {
@@ -61,9 +61,9 @@
             <li>
               <strong>{key}</strong>
               <ul>
-                {#each categorizedArticles[key] as { title }}
+                {#each categorizedArticles[key] as { title, slug }}
                   <li>
-                    <a href="{isIndexPage ? './articles' : '.'}/{slugify(title)}">{title}</a>
+                    <a href="{isIndexPage ? './articles' : '.'}/{slug}">{title}</a>
                   </li>
                 {/each}
               </ul>
@@ -87,7 +87,7 @@
         />
       {/if}
     </svelte:element>
-    <label style="margin-inline-start: auto;" for="toggle-theme">
+    <label for="toggle-theme">
       <input type="checkbox" id="toggle-theme" hidden />
       <svg
         xmlns="http://www.w3.org/2000/svg"

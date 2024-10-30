@@ -31,18 +31,37 @@
       <a href="#create-article">Create article</a>
     </h2>
 
-    <Modal id="create-article" text="Create article">
-      <h3>Create article</h3>
-
-      <form method="POST" action="?/createArticle" use:enhance={enhanceForm({ closeModal: true })}>
-        <label>
-          Title:
-          <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
-        </label>
-
-        <button type="submit" disabled={data.permissionLevel === 10}>Create article</button>
-      </form>
-    </Modal>
+    <div class="multi-wrapper">
+      <Modal id="create-article" text="Create article">
+        <h3>Create article</h3>
+        <form
+          method="POST"
+          action="?/createArticle"
+          use:enhance={enhanceForm({ closeModal: true })}
+        >
+          <label>
+            Title:
+            <input type="text" name="title" pattern="\S(.*\S)?" maxlength="100" required />
+          </label>
+          <button type="submit" disabled={data.permissionLevel === 10}>Create article</button>
+        </form>
+      </Modal>
+      <Modal id="import-articles" text="Import articles">
+        <h3>Import articles</h3>
+        <form
+          method="POST"
+          action="?/importArticles"
+          enctype="multipart/form-data"
+          use:enhance={enhanceForm({ closeModal: true })}
+        >
+          <label>
+            Markdown files:
+            <input type="file" name="import-articles" accept=".md" multiple required />
+          </label>
+          <button type="submit" disabled={data.permissionLevel === 10}>Import articles</button>
+        </form>
+      </Modal>
+    </div>
   </section>
 
   {#if data.totalArticleCount > 0}
@@ -51,6 +70,11 @@
         <a href="#all-articles">All articles</a>
       </h2>
 
+      <a
+        class="export-anchor"
+        href={`${data.API_BASE_PREFIX}/rpc/export_articles_zip?website_id=${data.website.id}`}
+        >Export articles</a
+      >
       <details>
         <summary>Search & Filter</summary>
         <form method="GET">
@@ -92,7 +116,6 @@
                     fill="currentColor"
                     width="16"
                     height="16"
-                    style="vertical-align: middle"
                   >
                     <path
                       fill-rule="evenodd"
@@ -159,5 +182,16 @@
     display: flex;
     gap: var(--space-s);
     align-items: center;
+  }
+
+  .multi-wrapper {
+    display: flex;
+    gap: var(--space-s);
+    flex-wrap: wrap;
+    align-items: start;
+  }
+
+  .export-anchor {
+    max-inline-size: fit-content;
   }
 </style>

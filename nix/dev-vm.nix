@@ -99,6 +99,14 @@
     };
   };
 
+  systemd.services.postgresql = {
+    path = with pkgs; [
+      # Tar and gzip are needed for tar.gz exports
+      gnutar
+      gzip
+    ];
+  };
+
   services.getty.autologinUser = "dev";
 
   system.stateVersion = "24.05";

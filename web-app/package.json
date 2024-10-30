@@ -11,7 +11,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal"
+    "gents": "pg-to-ts generate -c postgres://postgres@localhost:15432/archtika -o src/lib/db-schema.ts -s internal --datesAsStrings"
   },
   "devDependencies": {
     "@playwright/test": "1.47.0",

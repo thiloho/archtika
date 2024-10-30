@@ -47,7 +47,7 @@ test(`Update user website storage limit`, async ({ page }) => {
     .locator("details")
     .getByRole("button", { name: "Update storage limit" })
     .click();
-  await expect(page.getByText("Successfully updated user website storage size")).toBeVisible();
+  await expect(page.getByText("Successfully updated website storage")).toBeVisible();
 });
 
 test(`Delete user`, async ({ page }) => {

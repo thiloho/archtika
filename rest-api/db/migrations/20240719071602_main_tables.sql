@@ -1,4 +1,6 @@
 -- migrate:up
+CREATE EXTENSION unaccent;
+
 CREATE SCHEMA internal;
 
 CREATE SCHEMA api;
@@ -26,6 +28,17 @@ GRANT USAGE ON SCHEMA api TO authenticated_user;
 GRANT USAGE ON SCHEMA internal TO authenticated_user;
 
 ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
+CREATE FUNCTION internal.immutable_unaccent (TEXT)
+  RETURNS TEXT
+  AS $$
+  SELECT
+    unaccent ($1);
+$$
+LANGUAGE sql
+IMMUTABLE;
+
+GRANT EXECUTE ON FUNCTION internal.immutable_unaccent TO authenticated_user;
 
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
@@ -91,7 +104,7 @@ CREATE TABLE internal.docs_category (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
-  category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
+  category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != '' AND category_name != 'Uncategorized'),
   category_weight INT CHECK (category_weight >= 0) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
@@ -105,6 +118,7 @@ CREATE TABLE internal.article (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   title VARCHAR(100) NOT NULL CHECK (TRIM(title) != ''),
+  slug VARCHAR(100) GENERATED ALWAYS AS (REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(internal.immutable_unaccent (title), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g')) STORED,
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
@@ -115,6 +129,7 @@ CREATE TABLE internal.article (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  UNIQUE (website_id, slug),
   UNIQUE (website_id, category, article_weight)
 );
 
@@ -168,6 +183,8 @@ DROP TABLE internal.user;
 
 DROP SCHEMA api;
 
+DROP FUNCTION internal.immutable_unaccent;
+
 DROP SCHEMA internal;
 
 DROP ROLE anon;
@@ -179,4 +196,6 @@ DROP ROLE administrator;
 DROP ROLE authenticator;
 
 ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC;
+
+DROP EXTENSION unaccent;
 

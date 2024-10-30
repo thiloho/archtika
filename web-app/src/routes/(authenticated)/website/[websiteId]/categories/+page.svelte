@@ -36,7 +36,13 @@
       <form method="POST" action="?/createCategory" use:enhance={enhanceForm({ closeModal: true })}>
         <label>
           Name:
-          <input type="text" name="category-name" maxlength="50" required />
+          <input
+            type="text"
+            name="category-name"
+            maxlength="50"
+            pattern="^(?!Uncategorized$).+$"
+            required
+          />
         </label>
 
         <label>
@@ -80,6 +86,7 @@
                       name="category-name"
                       value={category_name}
                       maxlength="50"
+                      pattern="^(?!Uncategorized$).+$"
                       required
                     />
                   </label>

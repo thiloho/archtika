@@ -169,6 +169,14 @@ in
       extraPlugins = with pkgs.postgresql16Packages; [ pgjwt ];
     };
 
+    systemd.services.postgresql = {
+      path = with pkgs; [
+        # Tar and gzip are needed for tar.gz exports
+        gnutar
+        gzip
+      ];
+    };
+
     services.nginx = {
       enable = true;
       recommendedProxySettings = true;

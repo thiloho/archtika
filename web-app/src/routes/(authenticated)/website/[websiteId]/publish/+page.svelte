@@ -71,7 +71,7 @@
             placeholder="my-blog"
             minlength="3"
             maxlength="16"
-            pattern="^[a-z]+(-[a-z]+)*$"
+            pattern="^(?!previews$)[a-z]+(-[a-z]+)*$"
             required
           />
         </label>

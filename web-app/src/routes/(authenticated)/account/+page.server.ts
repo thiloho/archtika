@@ -4,7 +4,7 @@ import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 export const load: PageServerLoad = async ({ fetch, locals }) => {
   const storageSizes = await apiRequest(
     fetch,
-    `${API_BASE_PREFIX}/rpc/user_websites_storage_size`,
+    `${API_BASE_PREFIX}/rpc/user_websites_storage_size?order=max_storage_bytes.desc`,
     "GET",
     {
       returnData: true

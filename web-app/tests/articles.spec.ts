@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { randomBytes } from "node:crypto";
 import {
   userOwner,
   authenticate,
@@ -6,6 +7,8 @@ import {
   collabUsers,
   collabTestingWebsite
 } from "./shared";
+
+const genArticleName = () => randomBytes(12).toString("hex");
 
 test.describe("Website owner", () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +24,7 @@ test.describe("Website owner", () => {
   test(`Create article`, async ({ page }) => {
     await page.getByRole("button", { name: "Create article" }).click();
     await page.locator("#create-article-modal").getByLabel("Title:").click();
-    await page.locator("#create-article-modal").getByLabel("Title:").fill("Article");
+    await page.locator("#create-article-modal").getByLabel("Title:").fill(genArticleName());
     await page
       .locator("#create-article-modal")
       .getByRole("button", { name: "Create article" })
@@ -34,7 +37,7 @@ test.describe("Website owner", () => {
     test.beforeEach(async ({ page }) => {
       await page.getByRole("button", { name: "Create article" }).click();
       await page.locator("#create-article-modal").getByLabel("Title:").click();
-      await page.locator("#create-article-modal").getByLabel("Title:").fill("Article");
+      await page.locator("#create-article-modal").getByLabel("Title:").fill(genArticleName());
       await page
         .locator("#create-article-modal")
         .getByRole("button", { name: "Create article" })
@@ -81,7 +84,7 @@ for (const permissionLevel of permissionLevels) {
     test(`Create article`, async ({ page }) => {
       await page.getByRole("button", { name: "Create article" }).click();
       await page.locator("#create-article-modal").getByLabel("Title:").click();
-      await page.locator("#create-article-modal").getByLabel("Title:").fill("Article");
+      await page.locator("#create-article-modal").getByLabel("Title:").fill(genArticleName());
       await page
         .locator("#create-article-modal")
         .getByRole("button", { name: "Create article" })

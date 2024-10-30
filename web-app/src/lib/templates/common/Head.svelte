@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { slugify, type WebsiteOverview } from "../../utils";
+  import { type WebsiteOverview } from "../../utils";
 
   const {
     websiteOverview,
     nestingLevel,
     apiUrl,
     title,
+    slug,
     metaDescription,
     websiteUrl
   }: {
@@ -13,6 +14,7 @@
     nestingLevel: number;
     apiUrl: string;
     title: string;
+    slug?: string;
     metaDescription?: string | null;
     websiteUrl: string;
   } = $props();
@@ -20,7 +22,7 @@
   const constructedTitle =
     websiteOverview.title === title ? title : `${websiteOverview.title} | ${title}`;
 
-  let ogUrl = `${websiteUrl.replace(/\/$/, "")}${nestingLevel === 0 ? (websiteOverview.title === title ? "" : `/${slugify(title)}`) : `/articles/${slugify(title)}`}`;
+  let ogUrl = `${websiteUrl.replace(/\/$/, "")}${nestingLevel === 0 ? (websiteOverview.title === title ? "" : `/${slug}`) : `/articles/${slug}`}`;
 </script>
 
 <svelte:head>

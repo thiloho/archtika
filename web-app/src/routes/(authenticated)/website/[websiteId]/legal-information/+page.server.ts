@@ -44,7 +44,7 @@ export const actions: Actions = {
     });
   },
   deleteLegalInformation: async ({ fetch, params }) => {
-    const deleteLegalInformation = await apiRequest(
+    return await apiRequest(
       fetch,
       `${API_BASE_PREFIX}/legal_information?website_id=eq.${params.websiteId}`,
       "DELETE",
@@ -52,12 +52,6 @@ export const actions: Actions = {
         successMessage: "Successfully deleted legal information"
       }
     );
-
-    if (!deleteLegalInformation.success) {
-      return deleteLegalInformation;
-    }
-
-    return deleteLegalInformation;
   },
   pasteImage: async ({ request, fetch, params }) => {
     const data = await request.formData();

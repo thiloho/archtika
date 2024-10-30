@@ -17,15 +17,16 @@ export interface Article {
   website_id: string;
   user_id: string | null;
   title: string;
+  slug: string | null;
   meta_description: string | null;
   meta_author: string | null;
   cover_image: string | null;
-  publication_date: Date | null;
+  publication_date: string | null;
   main_content: string | null;
   category: string | null;
   article_weight: number | null;
-  created_at: Date;
-  last_modified_at: Date;
+  created_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface ArticleInput {
@@ -33,15 +34,16 @@ export interface ArticleInput {
   website_id: string;
   user_id?: string | null;
   title: string;
+  slug?: string | null;
   meta_description?: string | null;
   meta_author?: string | null;
   cover_image?: string | null;
-  publication_date?: Date | null;
+  publication_date?: string | null;
   main_content?: string | null;
   category?: string | null;
   article_weight?: number | null;
-  created_at?: Date;
-  last_modified_at?: Date;
+  created_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const article = {
@@ -51,6 +53,7 @@ const article = {
     "website_id",
     "user_id",
     "title",
+    "slug",
     "meta_description",
     "meta_author",
     "cover_image",
@@ -81,7 +84,7 @@ export interface ChangeLog {
   website_id: string | null;
   user_id: string | null;
   username: string;
-  tstamp: Date;
+  tstamp: string;
   table_name: string;
   operation: string;
   old_value: any | null;
@@ -92,7 +95,7 @@ export interface ChangeLogInput {
   website_id?: string | null;
   user_id?: string | null;
   username?: string;
-  tstamp?: Date;
+  tstamp?: string;
   table_name: string;
   operation: string;
   old_value?: any | null;
@@ -126,16 +129,16 @@ export interface Collab {
   website_id: string;
   user_id: string;
   permission_level: number;
-  added_at: Date;
-  last_modified_at: Date;
+  added_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface CollabInput {
   website_id: string;
   user_id: string;
   permission_level?: number;
-  added_at?: Date;
-  last_modified_at?: Date;
+  added_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const collab = {
@@ -166,8 +169,8 @@ export interface DocsCategory {
   user_id: string | null;
   category_name: string;
   category_weight: number;
-  created_at: Date;
-  last_modified_at: Date;
+  created_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface DocsCategoryInput {
@@ -176,8 +179,8 @@ export interface DocsCategoryInput {
   user_id?: string | null;
   category_name: string;
   category_weight: number;
-  created_at?: Date;
-  last_modified_at?: Date;
+  created_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const docs_category = {
@@ -207,15 +210,15 @@ const docs_category = {
 export interface DomainPrefix {
   website_id: string;
   prefix: string;
-  created_at: Date;
-  last_modified_at: Date;
+  created_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface DomainPrefixInput {
   website_id: string;
   prefix: string;
-  created_at?: Date;
-  last_modified_at?: Date;
+  created_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const domain_prefix = {
@@ -235,13 +238,13 @@ const domain_prefix = {
 export interface Footer {
   website_id: string;
   additional_text: string;
-  last_modified_at: Date;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface FooterInput {
   website_id: string;
   additional_text: string;
-  last_modified_at?: Date;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const footer = {
@@ -263,7 +266,7 @@ export interface Header {
   logo_type: string;
   logo_text: string | null;
   logo_image: string | null;
-  last_modified_at: Date;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface HeaderInput {
@@ -271,7 +274,7 @@ export interface HeaderInput {
   logo_type?: string;
   logo_text?: string | null;
   logo_image?: string | null;
-  last_modified_at?: Date;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const header = {
@@ -300,14 +303,14 @@ export interface Home {
   website_id: string;
   main_content: string;
   meta_description: string | null;
-  last_modified_at: Date;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface HomeInput {
   website_id: string;
   main_content: string;
   meta_description?: string | null;
-  last_modified_at?: Date;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const home = {
@@ -333,15 +336,15 @@ const home = {
 export interface LegalInformation {
   website_id: string;
   main_content: string;
-  created_at: Date;
-  last_modified_at: Date;
+  created_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface LegalInformationInput {
   website_id: string;
   main_content: string;
-  created_at?: Date;
-  last_modified_at?: Date;
+  created_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const legal_information = {
@@ -365,7 +368,7 @@ export interface Media {
   blob: string;
   mimetype: string;
   original_name: string;
-  created_at: Date;
+  created_at: string;
 }
 export interface MediaInput {
   id?: string;
@@ -374,7 +377,7 @@ export interface MediaInput {
   blob: string;
   mimetype: string;
   original_name: string;
-  created_at?: Date;
+  created_at?: string;
 }
 const media = {
   tableName: "media",
@@ -397,7 +400,7 @@ export interface Settings {
   background_color_dark_theme: string;
   background_color_light_theme: string;
   favicon_image: string | null;
-  last_modified_at: Date;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface SettingsInput {
@@ -407,7 +410,7 @@ export interface SettingsInput {
   background_color_dark_theme?: string;
   background_color_light_theme?: string;
   favicon_image?: string | null;
-  last_modified_at?: Date;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const settings = {
@@ -440,7 +443,7 @@ export interface User {
   password_hash: string;
   user_role: string;
   max_number_websites: number;
-  created_at: Date;
+  created_at: string;
 }
 export interface UserInput {
   id?: string;
@@ -448,7 +451,7 @@ export interface UserInput {
   password_hash: string;
   user_role?: string;
   max_number_websites?: number;
-  created_at?: Date;
+  created_at?: string;
 }
 const user = {
   tableName: "user",
@@ -468,8 +471,8 @@ export interface Website {
   title: string;
   max_storage_size: number;
   is_published: boolean;
-  created_at: Date;
-  last_modified_at: Date;
+  created_at: string;
+  last_modified_at: string;
   last_modified_by: string | null;
 }
 export interface WebsiteInput {
@@ -479,8 +482,8 @@ export interface WebsiteInput {
   title: string;
   max_storage_size?: number;
   is_published?: boolean;
-  created_at?: Date;
-  last_modified_at?: Date;
+  created_at?: string;
+  last_modified_at?: string;
   last_modified_by?: string | null;
 }
 const website = {

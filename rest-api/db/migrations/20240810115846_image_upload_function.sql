@@ -1,5 +1,5 @@
 -- migrate:up
-CREATE DOMAIN "*/*" AS bytea;
+CREATE DOMAIN "*/*" AS BYTEA;
 
 CREATE FUNCTION api.upload_file (BYTEA, OUT file_id UUID)
 AS $$

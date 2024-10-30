@@ -26,7 +26,7 @@ export const ALLOWED_MIME_TYPES = [
   "image/svg+xml"
 ];
 
-export const slugify = (string: string) => {
+const slugify = (string: string) => {
   return string
     .toString()
     .normalize("NFKD") // Normalize Unicode characters

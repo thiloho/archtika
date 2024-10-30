@@ -77,7 +77,7 @@
     </details>
 
     <ul class="website-grid unpadded">
-      {#each data.websites as { id, user_id, content_type, title, created_at, collab } (id)}
+      {#each data.websites as { id, user_id, content_type, title, created_at, last_modified_at, collab } (id)}
         <li class="website-card">
           <p>
             <strong>
@@ -90,8 +90,12 @@
               {content_type}
             </li>
             <li>
-              <strong>Created at:</strong>
+              <strong>Created:</strong>
               <DateTime date={created_at} />
+            </li>
+            <li>
+              <strong>Last modified:</strong>
+              <DateTime date={last_modified_at} />
             </li>
           </ul>
           <div class="website-card__actions">

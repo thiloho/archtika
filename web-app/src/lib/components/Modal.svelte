@@ -9,6 +9,14 @@
   }: { children: Snippet; id: string; text: string; isWider?: boolean } = $props();
 
   const modalId = `${id}-modal`;
+
+  $effect(() => {
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && window.location.hash === `#${modalId}`) {
+        window.location.hash = "!";
+      }
+    });
+  });
 </script>
 
 <a href={`#${modalId}`} role="button">{text}</a>

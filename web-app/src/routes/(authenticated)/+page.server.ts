@@ -76,19 +76,8 @@ export const actions: Actions = {
     const data = await request.formData();
     const id = data.get("id");
 
-    const deleteWebsite = await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/website?id=eq.${id}`,
-      "DELETE",
-      {
-        successMessage: "Successfully deleted website"
-      }
-    );
-
-    if (!deleteWebsite.success) {
-      return deleteWebsite;
-    }
-
-    return deleteWebsite;
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/website?id=eq.${id}`, "DELETE", {
+      successMessage: "Successfully deleted website"
+    });
   }
 };

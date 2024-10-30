@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
   const usersWithWebsites: (User & { website: Website[] })[] = (
     await apiRequest(
       fetch,
-      `${API_BASE_PREFIX}/user?select=*,website!user_id(*)&order=created_at&limit=${PAGINATION_MAX_ITEMS}&offset=${resultOffset}`,
+      `${API_BASE_PREFIX}/user?select=*,website!user_id(*)&order=created_at&website.order=created_at.desc&limit=${PAGINATION_MAX_ITEMS}&offset=${resultOffset}`,
       "GET",
       {
         returnData: true
@@ -61,7 +61,7 @@ export const actions: Actions = {
         body: {
           max_storage_size: data.get("storage-size")
         },
-        successMessage: "Successfully updated user website storage size"
+        successMessage: "Successfully updated website storage"
       }
     );
   },

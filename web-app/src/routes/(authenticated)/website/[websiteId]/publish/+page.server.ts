@@ -4,25 +4,24 @@ import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
 import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
 import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
 import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
-import { type WebsiteOverview, hexToHSL, slugify } from "$lib/utils";
-import { mkdir, readFile, rename, writeFile, chmod, readdir } from "node:fs/promises";
+import { type WebsiteOverview, hexToHSL } from "$lib/utils";
+import { mkdir, readFile, writeFile, chmod, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { render } from "svelte/server";
 import type { Actions, PageServerLoad } from "./$types";
 
+const getOverviewFetchUrl = (websiteId: string) => {
+  return `${API_BASE_PREFIX}/website?id=eq.${websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`;
+};
+
 export const load: PageServerLoad = async ({ params, fetch, parent }) => {
   const websiteOverview: WebsiteOverview = (
-    await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
-      "GET",
-      {
-        headers: {
-          Accept: "application/vnd.pgrst.object+json"
-        },
-        returnData: true
-      }
-    )
+    await apiRequest(fetch, getOverviewFetchUrl(params.websiteId), "GET", {
+      headers: {
+        Accept: "application/vnd.pgrst.object+json"
+      },
+      returnData: true
+    })
   ).data;
 
   const { websitePreviewUrl, websiteProdUrl } = await generateStaticFiles(websiteOverview);
@@ -40,22 +39,15 @@ export const load: PageServerLoad = async ({ params, fetch, parent }) => {
 export const actions: Actions = {
   publishWebsite: async ({ fetch, params }) => {
     const websiteOverview: WebsiteOverview = (
-      await apiRequest(
-        fetch,
-        `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`,
-        "GET",
-        {
-          headers: {
-            Accept: "application/vnd.pgrst.object+json"
-          },
-          returnData: true
-        }
-      )
+      await apiRequest(fetch, getOverviewFetchUrl(params.websiteId), "GET", {
+        headers: {
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        returnData: true
+      })
     ).data;
 
-    await generateStaticFiles(websiteOverview, false);
-
-    return await apiRequest(
+    const publish = await apiRequest(
       fetch,
       `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`,
       "PATCH",
@@ -66,78 +58,33 @@ export const actions: Actions = {
         successMessage: "Successfully published website"
       }
     );
+
+    if (!publish.success) {
+      return publish;
+    }
+
+    await generateStaticFiles(websiteOverview, false);
+
+    return publish;
   },
   createUpdateCustomDomainPrefix: async ({ request, fetch, params }) => {
     const data = await request.formData();
 
-    const oldDomainPrefix = (
-      await apiRequest(
-        fetch,
-        `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
-        "GET",
-        {
-          headers: {
-            Accept: "application/vnd.pgrst.object+json"
-          },
-          returnData: true
-        }
-      )
-    ).data;
-
-    const newDomainPrefix = await apiRequest(fetch, `${API_BASE_PREFIX}/domain_prefix`, "POST", {
-      headers: {
-        Prefer: "resolution=merge-duplicates",
-        Accept: "application/vnd.pgrst.object+json"
-      },
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/set_domain_prefix`, "POST", {
       body: {
         website_id: params.websiteId,
         prefix: data.get("domain-prefix")
       },
       successMessage: "Successfully created/updated domain prefix"
     });
-
-    if (!newDomainPrefix.success) {
-      return newDomainPrefix;
-    }
-
-    await rename(
-      join(
-        "/",
-        "var",
-        "www",
-        "archtika-websites",
-        oldDomainPrefix?.prefix ? oldDomainPrefix.prefix : params.websiteId
-      ),
-      join("/", "var", "www", "archtika-websites", data.get("domain-prefix") as string)
-    );
-
-    return newDomainPrefix;
   },
   deleteCustomDomainPrefix: async ({ fetch, params }) => {
-    const customPrefix = await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/domain_prefix?website_id=eq.${params.websiteId}`,
-      "DELETE",
-      {
-        headers: {
-          Prefer: "return=representation",
-          Accept: "application/vnd.pgrst.object+json"
-        },
-        successMessage: "Successfully deleted domain prefix",
-        returnData: true
-      }
-    );
-
-    if (!customPrefix.success) {
-      return customPrefix;
-    }
-
-    await rename(
-      join("/", "var", "www", "archtika-websites", customPrefix.data.prefix),
-      join("/", "var", "www", "archtika-websites", params.websiteId)
-    );
-
-    return customPrefix;
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/delete_domain_prefix`, "POST", {
+      body: {
+        website_id: params.websiteId
+      },
+      successMessage: "Successfully deleted domain prefix"
+    });
   }
 };
 
@@ -211,10 +158,7 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
       }
     });
 
-    await writeFile(
-      join(uploadDir, "articles", `${slugify(article.title)}.html`),
-      fileContents(head, body)
-    );
+    await writeFile(join(uploadDir, "articles", `${article.slug}.html`), fileContents(head, body));
   }
 
   if (websiteData.legal_information) {

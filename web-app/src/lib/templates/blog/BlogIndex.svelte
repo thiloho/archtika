@@ -2,7 +2,7 @@
   import Head from "../common/Head.svelte";
   import Nav from "../common/Nav.svelte";
   import Footer from "../common/Footer.svelte";
-  import { md, slugify, type WebsiteOverview } from "$lib/utils";
+  import { md, type WebsiteOverview } from "$lib/utils";
 
   const {
     websiteOverview,
@@ -62,7 +62,7 @@
               {/if}
               <p>
                 <strong>
-                  <a href="./articles/{slugify(article.title)}">{article.title}</a>
+                  <a href="./articles/{article.slug}">{article.title}</a>
                 </strong>
               </p>
               {#if article.meta_description}
