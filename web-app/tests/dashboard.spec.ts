@@ -6,6 +6,9 @@ import {
   collabUsers,
   collabTestingWebsite
 } from "./shared";
+import { randomBytes } from "node:crypto";
+
+const genWebsiteName = () => randomBytes(12).toString("hex");
 
 test.describe("Website owner", () => {
   test.beforeEach(async ({ page }) => {
@@ -16,7 +19,7 @@ test.describe("Website owner", () => {
     await page.getByRole("button", { name: "Create website" }).click();
     await page.getByLabel("Type:").selectOption("Blog");
     await page.locator("#create-website-modal").getByLabel("Title:").click();
-    await page.locator("#create-website-modal").getByLabel("Title:").fill("Blog");
+    await page.locator("#create-website-modal").getByLabel("Title:").fill(genWebsiteName());
     await page
       .locator("#create-website-modal")
       .getByRole("button", { name: "Create website" })
@@ -32,7 +35,7 @@ test.describe("Website owner", () => {
       await page.getByRole("button", { name: "Create website" }).click();
       await page.getByLabel("Type:").selectOption("Blog");
       await page.locator("#create-website-modal").getByLabel("Title:").click();
-      await page.locator("#create-website-modal").getByLabel("Title:").fill("Blog");
+      await page.locator("#create-website-modal").getByLabel("Title:").fill(genWebsiteName());
       await page
         .locator("#create-website-modal")
         .getByRole("button", { name: "Create website" })
@@ -48,7 +51,7 @@ test.describe("Website owner", () => {
         .click();
       const modalName = page.url().split("#")[1];
       await page.locator(`#${modalName}`).getByLabel("Title:").click();
-      await page.locator(`#${modalName}`).getByLabel("Title:").fill(`${"Blog"} updated`);
+      await page.locator(`#${modalName}`).getByLabel("Title:").fill(genWebsiteName());
       await page.getByRole("button", { name: "Update website" }).click();
       await expect(page.getByText("Successfully updated website")).toBeVisible();
     });
