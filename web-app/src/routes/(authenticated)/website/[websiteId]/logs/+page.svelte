@@ -96,6 +96,7 @@
           </select>
         </label>
         <input type="hidden" name="page" value={1} />
+        <input type="hidden" name="since" value={$page.url.searchParams.get("since")} />
         <button type="submit">Apply</button>
       </form>
     </details>
@@ -163,7 +164,7 @@
       </table>
     </div>
     <Pagination
-      commonFilters={["user", "resource", "operation"]}
+      commonFilters={["user", "resource", "operation", "since"]}
       resultCount={data.resultChangeLogCount}
     />
   </section>

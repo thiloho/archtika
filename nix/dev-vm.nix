@@ -95,6 +95,10 @@
             tryFiles = "$uri $uri/ $uri.html =404";
           };
         };
+        extraConfig = ''
+          port_in_redirect off;
+          absolute_redirect off;
+        '';
       };
     };
   };

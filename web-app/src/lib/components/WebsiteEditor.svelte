@@ -25,15 +25,7 @@
     previewElement.scrollTop = (textareaScrollTop.value / 100) * scrollHeight;
   });
 
-  const tabs = [
-    "settings",
-    "articles",
-    "categories",
-    "collaborators",
-    "legal-information",
-    "publish",
-    "logs"
-  ];
+  const tabs = ["settings", "articles", "categories", "collaborators", "publish", "logs"];
 </script>
 
 <input type="checkbox" id="toggle-mobile-preview" hidden />

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type WebsiteOverview } from "../../utils";
+  import { type WebsiteOverview } from "../utils";
 
   const {
     websiteOverview,
@@ -22,7 +22,7 @@
   const constructedTitle =
     websiteOverview.title === title ? title : `${websiteOverview.title} | ${title}`;
 
-  let ogUrl = `${websiteUrl.replace(/\/$/, "")}${nestingLevel === 0 ? (websiteOverview.title === title ? "" : `/${slug}`) : `/articles/${slug}`}`;
+  const ogUrl = `${websiteUrl.replace(/\/$/, "")}${nestingLevel === 0 ? (websiteOverview.title === title ? "" : `/${slug}`) : `/articles/${slug}`}`;
 </script>
 
 <svelte:head>

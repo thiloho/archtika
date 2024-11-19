@@ -12,14 +12,14 @@ CREATE FUNCTION api.user_websites_storage_size ()
   AS $$
 DECLARE
   _user_id UUID := (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id')::UUID;
-  _tables TEXT[] := ARRAY['article', 'collab', 'docs_category', 'domain_prefix', 'footer', 'header', 'home', 'legal_information', 'media', 'settings', 'change_log'];
+  _tables TEXT[] := ARRAY['article', 'collab', 'docs_category', 'footer', 'header', 'home', 'media', 'settings', 'change_log'];
   _query TEXT;
   _union_queries TEXT := '';
 BEGIN
   FOR i IN 1..ARRAY_LENGTH(_tables, 1)
   LOOP
     _union_queries := _union_queries || FORMAT('
-      SELECT SUM(PG_COLUMN_SIZE(t)) FROM internal.%s AS t WHERE t.website_id = w.id', _tables[i]);
+      SELECT SUM(PG_COLUMN_SIZE(t)) FROM internal.%I AS t WHERE t.website_id = w.id', _tables[i]);
     IF i < ARRAY_LENGTH(_tables, 1) THEN
       _union_queries := _union_queries || ' UNION ALL ';
     END IF;
@@ -67,14 +67,14 @@ DECLARE
     WHERE
       w.id = _website_id);
   _max_storage_bytes BIGINT := _max_storage_mb::BIGINT * 1024 * 1024;
-  _tables TEXT[] := ARRAY['article', 'collab', 'docs_category', 'domain_prefix', 'footer', 'header', 'home', 'legal_information', 'media', 'settings', 'change_log'];
+  _tables TEXT[] := ARRAY['article', 'collab', 'docs_category', 'footer', 'header', 'home', 'media', 'settings', 'change_log'];
   _union_queries TEXT := '';
   _query TEXT;
 BEGIN
   FOR i IN 1..ARRAY_LENGTH(_tables, 1)
   LOOP
     _union_queries := _union_queries || FORMAT('
-      SELECT SUM(PG_COLUMN_SIZE(t)) FROM internal.%s AS t WHERE t.website_id = $1', _tables[i]);
+      SELECT SUM(PG_COLUMN_SIZE(t)) FROM internal.%I AS t WHERE t.website_id = $1', _tables[i]);
     IF i < ARRAY_LENGTH(_tables, 1) THEN
       _union_queries := _union_queries || ' UNION ALL ';
     END IF;
@@ -109,11 +109,6 @@ CREATE TRIGGER _prevent_storage_excess_docs_category
   FOR EACH ROW
   EXECUTE FUNCTION internal.prevent_website_storage_size_excess ();
 
-CREATE TRIGGER _prevent_storage_excess_domain_prefix
-  BEFORE INSERT OR UPDATE ON internal.domain_prefix
-  FOR EACH ROW
-  EXECUTE FUNCTION internal.prevent_website_storage_size_excess ();
-
 CREATE TRIGGER _prevent_storage_excess_footer
   BEFORE UPDATE ON internal.footer
   FOR EACH ROW
@@ -126,11 +121,6 @@ CREATE TRIGGER _prevent_storage_excess_header
 
 CREATE TRIGGER _prevent_storage_excess_home
   BEFORE UPDATE ON internal.home
-  FOR EACH ROW
-  EXECUTE FUNCTION internal.prevent_website_storage_size_excess ();
-
-CREATE TRIGGER _prevent_storage_excess_legal_information
-  BEFORE INSERT OR UPDATE ON internal.legal_information
   FOR EACH ROW
   EXECUTE FUNCTION internal.prevent_website_storage_size_excess ();
 
@@ -159,15 +149,11 @@ DROP TRIGGER _prevent_storage_excess_collab ON internal.collab;
 
 DROP TRIGGER _prevent_storage_excess_docs_category ON internal.docs_category;
 
-DROP TRIGGER _prevent_storage_excess_domain_prefix ON internal.domain_prefix;
-
 DROP TRIGGER _prevent_storage_excess_footer ON internal.footer;
 
 DROP TRIGGER _prevent_storage_excess_header ON internal.header;
 
 DROP TRIGGER _prevent_storage_excess_home ON internal.home;
-
-DROP TRIGGER _prevent_storage_excess_legal_information ON internal.legal_information;
 
 DROP TRIGGER _prevent_storage_excess_media ON internal.media;
 

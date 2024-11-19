@@ -1,17 +1,15 @@
 import { dev } from "$app/environment";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
-import BlogArticle from "$lib/templates/blog/BlogArticle.svelte";
-import BlogIndex from "$lib/templates/blog/BlogIndex.svelte";
-import DocsArticle from "$lib/templates/docs/DocsArticle.svelte";
-import DocsIndex from "$lib/templates/docs/DocsIndex.svelte";
+import Index from "$lib/templates/Index.svelte";
+import Article from "$lib/templates/Article.svelte";
 import { type WebsiteOverview, hexToHSL } from "$lib/utils";
-import { mkdir, readFile, writeFile, chmod, readdir } from "node:fs/promises";
+import { mkdir, writeFile, chmod, readdir, rm, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { render } from "svelte/server";
 import type { Actions, PageServerLoad } from "./$types";
 
 const getOverviewFetchUrl = (websiteId: string) => {
-  return `${API_BASE_PREFIX}/website?id=eq.${websiteId}&select=*,settings(*),header(*),home(*),footer(*),article(*,docs_category(*)),legal_information(*),domain_prefix(*)`;
+  return `${API_BASE_PREFIX}/website?id=eq.${websiteId}&select=*,user!user_id(*),settings(*),header(*),home(*),footer(*),article(*,docs_category(*))`;
 };
 
 export const load: PageServerLoad = async ({ params, fetch, parent }) => {
@@ -25,19 +23,37 @@ export const load: PageServerLoad = async ({ params, fetch, parent }) => {
   ).data;
 
   const { websitePreviewUrl, websiteProdUrl } = await generateStaticFiles(websiteOverview);
+  const prodIsGenerated = (await fetch(websiteProdUrl, { method: "HEAD" })).ok;
 
-  const { permissionLevel } = await parent();
+  let currentMeta = null;
+  try {
+    const metaPath = join(
+      "/var/www/archtika-websites",
+      websiteOverview.user.username,
+      websiteOverview.slug as string,
+      ".publication-meta.json"
+    );
+    const metaContent = await readFile(metaPath, "utf-8");
+    currentMeta = JSON.parse(metaContent);
+  } catch {
+    currentMeta = null;
+  }
+
+  const { website, permissionLevel } = await parent();
 
   return {
     websiteOverview,
     websitePreviewUrl,
     websiteProdUrl,
-    permissionLevel
+    permissionLevel,
+    prodIsGenerated,
+    currentMeta,
+    website
   };
 };
 
 export const actions: Actions = {
-  publishWebsite: async ({ fetch, params }) => {
+  publishWebsite: async ({ fetch, params, locals }) => {
     const websiteOverview: WebsiteOverview = (
       await apiRequest(fetch, getOverviewFetchUrl(params.websiteId), "GET", {
         headers: {
@@ -47,48 +63,39 @@ export const actions: Actions = {
       })
     ).data;
 
-    const publish = await apiRequest(
-      fetch,
-      `${API_BASE_PREFIX}/website?id=eq.${params.websiteId}`,
-      "PATCH",
-      {
-        body: {
-          is_published: true
-        },
-        successMessage: "Successfully published website"
-      }
-    );
+    let permissionLevel = 40;
 
-    if (!publish.success) {
-      return publish;
+    if (websiteOverview.user_id !== locals.user.id) {
+      permissionLevel = (
+        await apiRequest(
+          fetch,
+          `${API_BASE_PREFIX}/collab?select=permission_level&website_id=eq.${params.websiteId}&user_id=eq.${locals.user.id}`,
+          "GET",
+          {
+            headers: {
+              Accept: "application/vnd.pgrst.object+json"
+            },
+            returnData: true
+          }
+        )
+      ).data.permission_level;
     }
 
-    await generateStaticFiles(websiteOverview, false);
+    if (permissionLevel < 30) {
+      return { success: false, message: "Insufficient permissions" };
+    }
 
-    return publish;
-  },
-  createUpdateCustomDomainPrefix: async ({ request, fetch, params }) => {
-    const data = await request.formData();
+    await generateStaticFiles(websiteOverview, false, fetch);
 
-    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/set_domain_prefix`, "POST", {
-      body: {
-        website_id: params.websiteId,
-        prefix: data.get("domain-prefix")
-      },
-      successMessage: "Successfully created/updated domain prefix"
-    });
-  },
-  deleteCustomDomainPrefix: async ({ fetch, params }) => {
-    return await apiRequest(fetch, `${API_BASE_PREFIX}/rpc/delete_domain_prefix`, "POST", {
-      body: {
-        website_id: params.websiteId
-      },
-      successMessage: "Successfully deleted domain prefix"
-    });
+    return { success: true, message: "Successfully published website" };
   }
 };
 
-const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = true) => {
+const generateStaticFiles = async (
+  websiteData: WebsiteOverview,
+  isPreview = true,
+  customFetch: typeof fetch = fetch
+) => {
   const websitePreviewUrl = `${
     dev
       ? "http://localhost:18000"
@@ -98,13 +105,10 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
   }/previews/${websiteData.id}/`;
 
   const websiteProdUrl = dev
-    ? `http://localhost:18000/${websiteData.domain_prefix?.prefix ?? websiteData.id}/`
+    ? `http://localhost:18000/${websiteData.user.username}/${websiteData.slug}`
     : process.env.ORIGIN
-      ? process.env.ORIGIN.replace(
-          "//",
-          `//${websiteData.domain_prefix?.prefix ?? websiteData.id}.`
-        )
-      : `http://localhost:18000/${websiteData.domain_prefix?.prefix ?? websiteData.id}/`;
+      ? `${process.env.ORIGIN.replace("//", `//${websiteData.user.username}.`)}/${websiteData.slug}`
+      : `http://localhost:18000/${websiteData.user.username}/${websiteData.slug}`;
 
   const fileContents = (head: string, body: string) => {
     return `
@@ -119,11 +123,10 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
 </html>`;
   };
 
-  const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
+  const { head, body } = render(Index, {
     props: {
       websiteOverview: websiteData,
       apiUrl: API_BASE_PREFIX,
-      isLegalPage: false,
       websiteUrl: isPreview ? websitePreviewUrl : websiteProdUrl
     }
   });
@@ -132,24 +135,60 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
 
   if (isPreview) {
     uploadDir = join("/", "var", "www", "archtika-websites", "previews", websiteData.id);
+    await mkdir(uploadDir, { recursive: true });
   } else {
     uploadDir = join(
       "/",
       "var",
       "www",
       "archtika-websites",
-      websiteData.domain_prefix?.prefix ?? websiteData.id
+      websiteData.user.username,
+      websiteData.slug ?? websiteData.id
     );
+
+    const articlesDir = join(uploadDir, "articles");
+    let existingArticles: string[] = [];
+    try {
+      existingArticles = await readdir(articlesDir);
+    } catch {
+      existingArticles = [];
+    }
+    const currentArticleSlugs = websiteData.article?.map((article) => `${article.slug}.html`) ?? [];
+
+    for (const file of existingArticles) {
+      if (!currentArticleSlugs.includes(file)) {
+        await rm(join(articlesDir, file));
+      }
+    }
+
+    const latestChange = await apiRequest(
+      customFetch,
+      `${API_BASE_PREFIX}/change_log?website_id=eq.${websiteData.id}&order=tstamp.desc&limit=1`,
+      "GET",
+      {
+        headers: {
+          Accept: "application/vnd.pgrst.object+json"
+        },
+        returnData: true
+      }
+    );
+
+    const meta = {
+      lastPublishedAt: new Date().toISOString(),
+      lastChangeLogId: latestChange?.data?.id
+    };
+
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(join(uploadDir, ".publication-meta.json"), JSON.stringify(meta, null, 2));
   }
 
-  await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, "index.html"), fileContents(head, body));
   await mkdir(join(uploadDir, "articles"), {
     recursive: true
   });
 
   for (const article of websiteData.article ?? []) {
-    const { head, body } = render(websiteData.content_type === "Blog" ? BlogArticle : DocsArticle, {
+    const { head, body } = render(Article, {
       props: {
         websiteOverview: websiteData,
         article,
@@ -159,19 +198,6 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
     });
 
     await writeFile(join(uploadDir, "articles", `${article.slug}.html`), fileContents(head, body));
-  }
-
-  if (websiteData.legal_information) {
-    const { head, body } = render(websiteData.content_type === "Blog" ? BlogIndex : DocsIndex, {
-      props: {
-        websiteOverview: websiteData,
-        apiUrl: API_BASE_PREFIX,
-        isLegalPage: true,
-        websiteUrl: isPreview ? websitePreviewUrl : websiteProdUrl
-      }
-    });
-
-    await writeFile(join(uploadDir, "legal-information.html"), fileContents(head, body));
   }
 
   const variableStyles = await readFile(`${process.cwd()}/template-styles/variables.css`, {
@@ -237,7 +263,7 @@ const generateStaticFiles = async (websiteData: WebsiteOverview, isPreview = tru
   await writeFile(join(uploadDir, "common.css"), commonStyles);
   await writeFile(join(uploadDir, "scoped.css"), specificStyles);
 
-  await setPermissions(isPreview ? join(uploadDir, "../") : uploadDir);
+  await setPermissions(join(uploadDir, "../"));
 
   return { websitePreviewUrl, websiteProdUrl };
 };

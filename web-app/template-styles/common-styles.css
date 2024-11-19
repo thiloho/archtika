@@ -278,7 +278,6 @@ table {
 
 th,
 td {
-  text-align: start;
   padding: var(--space-2xs);
   border: var(--border-primary);
 }

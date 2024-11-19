@@ -11,8 +11,7 @@ import type {
   Footer,
   Article,
   DocsCategory,
-  LegalInformation,
-  DomainPrefix
+  User
 } from "$lib/db-schema";
 import type { SubmitFunction } from "@sveltejs/kit";
 import { sending } from "./runes.svelte";
@@ -221,6 +220,5 @@ export interface WebsiteOverview extends Website {
   home: Home;
   footer: Footer;
   article: (Article & { docs_category: DocsCategory | null })[];
-  legal_information?: LegalInformation;
-  domain_prefix?: DomainPrefix;
+  user: User;
 }

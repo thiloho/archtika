@@ -19,11 +19,13 @@ export const apiRequest = async (
     body?: any;
     successMessage?: string;
     returnData?: boolean;
+    noJSONTransform?: boolean;
   } = {
     headers: {},
     body: undefined,
     successMessage: "Operation was successful",
-    returnData: false
+    returnData: false,
+    noJSONTransform: false
   }
 ) => {
   const headers = {
@@ -48,7 +50,7 @@ export const apiRequest = async (
     return {
       success: true,
       message: options.successMessage,
-      data: method === "HEAD" ? response : await response.json()
+      data: method === "HEAD" || options.noJSONTransform ? response : await response.json()
     };
   }
 

@@ -1,19 +1,17 @@
 <script lang="ts">
-  import { type WebsiteOverview } from "../../utils";
-  import type { Article } from "../../db-schema";
+  import { type WebsiteOverview } from "../utils";
+  import type { Article } from "../db-schema";
 
   const {
     websiteOverview,
     isDocsTemplate,
     isIndexPage,
-    apiUrl,
-    isLegalPage
+    apiUrl
   }: {
     websiteOverview: WebsiteOverview;
     isDocsTemplate: boolean;
     isIndexPage: boolean;
     apiUrl: string;
-    isLegalPage?: boolean;
   } = $props();
 
   const categorizedArticles = Object.fromEntries(
@@ -72,17 +70,14 @@
         </ul>
       </section>
     {/if}
-    <svelte:element
-      this={isIndexPage && !isLegalPage ? "span" : "a"}
-      href={`${isLegalPage ? "./" : "../"}`}
-    >
+    <svelte:element this={isIndexPage ? "span" : "a"} href={`${isIndexPage ? "./" : "../"}`}>
       {#if websiteOverview.header.logo_type === "text"}
         <strong>{websiteOverview.header.logo_text}</strong>
       {:else}
         <img
           src="{apiUrl}/rpc/retrieve_file?id={websiteOverview.header.logo_image}"
-          width="24"
-          height="24"
+          width="32"
+          height="32"
           alt=""
         />
       {/if}

@@ -70,13 +70,6 @@ SELECT
 FROM
   internal.footer;
 
-CREATE VIEW api.legal_information WITH ( security_invoker = ON
-) AS
-SELECT
-  *
-FROM
-  internal.legal_information;
-
 CREATE VIEW api.collab WITH ( security_invoker = ON
 ) AS
 SELECT
@@ -137,7 +130,7 @@ GRANT SELECT ON api.account TO authenticated_user;
 
 GRANT SELECT ON api.user TO authenticated_user;
 
-GRANT SELECT, UPDATE (title, is_published), DELETE ON internal.website TO authenticated_user;
+GRANT SELECT, UPDATE (title), DELETE ON internal.website TO authenticated_user;
 
 GRANT SELECT, UPDATE, DELETE ON api.website TO authenticated_user;
 
@@ -165,10 +158,6 @@ GRANT SELECT, UPDATE (additional_text) ON internal.footer TO authenticated_user;
 
 GRANT SELECT, UPDATE ON api.footer TO authenticated_user;
 
-GRANT SELECT, INSERT (website_id, main_content), UPDATE (website_id, main_content), DELETE ON internal.legal_information TO authenticated_user;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON api.legal_information TO authenticated_user;
-
 GRANT SELECT, INSERT (website_id, user_id, permission_level), UPDATE (permission_level), DELETE ON internal.collab TO authenticated_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.collab TO authenticated_user;
@@ -177,8 +166,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON api.collab TO authenticated_user;
 DROP FUNCTION api.create_website;
 
 DROP VIEW api.collab;
-
-DROP VIEW api.legal_information;
 
 DROP VIEW api.footer;
 

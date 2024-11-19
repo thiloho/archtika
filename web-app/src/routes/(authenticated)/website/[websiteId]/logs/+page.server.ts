@@ -9,11 +9,16 @@ export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const resourceFilter = url.searchParams.get("resource");
   const operationFilter = url.searchParams.get("operation");
   const currentPage = Number.parseInt(url.searchParams.get("page") ?? "1");
+  const sinceTime = url.searchParams.get("since");
   const resultOffset = (currentPage - 1) * PAGINATION_MAX_ITEMS;
 
   const searchParams = new URLSearchParams();
 
   const baseFetchUrl = `${API_BASE_PREFIX}/change_log?website_id=eq.${params.websiteId}&select=id,table_name,operation,tstamp,old_value,new_value,user_id,username&order=tstamp.desc`;
+
+  if (sinceTime) {
+    searchParams.append("tstamp", `gt.${sinceTime}`);
+  }
 
   if (userFilter && userFilter !== "all") {
     searchParams.append("username", `eq.${userFilter}`);

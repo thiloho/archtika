@@ -73,7 +73,7 @@
       <a
         class="export-anchor"
         href={`${data.API_BASE_PREFIX}/rpc/export_articles_zip?website_id=${data.website.id}`}
-        >Export articles</a
+        download>Export articles</a
       >
       <details>
         <summary>Search & Filter</summary>

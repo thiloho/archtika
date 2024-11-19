@@ -4,6 +4,12 @@
   const dateObject = new Date(date);
 
   const calcTimeAgo = (date: Date) => {
+    const secondsElapsed = (date.getTime() - Date.now()) / 1000;
+
+    if (Math.abs(secondsElapsed) < 1) {
+      return "Just now";
+    }
+
     const formatter = new Intl.RelativeTimeFormat("en");
     const ranges = [
       ["years", 60 * 60 * 24 * 365],
@@ -14,7 +20,6 @@
       ["minutes", 60],
       ["seconds", 1]
     ] as const;
-    const secondsElapsed = (date.getTime() - Date.now()) / 1000;
 
     for (const [rangeType, rangeVal] of ranges) {
       if (rangeVal < Math.abs(secondsElapsed)) {

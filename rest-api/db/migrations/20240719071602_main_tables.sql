@@ -29,16 +29,16 @@ GRANT USAGE ON SCHEMA internal TO authenticated_user;
 
 ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
-CREATE FUNCTION internal.immutable_unaccent (TEXT)
+CREATE FUNCTION internal.generate_slug (TEXT)
   RETURNS TEXT
   AS $$
   SELECT
-    unaccent ($1);
+    REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(unaccent ($1), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g')
 $$
 LANGUAGE sql
 IMMUTABLE;
 
-GRANT EXECUTE ON FUNCTION internal.immutable_unaccent TO authenticated_user;
+GRANT EXECUTE ON FUNCTION internal.generate_slug TO authenticated_user;
 
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
@@ -54,11 +54,12 @@ CREATE TABLE internal.website (
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
+  slug VARCHAR(50) GENERATED ALWAYS AS (internal.generate_slug (title)) STORED,
   max_storage_size INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_storage_size') ::INT,
-  is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  UNIQUE (user_id, slug)
 );
 
 CREATE TABLE internal.media (
@@ -118,7 +119,7 @@ CREATE TABLE internal.article (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   title VARCHAR(100) NOT NULL CHECK (TRIM(title) != ''),
-  slug VARCHAR(100) GENERATED ALWAYS AS (REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(internal.immutable_unaccent (title), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g')) STORED,
+  slug VARCHAR(100) GENERATED ALWAYS AS (internal.generate_slug (title)) STORED,
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
@@ -140,14 +141,6 @@ CREATE TABLE internal.footer (
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
 
-CREATE TABLE internal.legal_information (
-  website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
-);
-
 CREATE TABLE internal.collab (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE,
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE,
@@ -160,8 +153,6 @@ CREATE TABLE internal.collab (
 
 -- migrate:down
 DROP TABLE internal.collab;
-
-DROP TABLE internal.legal_information;
 
 DROP TABLE internal.footer;
 
@@ -183,7 +174,7 @@ DROP TABLE internal.user;
 
 DROP SCHEMA api;
 
-DROP FUNCTION internal.immutable_unaccent;
+DROP FUNCTION internal.generate_slug;
 
 DROP SCHEMA internal;
 
