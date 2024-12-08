@@ -18,7 +18,7 @@ export const actions: Actions = {
       return response;
     }
 
-    cookies.set("session_token", response.data.token, { path: "/", maxAge: 86400 });
+    cookies.set("session_token", response.data.token, { path: "/", maxAge: 43200 });
     return response;
   }
 };

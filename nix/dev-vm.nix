@@ -95,8 +95,20 @@
             tryFiles = "$uri $uri/ $uri.html =404";
           };
         };
+        extraConfig = ''
+          port_in_redirect off;
+          absolute_redirect off;
+        '';
       };
     };
+  };
+
+  systemd.services.postgresql = {
+    path = with pkgs; [
+      # Tar and gzip are needed for tar.gz exports
+      gnutar
+      gzip
+    ];
   };
 
   services.getty.autologinUser = "dev";

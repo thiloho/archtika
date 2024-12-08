@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { API_BASE_PREFIX } from "$lib/server/utils";
 import { apiRequest } from "$lib/server/utils";
+import { parse } from "node:path";
 import type { Article, DocsCategory } from "$lib/db-schema";
 
 export const load: PageServerLoad = async ({ params, fetch, url, parent, locals }) => {
@@ -58,6 +59,7 @@ export const load: PageServerLoad = async ({ params, fetch, url, parent, locals 
     website,
     home,
     permissionLevel,
+    API_BASE_PREFIX,
     user: locals.user
   };
 };
@@ -72,6 +74,25 @@ export const actions: Actions = {
         title: data.get("title")
       },
       successMessage: "Successfully created article"
+    });
+  },
+  importArticles: async ({ request, fetch, params }) => {
+    const data = await request.formData();
+    const files = data.getAll("import-articles") as File[];
+
+    const articles = await Promise.all(
+      files.map(async (file) => {
+        return {
+          website_id: params.websiteId,
+          title: parse(file.name).name,
+          main_content: await file.text()
+        };
+      })
+    );
+
+    return await apiRequest(fetch, `${API_BASE_PREFIX}/article`, "POST", {
+      body: articles,
+      successMessage: "Successfully imported articles"
     });
   },
   deleteArticle: async ({ request, fetch }) => {

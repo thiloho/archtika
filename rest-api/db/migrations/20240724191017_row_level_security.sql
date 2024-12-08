@@ -17,8 +17,6 @@ ALTER TABLE internal.docs_category ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.footer ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE internal.legal_information ENABLE ROW LEVEL SECURITY;
-
 ALTER TABLE internal.collab ENABLE ROW LEVEL SECURITY;
 
 CREATE FUNCTION internal.user_has_website_access (website_id UUID, required_permission INT, collaborator_permission_level INT DEFAULT NULL, collaborator_user_id UUID DEFAULT NULL, article_user_id UUID DEFAULT NULL, raise_error BOOLEAN DEFAULT TRUE, OUT has_access BOOLEAN)
@@ -155,22 +153,6 @@ CREATE POLICY update_footer ON internal.footer
   FOR UPDATE
     USING (internal.user_has_website_access (website_id, 20));
 
-CREATE POLICY view_legal_information ON internal.legal_information
-  FOR SELECT
-    USING (internal.user_has_website_access (website_id, 10));
-
-CREATE POLICY update_legal_information ON internal.legal_information
-  FOR UPDATE
-    USING (internal.user_has_website_access (website_id, 30));
-
-CREATE POLICY delete_legal_information ON internal.legal_information
-  FOR DELETE
-    USING (internal.user_has_website_access (website_id, 30));
-
-CREATE POLICY insert_legal_information ON internal.legal_information
-  FOR INSERT
-    WITH CHECK (internal.user_has_website_access (website_id, 30));
-
 CREATE POLICY view_collaborations ON internal.collab
   FOR SELECT
     USING (internal.user_has_website_access (website_id, 10));
@@ -232,14 +214,6 @@ DROP POLICY view_footer ON internal.footer;
 
 DROP POLICY update_footer ON internal.footer;
 
-DROP POLICY insert_legal_information ON internal.legal_information;
-
-DROP POLICY delete_legal_information ON internal.legal_information;
-
-DROP POLICY update_legal_information ON internal.legal_information;
-
-DROP POLICY view_legal_information ON internal.legal_information;
-
 DROP POLICY view_collaborations ON internal.collab;
 
 DROP POLICY insert_collaborations ON internal.collab;
@@ -267,8 +241,6 @@ ALTER TABLE internal.article DISABLE ROW LEVEL SECURITY;
 ALTER TABLE internal.docs_category DISABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.footer DISABLE ROW LEVEL SECURITY;
-
-ALTER TABLE internal.legal_information DISABLE ROW LEVEL SECURITY;
 
 ALTER TABLE internal.collab DISABLE ROW LEVEL SECURITY;
 

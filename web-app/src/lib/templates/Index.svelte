@@ -1,18 +1,16 @@
 <script lang="ts">
-  import Head from "../common/Head.svelte";
-  import Nav from "../common/Nav.svelte";
-  import Footer from "../common/Footer.svelte";
-  import { md, slugify, type WebsiteOverview } from "$lib/utils";
+  import { md, type WebsiteOverview } from "$lib/utils";
+  import Head from "$lib/templates/Head.svelte";
+  import Nav from "$lib/templates/Nav.svelte";
+  import Footer from "$lib/templates/Footer.svelte";
 
   const {
     websiteOverview,
     apiUrl,
-    isLegalPage,
     websiteUrl
   }: {
     websiteOverview: WebsiteOverview;
     apiUrl: string;
-    isLegalPage: boolean;
     websiteUrl: string;
   } = $props();
 
@@ -27,28 +25,29 @@
   {websiteOverview}
   nestingLevel={0}
   {apiUrl}
-  title={isLegalPage ? "Legal information" : websiteOverview.title}
+  title={websiteOverview.title}
   metaDescription={websiteOverview.home.meta_description}
   {websiteUrl}
 />
 
-<Nav {websiteOverview} isDocsTemplate={false} isIndexPage={true} {isLegalPage} {apiUrl} />
+<Nav
+  {websiteOverview}
+  isDocsTemplate={websiteOverview.content_type === "Docs"}
+  isIndexPage={true}
+  {apiUrl}
+/>
 
 <header>
   <div class="container">
-    <h1>{isLegalPage ? "Legal information" : websiteOverview.title}</h1>
+    <h1>{websiteOverview.title}</h1>
   </div>
 </header>
 
 <main>
   <div class="container">
-    {@html md(
-      isLegalPage
-        ? (websiteOverview.legal_information?.main_content ?? "")
-        : websiteOverview.home.main_content,
-      false
-    )}
-    {#if websiteOverview.article.length > 0 && !isLegalPage}
+    {@html md(websiteOverview.home.main_content, false)}
+
+    {#if websiteOverview.article.length > 0 && websiteOverview.content_type === "Blog"}
       <section class="articles" id="articles">
         <h2>
           <a href="#articles">Articles</a>
@@ -62,7 +61,7 @@
               {/if}
               <p>
                 <strong>
-                  <a href="./articles/{slugify(article.title)}">{article.title}</a>
+                  <a href="./articles/{article.slug}">{article.title}</a>
                 </strong>
               </p>
               {#if article.meta_description}
@@ -76,4 +75,4 @@
   </div>
 </main>
 
-<Footer {websiteOverview} isIndexPage={true} />
+<Footer {websiteOverview} />

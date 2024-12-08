@@ -127,11 +127,6 @@ CREATE TRIGGER track_changes_footer
   FOR EACH ROW
   EXECUTE FUNCTION internal.track_changes ();
 
-CREATE TRIGGER track_changes_legal_information
-  AFTER INSERT OR UPDATE OR DELETE ON internal.legal_information
-  FOR EACH ROW
-  EXECUTE FUNCTION internal.track_changes ();
-
 CREATE TRIGGER track_changes_collab
   AFTER INSERT OR UPDATE OR DELETE ON internal.collab
   FOR EACH ROW
@@ -153,8 +148,6 @@ DROP TRIGGER track_changes_article ON internal.article;
 DROP TRIGGER track_changes_docs_category ON internal.docs_category;
 
 DROP TRIGGER track_changes_footer ON internal.footer;
-
-DROP TRIGGER track_changes_legal_information ON internal.legal_information;
 
 DROP TRIGGER track_changes_collab ON internal.collab;
 

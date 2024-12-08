@@ -25,15 +25,9 @@
     previewElement.scrollTop = (textareaScrollTop.value / 100) * scrollHeight;
   });
 
-  const tabs = [
-    "settings",
-    "articles",
-    "categories",
-    "collaborators",
-    "legal-information",
-    "publish",
-    "logs"
-  ];
+  const tabs = ["settings", "articles", "categories", "collaborators", "publish", "logs"];
+
+  let iframeLoaded = $state(false);
 </script>
 
 <input type="checkbox" id="toggle-mobile-preview" hidden />
@@ -63,7 +57,15 @@
 
 <div class="preview" bind:this={previewElement}>
   {#if fullPreview}
-    <iframe src={previewContent.value} title="Preview"></iframe>
+    {#if !iframeLoaded}
+      <p>Loading preview...</p>
+    {/if}
+    <iframe
+      src={previewContent.value}
+      title="Preview"
+      onload={() => (iframeLoaded = true)}
+      style:display={iframeLoaded ? "block" : "none"}
+    ></iframe>
   {:else}
     {@html md(
       previewContent.value || "Write some markdown content to see a live preview here",

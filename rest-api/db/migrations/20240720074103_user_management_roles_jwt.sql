@@ -120,7 +120,7 @@ AS $$
 DECLARE
   _role NAME;
   _user_id UUID;
-  _exp INT := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INT + 86400;
+  _exp INT := EXTRACT(EPOCH FROM CLOCK_TIMESTAMP())::INT + 43200;
 BEGIN
   SELECT
     internal.user_role (login.username, login.pass) INTO _role;

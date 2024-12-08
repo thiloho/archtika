@@ -9,6 +9,29 @@ with lib;
 
 let
   cfg = config.services.archtika;
+  baseHardenedSystemdOptions = {
+    CapabilityBoundingSet = "";
+    LockPersonality = true;
+    NoNewPrivileges = true;
+    PrivateDevices = true;
+    PrivateTmp = true;
+    ProtectClock = true;
+    ProtectControlGroups = true;
+    ProtectHome = true;
+    ProtectHostname = true;
+    ProtectKernelLogs = true;
+    ProtectKernelModules = true;
+    ProtectKernelTunables = true;
+    ProtectSystem = "strict";
+    RemoveIPC = true;
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    SystemCallArchitectures = "native";
+    SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
+    
+    ReadWritePaths = ["/var/www/archtika-websites"];
+  };
 in
 {
   options.services.archtika = {
@@ -105,9 +128,17 @@ in
       group = cfg.group;
     };
 
-    users.groups.${cfg.group} = { };
+    users.groups.${cfg.group} = {
+      members = [
+        "nginx"
+        "postgres"
+      ];
+    };
 
-    systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0777 ${cfg.user} ${cfg.group} -" ];
+    systemd.tmpfiles.rules = [
+      "d /var/www 0755 root root -"
+      "d /var/www/archtika-websites 0770 ${cfg.user} ${cfg.group} -"
+    ];
 
     systemd.services.archtika-api = {
       description = "archtika API service";
@@ -117,11 +148,13 @@ in
         "postgresql.service"
       ];
 
-      serviceConfig = {
+      serviceConfig = baseHardenedSystemdOptions // {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
         WorkingDirectory = "${cfg.package}/rest-api";
+
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
       };
 
       script = ''
@@ -142,11 +175,13 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
-      serviceConfig = {
+      serviceConfig = baseHardenedSystemdOptions // {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
         WorkingDirectory = "${cfg.package}/web-app";
+
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
       };
 
       script = ''
@@ -169,6 +204,14 @@ in
       extraPlugins = with pkgs.postgresql16Packages; [ pgjwt ];
     };
 
+    systemd.services.postgresql = {
+      path = with pkgs; [
+        # Tar and gzip are needed for tar.gz exports
+        gnutar
+        gzip
+      ];
+    };
+
     services.nginx = {
       enable = true;
       recommendedProxySettings = true;
@@ -186,6 +229,11 @@ in
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Permissions-Policy "accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(self),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(self),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),xr-spatial-tracking=(),clipboard-read=(self),clipboard-write=(self),gamepad=(),hid=(),idle-detection=(),interest-cohort=(),serial=(),unload=()" always;
+
+        map $http_cookie $auth_header {
+          default "";
+          "~*session_token=([^;]+)" "Bearer $1";
+        }
       '';
 
       virtualHosts = {
@@ -200,6 +248,13 @@ in
               alias = "/var/www/archtika-websites/previews/";
               index = "index.html";
               tryFiles = "$uri $uri/ $uri.html =404";
+            };
+            "/api/rpc/export_articles_zip" = {
+              proxyPass = "http://localhost:${toString cfg.apiPort}/rpc/export_articles_zip";
+              extraConfig = ''
+                default_type application/json;
+                proxy_set_header Authorization $auth_header;
+              '';
             };
             "/api/" = {
               proxyPass = "http://localhost:${toString cfg.apiPort}/";

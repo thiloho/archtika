@@ -27,14 +27,21 @@ header > .container {
 
 nav,
 header,
-main,
-footer {
+main {
   padding-block: var(--space-s);
+}
+
+main {
+  padding-block-end: var(--space-xl);
 }
 
 footer {
   margin-block-start: auto;
-  text-align: center;
+}
+
+footer > .container {
+  border-block-start: 0.125rem dotted var(--color-border);
+  padding-block: var(--space-s);
 }
 
 section {

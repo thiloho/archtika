@@ -4,10 +4,9 @@
   import SuccessOrError from "$lib/components/SuccessOrError.svelte";
   import type { ActionData, PageServerData } from "./$types";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
-  import Modal from "$lib/components/Modal.svelte";
-  import { enhanceForm } from "$lib/utils";
   import { sending } from "$lib/runes.svelte";
   import { previewContent } from "$lib/runes.svelte";
+  import { enhanceForm } from "$lib/utils";
 
   const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -31,10 +30,16 @@
       <a href="#publish-website">Publish website</a>
     </h2>
     <p>
-      The preview area on this page allows you to see exactly how your website will look when it is
-      is published. If you are happy with the results, click the button below and your website will
-      be published on the Internet.
+      Whenever you make changes, you will need to click the button below to make them visible on the
+      published website.
     </p>
+    {#if data.currentMeta}
+      <a
+        class="latest-changes-anchor"
+        href="/website/{data.website.id}/logs?since={data.currentMeta.lastPublishedAt}"
+        >Changes since last publication</a
+      >
+    {/if}
     <form method="POST" action="?/publishWebsite" use:enhance={enhanceForm()}>
       <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
         >Publish website</button
@@ -42,7 +47,7 @@
     </form>
   </section>
 
-  {#if data.websiteOverview.is_published}
+  {#if data.prodIsGenerated}
     <section id="publication-status">
       <h2>
         <a href="#publication-status">Publication status</a>
@@ -52,51 +57,11 @@
         <a href={data.websiteProdUrl}>{data.websiteProdUrl}</a>
       </p>
     </section>
-
-    <section id="custom-domain-prefix">
-      <h2>
-        <a href="#custom-domain-prefix">Custom domain prefix</a>
-      </h2>
-      <form
-        method="POST"
-        action="?/createUpdateCustomDomainPrefix"
-        use:enhance={enhanceForm({ reset: false })}
-      >
-        <label>
-          Prefix:
-          <input
-            type="text"
-            name="domain-prefix"
-            value={data.websiteOverview.domain_prefix?.prefix ?? ""}
-            placeholder="my-blog"
-            minlength="3"
-            maxlength="16"
-            pattern="^[a-z]+(-[a-z]+)*$"
-            required
-          />
-        </label>
-        <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
-          >Update domain prefix</button
-        >
-      </form>
-      {#if data.websiteOverview.domain_prefix?.prefix}
-        <Modal id="delete-domain-prefix" text="Delete">
-          <form
-            action="?/deleteCustomDomainPrefix"
-            method="post"
-            use:enhance={enhanceForm({ closeModal: true })}
-          >
-            <h3>Delete domain prefix</h3>
-            <p>
-              <strong>Caution!</strong>
-              This action will remove the domain prefix and reset it to its initial value.
-            </p>
-            <button type="submit" disabled={[10, 20].includes(data.permissionLevel)}
-              >Delete domain prefix</button
-            >
-          </form>
-        </Modal>
-      {/if}
-    </section>
   {/if}
 </WebsiteEditor>
+
+<style>
+  .latest-changes-anchor {
+    max-inline-size: fit-content;
+  }
+</style>

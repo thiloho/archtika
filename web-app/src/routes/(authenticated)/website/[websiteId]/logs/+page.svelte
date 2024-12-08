@@ -96,6 +96,7 @@
           </select>
         </label>
         <input type="hidden" name="page" value={1} />
+        <input type="hidden" name="since" value={$page.url.searchParams.get("since")} />
         <button type="submit">Apply</button>
       </form>
     </details>
@@ -106,7 +107,7 @@
             <th>User</th>
             <th>Resource</th>
             <th>Operation</th>
-            <th>Date & Time</th>
+            <th>Time</th>
             <th>Changes</th>
           </tr>
         </thead>
@@ -140,21 +141,20 @@
                       <button type="submit">Compute diff</button>
                     </form>
                     {#if form?.logId === id && form?.currentDiff}
-                      <pre style="white-space: pre-wrap">{@html DOMPurify.sanitize(
-                          form.currentDiff,
-                          { ALLOWED_TAGS: ["ins", "del"] }
-                        )}</pre>
+                      <pre>{@html DOMPurify.sanitize(form.currentDiff, {
+                          ALLOWED_TAGS: ["ins", "del"]
+                        })}</pre>
                     {/if}
                   {/if}
 
                   {#if new_value && !old_value}
                     <h4>New value</h4>
-                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(newValue)}</pre>
+                    <pre>{DOMPurify.sanitize(newValue)}</pre>
                   {/if}
 
                   {#if old_value && !new_value}
                     <h4>Old value</h4>
-                    <pre style="white-space: pre-wrap">{DOMPurify.sanitize(oldValue)}</pre>
+                    <pre>{DOMPurify.sanitize(oldValue)}</pre>
                   {/if}
                 </Modal>
               </td>
@@ -164,8 +164,14 @@
       </table>
     </div>
     <Pagination
-      commonFilters={["user", "resource", "operation"]}
+      commonFilters={["user", "resource", "operation", "since"]}
       resultCount={data.resultChangeLogCount}
     />
   </section>
 </WebsiteEditor>
+
+<style>
+  pre {
+    white-space: pre-wrap;
+  }
+</style>

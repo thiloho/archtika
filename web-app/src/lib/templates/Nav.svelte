@@ -1,19 +1,17 @@
 <script lang="ts">
-  import { type WebsiteOverview, slugify } from "../../utils";
-  import type { Article } from "../../db-schema";
+  import { type WebsiteOverview } from "../utils";
+  import type { Article } from "../db-schema";
 
   const {
     websiteOverview,
     isDocsTemplate,
     isIndexPage,
-    apiUrl,
-    isLegalPage
+    apiUrl
   }: {
     websiteOverview: WebsiteOverview;
     isDocsTemplate: boolean;
     isIndexPage: boolean;
     apiUrl: string;
-    isLegalPage?: boolean;
   } = $props();
 
   const categorizedArticles = Object.fromEntries(
@@ -61,9 +59,9 @@
             <li>
               <strong>{key}</strong>
               <ul>
-                {#each categorizedArticles[key] as { title }}
+                {#each categorizedArticles[key] as { title, slug }}
                   <li>
-                    <a href="{isIndexPage ? './articles' : '.'}/{slugify(title)}">{title}</a>
+                    <a href="{isIndexPage ? './articles' : '.'}/{slug}">{title}</a>
                   </li>
                 {/each}
               </ul>
@@ -72,22 +70,19 @@
         </ul>
       </section>
     {/if}
-    <svelte:element
-      this={isIndexPage && !isLegalPage ? "span" : "a"}
-      href={`${isLegalPage ? "./" : "../"}`}
-    >
+    <svelte:element this={isIndexPage ? "span" : "a"} href={`${isIndexPage ? "./" : "../"}`}>
       {#if websiteOverview.header.logo_type === "text"}
         <strong>{websiteOverview.header.logo_text}</strong>
       {:else}
         <img
           src="{apiUrl}/rpc/retrieve_file?id={websiteOverview.header.logo_image}"
-          width="24"
-          height="24"
+          width="32"
+          height="32"
           alt=""
         />
       {/if}
     </svelte:element>
-    <label style="margin-inline-start: auto;" for="toggle-theme">
+    <label for="toggle-theme">
       <input type="checkbox" id="toggle-theme" hidden />
       <svg
         xmlns="http://www.w3.org/2000/svg"

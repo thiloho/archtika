@@ -1,4 +1,6 @@
 -- migrate:up
+CREATE EXTENSION unaccent;
+
 CREATE SCHEMA internal;
 
 CREATE SCHEMA api;
@@ -27,6 +29,22 @@ GRANT USAGE ON SCHEMA internal TO authenticated_user;
 
 ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
+CREATE FUNCTION internal.generate_slug (TEXT)
+  RETURNS TEXT
+  AS $$
+BEGIN
+  IF $1 ~ '[/\\.]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Title cannot contain "/", "\" or "."';
+  END IF;
+    RETURN REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(unaccent ($1), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g');
+END;
+$$
+LANGUAGE plpgsql
+IMMUTABLE;
+
+GRANT EXECUTE ON FUNCTION internal.generate_slug TO authenticated_user;
+
 CREATE TABLE internal.user (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   username VARCHAR(16) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3 AND username ~ '^[a-zA-Z0-9_-]+$'),
@@ -41,11 +59,12 @@ CREATE TABLE internal.website (
   user_id UUID REFERENCES internal.user (id) ON DELETE CASCADE NOT NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   content_type VARCHAR(10) CHECK (content_type IN ('Blog', 'Docs')) NOT NULL,
   title VARCHAR(50) NOT NULL CHECK (TRIM(title) != ''),
+  slug VARCHAR(50) GENERATED ALWAYS AS (internal.generate_slug (title)) STORED,
   max_storage_size INT NOT NULL DEFAULT CURRENT_SETTING('app.website_max_storage_size') ::INT,
-  is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
+  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  UNIQUE (user_id, slug)
 );
 
 CREATE TABLE internal.media (
@@ -91,7 +110,7 @@ CREATE TABLE internal.docs_category (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
-  category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != ''),
+  category_name VARCHAR(50) NOT NULL CHECK (TRIM(category_name) != '' AND category_name != 'Uncategorized'),
   category_weight INT CHECK (category_weight >= 0) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
@@ -105,6 +124,7 @@ CREATE TABLE internal.article (
   website_id UUID REFERENCES internal.website (id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES internal.user (id) ON DELETE SET NULL DEFAULT (CURRENT_SETTING('request.jwt.claims', TRUE)::JSON ->> 'user_id') ::UUID,
   title VARCHAR(100) NOT NULL CHECK (TRIM(title) != ''),
+  slug VARCHAR(100) GENERATED ALWAYS AS (internal.generate_slug (title)) STORED,
   meta_description VARCHAR(250) CHECK (TRIM(meta_description) != ''),
   meta_author VARCHAR(100) CHECK (TRIM(meta_author) != ''),
   cover_image UUID REFERENCES internal.media (id) ON DELETE SET NULL,
@@ -115,20 +135,13 @@ CREATE TABLE internal.article (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL,
+  UNIQUE (website_id, slug),
   UNIQUE (website_id, category, article_weight)
 );
 
 CREATE TABLE internal.footer (
   website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
   additional_text VARCHAR(250) NOT NULL CHECK (TRIM(additional_text) != ''),
-  last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
-  last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
-);
-
-CREATE TABLE internal.legal_information (
-  website_id UUID PRIMARY KEY REFERENCES internal.website (id) ON DELETE CASCADE,
-  main_content VARCHAR(200000) NOT NULL CHECK (TRIM(main_content) != ''),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CLOCK_TIMESTAMP(),
   last_modified_by UUID REFERENCES internal.user (id) ON DELETE SET NULL
 );
@@ -145,8 +158,6 @@ CREATE TABLE internal.collab (
 
 -- migrate:down
 DROP TABLE internal.collab;
-
-DROP TABLE internal.legal_information;
 
 DROP TABLE internal.footer;
 
@@ -168,6 +179,8 @@ DROP TABLE internal.user;
 
 DROP SCHEMA api;
 
+DROP FUNCTION internal.generate_slug;
+
 DROP SCHEMA internal;
 
 DROP ROLE anon;
@@ -179,4 +192,6 @@ DROP ROLE administrator;
 DROP ROLE authenticator;
 
 ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC;
+
+DROP EXTENSION unaccent;
 

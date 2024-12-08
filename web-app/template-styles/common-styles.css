@@ -88,9 +88,14 @@ summary {
   background-color: var(--bg-secondary);
 }
 
+summary:has(svg),
 label:has(svg) {
   display: inline-grid;
   place-content: center;
+}
+
+label[for="toggle-theme"] {
+  margin-inline-start: auto;
 }
 
 label[for="toggle-theme"] svg:first-of-type {
@@ -113,6 +118,7 @@ label[for="toggle-theme"] svg:last-of-type {
 }
 
 button:disabled {
+  user-select: none;
   pointer-events: none;
   opacity: 0.5;
   z-index: -10;
@@ -272,7 +278,6 @@ table {
 
 th,
 td {
-  text-align: start;
   padding: var(--space-2xs);
   border: var(--border-primary);
 }
