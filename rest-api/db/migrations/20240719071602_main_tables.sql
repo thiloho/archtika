@@ -32,10 +32,15 @@ ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 CREATE FUNCTION internal.generate_slug (TEXT)
   RETURNS TEXT
   AS $$
-  SELECT
-    REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(unaccent ($1), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g')
+BEGIN
+  IF $1 ~ '[/\\.]' THEN
+    RAISE invalid_parameter_value
+    USING message = 'Title cannot contain "/", "\" or "."';
+  END IF;
+    RETURN REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(LOWER(TRIM(REGEXP_REPLACE(unaccent ($1), '\s+', '-', 'g'))), '[^\w-]', '', 'g'), '-+', '-', 'g'), '^-+', '', 'g'), '-+$', '', 'g');
+END;
 $$
-LANGUAGE sql
+LANGUAGE plpgsql
 IMMUTABLE;
 
 GRANT EXECUTE ON FUNCTION internal.generate_slug TO authenticated_user;

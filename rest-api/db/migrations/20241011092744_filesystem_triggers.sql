@@ -46,12 +46,12 @@ LANGUAGE plpgsql
 SECURITY DEFINER;
 
 CREATE TRIGGER _cleanup_filesystem_website
-  BEFORE UPDATE OR DELETE ON internal.website
+  BEFORE UPDATE OF title OR DELETE ON internal.website
   FOR EACH ROW
   EXECUTE FUNCTION internal.cleanup_filesystem ();
 
 CREATE TRIGGER _cleanup_filesystem_article
-  BEFORE UPDATE OR DELETE ON internal.article
+  BEFORE UPDATE OF title OR DELETE ON internal.article
   FOR EACH ROW
   EXECUTE FUNCTION internal.cleanup_filesystem ();
 

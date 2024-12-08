@@ -9,6 +9,29 @@ with lib;
 
 let
   cfg = config.services.archtika;
+  baseHardenedSystemdOptions = {
+    CapabilityBoundingSet = "";
+    LockPersonality = true;
+    NoNewPrivileges = true;
+    PrivateDevices = true;
+    PrivateTmp = true;
+    ProtectClock = true;
+    ProtectControlGroups = true;
+    ProtectHome = true;
+    ProtectHostname = true;
+    ProtectKernelLogs = true;
+    ProtectKernelModules = true;
+    ProtectKernelTunables = true;
+    ProtectSystem = "strict";
+    RemoveIPC = true;
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    SystemCallArchitectures = "native";
+    SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
+    
+    ReadWritePaths = ["/var/www/archtika-websites"];
+  };
 in
 {
   options.services.archtika = {
@@ -105,9 +128,17 @@ in
       group = cfg.group;
     };
 
-    users.groups.${cfg.group} = { };
+    users.groups.${cfg.group} = {
+      members = [
+        "nginx"
+        "postgres"
+      ];
+    };
 
-    systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0777 ${cfg.user} ${cfg.group} -" ];
+    systemd.tmpfiles.rules = [
+      "d /var/www 0755 root root -"
+      "d /var/www/archtika-websites 0770 ${cfg.user} ${cfg.group} -"
+    ];
 
     systemd.services.archtika-api = {
       description = "archtika API service";
@@ -117,11 +148,13 @@ in
         "postgresql.service"
       ];
 
-      serviceConfig = {
+      serviceConfig = baseHardenedSystemdOptions // {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
         WorkingDirectory = "${cfg.package}/rest-api";
+
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
       };
 
       script = ''
@@ -142,11 +175,13 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
-      serviceConfig = {
+      serviceConfig = baseHardenedSystemdOptions // {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
         WorkingDirectory = "${cfg.package}/web-app";
+
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
       };
 
       script = ''

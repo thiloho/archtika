@@ -269,14 +269,15 @@ const generateStaticFiles = async (
 };
 
 const setPermissions = async (dir: string) => {
-  await chmod(dir, 0o777);
+  const mode = dev ? 0o777 : process.env.ORIGIN ? 0o770 : 0o777;
+  await chmod(dir, mode);
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       await setPermissions(fullPath);
     } else {
-      await chmod(fullPath, 0o777);
+      await chmod(fullPath, mode);
     }
   }
 };
