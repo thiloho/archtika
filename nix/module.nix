@@ -28,9 +28,13 @@ let
     RestrictRealtime = true;
     RestrictSUIDSGID = true;
     SystemCallArchitectures = "native";
-    SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
-    
-    ReadWritePaths = ["/var/www/archtika-websites"];
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+      "~@resources"
+    ];
+
+    ReadWritePaths = [ "/var/www/archtika-websites" ];
   };
 in
 {
@@ -154,7 +158,11 @@ in
         Restart = "always";
         WorkingDirectory = "${cfg.package}/rest-api";
 
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+          "AF_UNIX"
+        ];
       };
 
       script = ''
@@ -181,7 +189,10 @@ in
         Restart = "always";
         WorkingDirectory = "${cfg.package}/web-app";
 
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+        ];
       };
 
       script = ''

@@ -6,8 +6,9 @@
     ../../module.nix
   ];
 
-  networking.hostName = "archtika-prod";
+  networking.hostName = "archtika-demo";
 
+  /*
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
@@ -15,5 +16,11 @@
     acmeEmail = "thilo.hohlt@tutanota.com";
     dnsProvider = "porkbun";
     dnsEnvironmentFile = /var/lib/porkbun.env;
+    settings = {
+      disableRegistration = true;
+      maxWebsiteStorageSize = 50;
+      maxUserWebsites = 2;
+    };
   };
+  */
 }
