@@ -8,7 +8,6 @@
 
   networking.hostName = "archtika-demo";
 
-  /*
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
@@ -22,5 +21,4 @@
       maxUserWebsites = 2;
     };
   };
-  */
 }
