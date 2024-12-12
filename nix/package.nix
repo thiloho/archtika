@@ -7,9 +7,6 @@
 }:
 
 let
-  pname = "archtika";
-  version = "1.0.0";
-
   web = buildNpmPackage {
     name = "web-app";
     src = ../web-app;
@@ -35,7 +32,9 @@ let
   };
 in
 symlinkJoin {
-  name = pname;
+  pname = "archtika";
+  version = "1.0.0";
+
   paths = [
     web
     api

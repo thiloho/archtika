@@ -38,7 +38,7 @@
   <title>archtika | {routeName.replaceAll("/", " - ")}</title>
   <meta
     name="description"
-    content="FLOSS, modern, performant and lightweight CMS (Content Mangement System) with predefined templates"
+    content="FLOSS, modern, performant, lightweight and self-hosted CMS in the form of a web application"
   />
 </svelte:head>
 
