@@ -32,6 +32,7 @@ let
   };
 in
 symlinkJoin {
+  name = "archtika";
   pname = "archtika";
   version = "1.0.0";
 
