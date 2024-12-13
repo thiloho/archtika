@@ -4,6 +4,7 @@
 }
 
 nav {
+  z-index: 10;
   position: sticky;
   block-size: var(--space-xl);
   display: flex;
