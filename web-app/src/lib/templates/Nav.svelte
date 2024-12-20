@@ -75,9 +75,8 @@
         <strong>{websiteOverview.header.logo_text}</strong>
       {:else}
         <img
+          class="top-nav-logo"
           src="{apiUrl}/rpc/retrieve_file?id={websiteOverview.header.logo_image}"
-          width="32"
-          height="32"
           alt=""
         />
       {/if}
