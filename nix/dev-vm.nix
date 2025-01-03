@@ -109,6 +109,10 @@
       gnutar
       gzip
     ];
+
+    serviceConfig = {
+      ReadWritePaths = [ "/var/www/archtika-websites" ];
+    };
   };
 
   services.getty.autologinUser = "dev";

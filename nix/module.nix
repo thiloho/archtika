@@ -162,7 +162,6 @@ in
           Group = cfg.group;
           Restart = "always";
           WorkingDirectory = "${cfg.package}/rest-api";
-
           RestrictAddressFamilies = [
             "AF_INET"
             "AF_INET6"
@@ -208,7 +207,6 @@ in
           Group = cfg.group;
           Restart = "always";
           WorkingDirectory = "${cfg.package}/web-app";
-
           RestrictAddressFamilies = [
             "AF_INET"
             "AF_INET6"
@@ -236,8 +234,13 @@ in
         extensions = ps: with ps; [ pgjwt ];
       };
 
-      systemd.services.postgresql.path = builtins.attrValues {
-        inherit (pkgs) gnutar gzip;
+      systemd.services.postgresql = {
+        path = builtins.attrValues {
+          inherit (pkgs) gnutar gzip;
+        };
+        serviceConfig = {
+          ReadWritePaths = [ "/var/www/archtika-websites" ];
+        };
       };
 
       services.nginx = {
