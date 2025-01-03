@@ -177,14 +177,14 @@ in
               "postgres://${user}@127.0.0.1:${toString config.services.postgresql.settings.port}/${cfg.databaseName}";
           in
           ''
-            JWT_SECRET=$(tr -dc "A-Za-z0-9" < /dev/urandom | head -c64)
+            JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
 
             psql ${dbUrl "postgres"} \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '$JWT_SECRET'" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
-            dbmate --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+            ${pkgs.dbmate} --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
             PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" \
             PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} \

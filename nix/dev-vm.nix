@@ -20,9 +20,20 @@
     password = "dev";
   };
 
-  systemd.tmpfiles.rules = [ "d /var/www/archtika-websites 0777 root root -" ];
+  systemd.tmpfiles.settings = {
+    "10-archtika" = {
+      "/var/www/archtika-websites" = {
+        d = {
+          mode = "0777";
+          user = "root";
+          group = "root";
+        };
+      };
+    };
+  };
 
   virtualisation = {
+    msize = 65536;
     graphics = false;
     memorySize = 2048;
     cores = 2;
@@ -51,23 +62,13 @@
   services = {
     postgresql = {
       enable = true;
-      package = pkgs.postgresql_16;
-      /*
-        PL/Perl:
-        overrideAttrs (
-          finalAttrs: previousAttrs: {
-            buildInputs = previousAttrs.buildInputs ++ [ pkgs.perl ];
-            configureFlags = previousAttrs.configureFlags ++ [ "--with-perl" ];
-          }
-        );
-      */
       ensureDatabases = [ "archtika" ];
       authentication = lib.mkForce ''
         local all all trust
         host all all all trust
       '';
       enableTCPIP = true;
-      extraPlugins = with pkgs.postgresql16Packages; [ pgjwt ];
+      extensions = ps: with ps; [ pgjwt ];
     };
     nginx = {
       enable = true;
@@ -105,7 +106,6 @@
 
   systemd.services.postgresql = {
     path = with pkgs; [
-      # Tar and gzip are needed for tar.gz exports
       gnutar
       gzip
     ];
