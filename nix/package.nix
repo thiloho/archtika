@@ -10,8 +10,7 @@ let
   web = buildNpmPackage {
     name = "web-app";
     src = ../web-app;
-    npmDeps = importNpmLock { npmRoot = ../web-app; };
-    npmConfigHook = importNpmLock.npmConfigHook;
+    npmDepsHash = "sha256-RTyo7K/Hr1hBGtcBKynrziUInl91JqZl84NkJg16ufA=";
     npmFlags = [ "--legacy-peer-deps" ];
     installPhase = ''
       mkdir -p $out/web-app
@@ -34,18 +33,9 @@ in
 symlinkJoin {
   name = "archtika";
   pname = "archtika";
-  version = "1.0.0";
 
   paths = [
     web
     api
   ];
-
-  meta = with lib; {
-    description = "A modern, performant and lightweight CMS";
-    homepage = "https://archtika.com";
-    license = licenses.mit;
-    maintainers = with maintainers; [ thiloho ];
-    platforms = platforms.unix;
-  };
 }
