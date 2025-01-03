@@ -184,7 +184,7 @@ in
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
-            ${pkgs.dbmate} --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+            ${pkgs.dbmate}/bin/dbmate --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
             PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" \
             PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} \
