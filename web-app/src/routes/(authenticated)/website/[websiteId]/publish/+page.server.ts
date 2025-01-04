@@ -98,17 +98,17 @@ const generateStaticFiles = async (
 ) => {
   const websitePreviewUrl = `${
     dev
-      ? "http://localhost:18000"
+      ? "http://127.0.0.1:18000"
       : process.env.ORIGIN
         ? process.env.ORIGIN
-        : "http://localhost:18000"
+        : "http://127.0.0.1:18000"
   }/previews/${websiteData.id}/`;
 
   const websiteProdUrl = dev
-    ? `http://localhost:18000/${websiteData.user.username}/${websiteData.slug}`
+    ? `http://127.0.0.1:18000/${websiteData.user.username}/${websiteData.slug}`
     : process.env.ORIGIN
       ? `${process.env.ORIGIN.replace("//", `//${websiteData.user.username}.`)}/${websiteData.slug}`
-      : `http://localhost:18000/${websiteData.user.username}/${websiteData.slug}`;
+      : `http://127.0.0.1:18000/${websiteData.user.username}/${websiteData.slug}`;
 
   const fileContents = (head: string, body: string) => {
     return `

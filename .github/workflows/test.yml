@@ -23,7 +23,7 @@ jobs:
       run: |
         wait_for_postgres() {
           echo "Waiting for PostgreSQL to be ready..."
-          while ! nix shell nixpkgs#postgresql_16 -c pg_isready -h localhost -p 15432 -U postgres; do
+          while ! nix shell nixpkgs#postgresql_16 -c pg_isready -h 127.0.0.1 -p 15432 -U postgres; do
             sleep 1
           done
           echo "PostgreSQL is ready."
@@ -31,10 +31,10 @@ jobs:
 
         wait_for_postgrest() {
           echo "Waiting for PostgREST to be live and ready..."
-          while ! curl -s -I "http://localhost:3001/live" | grep "OK"; do
+          while ! curl -s -I "http://127.0.0.1:3001/live" | grep "OK"; do
             sleep 1
           done
-          while ! curl -s -I "http://localhost:3001/ready" | grep "OK"; do
+          while ! curl -s -I "http://127.0.0.1:3001/ready" | grep "OK"; do
             sleep 1
           done
           echo "PostgREST is live and ready."
