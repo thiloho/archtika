@@ -162,7 +162,6 @@ in
           Group = cfg.group;
           Restart = "always";
           WorkingDirectory = "${cfg.package}/rest-api";
-
           RestrictAddressFamilies = [
             "AF_INET"
             "AF_INET6"
@@ -177,14 +176,14 @@ in
               "postgres://${user}@127.0.0.1:${toString config.services.postgresql.settings.port}/${cfg.databaseName}";
           in
           ''
-            JWT_SECRET=$(tr -dc "A-Za-z0-9" < /dev/urandom | head -c64)
+            JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
 
             psql ${dbUrl "postgres"} \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.jwt_secret\" TO '$JWT_SECRET'" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
-            dbmate --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+            ${pkgs.dbmate}/bin/dbmate --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
             PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" \
             PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} \
@@ -208,7 +207,6 @@ in
           Group = cfg.group;
           Restart = "always";
           WorkingDirectory = "${cfg.package}/web-app";
-
           RestrictAddressFamilies = [
             "AF_INET"
             "AF_INET6"
@@ -236,8 +234,13 @@ in
         extensions = ps: with ps; [ pgjwt ];
       };
 
-      systemd.services.postgresql.path = builtins.attrValues {
-        inherit (pkgs) gnutar gzip;
+      systemd.services.postgresql = {
+        path = builtins.attrValues {
+          inherit (pkgs) gnutar gzip;
+        };
+        serviceConfig = {
+          ReadWritePaths = [ "/var/www/archtika-websites" ];
+        };
       };
 
       services.nginx = {

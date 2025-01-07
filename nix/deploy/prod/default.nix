@@ -1,4 +1,7 @@
 { pkgs, localArchtikaPackage, ... }:
+let
+  domain = "demo.archtika.com";
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -6,19 +9,26 @@
     ../../module.nix
   ];
 
-  networking.hostName = "archtika-demo";
+  networking.hostName = "archtika-qs";
 
   services.archtika = {
     enable = true;
     package = localArchtikaPackage;
-    domain = "demo.archtika.com";
-    acmeEmail = "thilo.hohlt@tutanota.com";
-    dnsProvider = "porkbun";
-    dnsEnvironmentFile = /var/lib/porkbun.env;
+    inherit domain;
     settings = {
       disableRegistration = true;
-      maxWebsiteStorageSize = 50;
-      maxUserWebsites = 2;
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "thilo.hohlt@tutanota.com";
+    certs."${domain}" = {
+      inherit domain;
+      extraDomainNames = [ "*.${domain}" ];
+      dnsProvider = "porkbun";
+      environmentFile = /var/lib/porkbun.env;
+      group = "nginx";
     };
   };
 }

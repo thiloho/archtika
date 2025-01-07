@@ -17,8 +17,6 @@ in
     inherit domain;
     settings = {
       disableRegistration = true;
-      maxWebsiteStorageSize = 50;
-      maxUserWebsites = 2;
     };
   };
 

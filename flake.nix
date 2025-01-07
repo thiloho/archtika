@@ -14,6 +14,8 @@
       ];
 
       forAllSystems = nixpkgs.lib.genAttrs allSystems;
+
+      dbUrl = user: "postgres://${user}@127.0.0.1:15432/archtika";
     in
     {
       devShells = forAllSystems (
@@ -24,13 +26,13 @@
         {
           api = pkgs.mkShell {
             packages = with pkgs; [
-              postgresql_16
+              postgresql
               postgrest
             ];
             shellHook = ''
-              alias dbmate="${pkgs.dbmate}/bin/dbmate --no-dump-schema --url postgres://postgres@localhost:15432/archtika?sslmode=disable"
+              alias dbmate="${pkgs.dbmate}/bin/dbmate --no-dump-schema --url ${dbUrl "postgres"}?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
-              alias dbconnect="${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika"
+              alias dbconnect="${pkgs.postgresql_16}/bin/psql ${dbUrl "postgres"}"
             '';
           };
           web = pkgs.mkShell {
@@ -65,19 +67,32 @@
         {
           api = {
             type = "app";
-            program = "${pkgs.writeShellScriptBin "api-setup" ''
-              JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
-              WEBSITE_MAX_STORAGE_SIZE=100
-              WEBSITE_MAX_NUMBER_USER=3
+            program =
+              let
+                settings = {
+                  maxStorage = 100;
+                  maxWebsites = 3;
+                };
+                jwtSecret = "BMlgCY9fEzmf7jhQpNnxlS6TM8E6xk2vS08C3ukm5LM2aTooaF5PfxT3o2K9uKzq";
+              in
+              "${pkgs.writeShellScriptBin "api-setup" ''
+                psql ${dbUrl "postgres"} \
+                  -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '${jwtSecret}'" \
+                  -c "ALTER DATABASE archtika SET \"app.website_max_storage_size\" TO ${toString settings.maxStorage}" \
+                  -c "ALTER DATABASE archtika SET \"app.website_max_number_user\" TO ${toString settings.maxWebsites}"
 
-              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '$JWT_SECRET'"
-              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_storage_size\" TO $WEBSITE_MAX_STORAGE_SIZE"
-              ${pkgs.postgresql_16}/bin/psql postgres://postgres@localhost:15432/archtika -c "ALTER DATABASE archtika SET \"app.website_max_number_user\" TO $WEBSITE_MAX_NUMBER_USER"
+                ${pkgs.dbmate}/bin/dbmate --no-dump-schema \
+                  --url ${dbUrl "postgres"}?sslmode=disable \
+                  --migrations-dir ${self.outPath}/rest-api/db/migrations up
 
-              ${pkgs.dbmate}/bin/dbmate --url postgres://postgres@localhost:15432/archtika?sslmode=disable --migrations-dir ${self.outPath}/rest-api/db/migrations up
-
-              PGRST_ADMIN_SERVER_PORT=3001 PGRST_DB_SCHEMAS="api" PGRST_DB_ANON_ROLE="anon" PGRST_OPENAPI_MODE="ignore-privileges" PGRST_DB_URI="postgres://authenticator@localhost:15432/archtika" PGRST_JWT_SECRET="$JWT_SECRET" ${pkgs.postgrest}/bin/postgrest
-            ''}/bin/api-setup";
+                PGRST_ADMIN_SERVER_PORT=3001 \
+                PGRST_DB_SCHEMAS="api" \
+                PGRST_DB_ANON_ROLE="anon" \
+                PGRST_OPENAPI_MODE="ignore-privileges" \
+                PGRST_DB_URI="${dbUrl "authenticator"}" \
+                PGRST_JWT_SECRET="${jwtSecret}" \
+                ${pkgs.postgrest}/bin/postgrest
+              ''}/bin/api-setup";
           };
         }
       );

@@ -26,7 +26,7 @@ pkgs.dockerTools.buildLayeredImage {
   contents = [
     archtika
     entrypoint
-    pkgs.postgresql_16
+    pkgs.postgresql
     pkgs.nginx
     pkgs.acme-sh
     pkgs.bash
