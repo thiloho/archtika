@@ -72,6 +72,19 @@ export const actions: Actions = {
       }
     );
   },
+  removeFavicon: async ({ fetch, params }) => {
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/settings?website_id=eq.${params.websiteId}`,
+      "PATCH",
+      {
+        body: {
+          favicon_image: null
+        },
+        successMessage: "Successfully removed favicon"
+      }
+    );
+  },
   updateHeader: async ({ request, fetch, params }) => {
     const data = await request.formData();
     const logoImage = data.get("logo-image") as File;
@@ -107,6 +120,19 @@ export const actions: Actions = {
           logo_image: uploadedImage.data?.file_id
         },
         successMessage: "Successfully updated header"
+      }
+    );
+  },
+  removeLogoImage: async ({ fetch, params }) => {
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/header?website_id=eq.${params.websiteId}`,
+      "PATCH",
+      {
+        body: {
+          logo_image: null
+        },
+        successMessage: "Successfully removed logo image"
       }
     );
   },

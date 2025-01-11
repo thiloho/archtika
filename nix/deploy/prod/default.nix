@@ -9,7 +9,7 @@ in
     ../../module.nix
   ];
 
-  networking.hostName = "archtika-qs";
+  networking.hostName = "archtika-demo";
 
   services.archtika = {
     enable = true;
