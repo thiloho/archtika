@@ -1,5 +1,5 @@
-import { Marked } from "marked";
-import type { Renderer, Token } from "marked";
+import { Marked, Renderer } from "marked";
+import type { Token } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import DOMPurify from "isomorphic-dompurify";
@@ -40,6 +40,7 @@ const slugify = (string: string) => {
 
 const createMarkdownParser = (showToc = true) => {
   const marked = new Marked();
+  const renderer = new Renderer();
 
   marked.use({
     async: false,
@@ -57,6 +58,14 @@ const createMarkdownParser = (showToc = true) => {
       }
     })
   );
+
+  marked.use({
+    renderer: {
+      table(...args) {
+        return `<div class="scroll-container">${renderer.table.apply(this, args)}</div>`;
+      }
+    }
+  });
 
   const gfmHeadingId = ({ prefix = "", showToc = true } = {}) => {
     const headings: { text: string; level: number; id: string }[] = [];

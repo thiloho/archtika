@@ -32,7 +32,7 @@
             shellHook = ''
               alias dbmate="${pkgs.dbmate}/bin/dbmate --no-dump-schema --url ${dbUrl "postgres"}?sslmode=disable"
               alias formatsql="${pkgs.pgformatter}/bin/pg_format -s 2 -f 2 -U 2 -i db/migrations/*.sql"
-              alias dbconnect="${pkgs.postgresql_16}/bin/psql ${dbUrl "postgres"}"
+              alias dbconnect="${pkgs.postgresql}/bin/psql ${dbUrl "postgres"}"
             '';
           };
           web = pkgs.mkShell {
@@ -76,7 +76,7 @@
                 jwtSecret = "BMlgCY9fEzmf7jhQpNnxlS6TM8E6xk2vS08C3ukm5LM2aTooaF5PfxT3o2K9uKzq";
               in
               "${pkgs.writeShellScriptBin "api-setup" ''
-                psql ${dbUrl "postgres"} \
+                ${pkgs.postgresql}/bin/psql ${dbUrl "postgres"} \
                   -c "ALTER DATABASE archtika SET \"app.jwt_secret\" TO '${jwtSecret}'" \
                   -c "ALTER DATABASE archtika SET \"app.website_max_storage_size\" TO ${toString settings.maxStorage}" \
                   -c "ALTER DATABASE archtika SET \"app.website_max_number_user\" TO ${toString settings.maxWebsites}"

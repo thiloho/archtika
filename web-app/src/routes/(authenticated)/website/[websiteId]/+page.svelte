@@ -91,6 +91,13 @@
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.globalSettings.favicon_image}`}
               alt=""
             />
+            <form
+              method="POST"
+              action="?/removeFavicon"
+              use:enhance={enhanceForm({ reset: false, closeModal: true })}
+            >
+              <button type="submit">Remove</button>
+            </form>
           </Modal>
         {/if}
       </div>
@@ -138,6 +145,13 @@
               src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.header.logo_image}`}
               alt=""
             />
+            <form
+              method="POST"
+              action="?/removeLogoImage"
+              use:enhance={enhanceForm({ reset: false, closeModal: true })}
+            >
+              <button type="submit">Remove</button>
+            </form>
           </Modal>
         {/if}
       </div>

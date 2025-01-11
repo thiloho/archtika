@@ -72,6 +72,19 @@ export const actions: Actions = {
       }
     );
   },
+  removeCoverImage: async ({ fetch, params }) => {
+    return await apiRequest(
+      fetch,
+      `${API_BASE_PREFIX}/article?id=eq.${params.articleId}`,
+      "PATCH",
+      {
+        body: {
+          cover_image: null
+        },
+        successMessage: "Successfully removed cover image"
+      }
+    );
+  },
   pasteImage: async ({ request, fetch, params }) => {
     const data = await request.formData();
     const file = data.get("file") as File;

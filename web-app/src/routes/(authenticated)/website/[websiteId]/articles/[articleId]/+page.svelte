@@ -107,6 +107,13 @@
                 src={`${data.API_BASE_PREFIX}/rpc/retrieve_file?id=${data.article.cover_image}`}
                 alt=""
               />
+              <form
+                method="POST"
+                action="?/removeCoverImage"
+                use:enhance={enhanceForm({ reset: false, closeModal: true })}
+              >
+                <button type="submit">Remove</button>
+              </form>
             </Modal>
           {/if}
         </div>

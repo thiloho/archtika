@@ -240,6 +240,7 @@ in
         };
         serviceConfig = {
           ReadWritePaths = [ "/var/www/archtika-websites" ];
+          SystemCallFilter = [ "@system-service" ];
         };
       };
 
