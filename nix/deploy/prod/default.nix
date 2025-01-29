@@ -27,7 +27,10 @@ in
     defaults.email = "thilo.hohlt@tutanota.com";
     certs."${domain}" = {
       inherit domain;
-      extraDomainNames = [ "*.${domain}" docsSubdomain ];
+      extraDomainNames = [
+        "*.${domain}"
+        docsSubdomain
+      ];
       dnsProvider = "porkbun";
       environmentFile = /var/lib/porkbun.env;
       group = "nginx";
