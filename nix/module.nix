@@ -179,7 +179,7 @@ in
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
-            ${lib.getExe pkgs.dbmate} --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+            ${lib.getExe pkgs.dbmate} --url "${dbUrl "postgres"}&sslmode=disable" --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
             PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" \
             PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} \
@@ -216,13 +216,16 @@ in
           PORT = toString cfg.webAppPort;
         };
 
-        script = "${lib.getExe pkgs.nodejs_22} ${cfg.package}/web-app";
+        script = "${lib.getExe pkgs.nodejs} ${cfg.package}/web-app";
       };
 
       services.postgresql = {
         enable = true;
         ensureDatabases = [ cfg.databaseName ];
         extensions = ps: with ps; [ pgjwt ];
+        authentication = lib.mkOverride 11 ''
+          local all all trust
+        '';
       };
 
       systemd.services.postgresql = {
@@ -243,16 +246,17 @@ in
         recommendedZstdSettings = true;
         recommendedOptimisation = true;
 
+        appendHttpConfig = ''
+          map $http_cookie $archtika_auth_header {
+            default "";
+            "~*session_token=([^;]+)" "Bearer $1";
+          }
+        '';
+
         virtualHosts = {
           "${cfg.domain}" = {
             useACMEHost = cfg.domain;
             forceSSL = true;
-            extraConfig = ''
-              map $http_cookie $auth_header {
-                default "";
-                "~*session_token=([^;]+)" "Bearer $1";
-              }
-            '';
             locations = {
               "/" = {
                 proxyPass = "http://127.0.0.1:${toString cfg.webAppPort}";
@@ -266,7 +270,7 @@ in
                 proxyPass = "http://127.0.0.1:${toString cfg.apiPort}/rpc/export_articles_zip";
                 extraConfig = ''
                   default_type application/json;
-                  proxy_set_header Authorization $auth_header;
+                  proxy_set_header Authorization $archtika_auth_header;
                 '';
               };
               "/api/" = {
