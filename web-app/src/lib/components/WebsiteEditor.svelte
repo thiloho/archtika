@@ -3,6 +3,7 @@
   import { md } from "$lib/utils";
   import { page } from "$app/stores";
   import { previewContent, textareaScrollTop } from "$lib/runes.svelte";
+  import { browser } from "$app/environment";
 
   const {
     id,
@@ -57,14 +58,14 @@
 
 <div class="preview" bind:this={previewElement}>
   {#if fullPreview}
-    {#if !iframeLoaded}
+    {#if !iframeLoaded && browser}
       <p>Loading preview...</p>
     {/if}
     <iframe
       src={previewContent.value}
       title="Preview"
       onload={() => (iframeLoaded = true)}
-      style:display={iframeLoaded ? "block" : "none"}
+      style:display={!browser || iframeLoaded ? "block" : "none"}
     ></iframe>
   {:else}
     {@html md(
@@ -131,6 +132,9 @@
 
     .operations {
       padding-block-start: var(--space-s);
+      resize: horizontal;
+      min-inline-size: 100%;
+      max-inline-size: calc(1536px - 320px);
     }
 
     .preview {

@@ -23,7 +23,7 @@ jobs:
       run: |
         wait_for_postgres() {
           echo "Waiting for PostgreSQL to be ready..."
-          while ! nix shell nixpkgs#postgresql_16 -c pg_isready -h 127.0.0.1 -p 15432 -U postgres; do
+          while ! nix shell nixpkgs#postgresql -c pg_isready -h 127.0.0.1 -p 15432 -U postgres; do
             sleep 1
           done
           echo "PostgreSQL is ready."

@@ -69,7 +69,7 @@ in
           disableRegistration = mkOption {
             type = types.bool;
             default = false;
-            description = "By default any user can create an account. That behavior can be disabled by using this option.";
+            description = "By default any user can create an account. That behavior can be disabled with this option.";
           };
           maxUserWebsites = mkOption {
             type = types.ints.positive;
@@ -128,21 +128,19 @@ in
         ];
       };
 
-      systemd.tmpfiles.settings = {
-        "10-archtika" = {
-          "/var/www" = {
-            d = {
-              mode = "0755";
-              user = "root";
-              group = "root";
-            };
+      systemd.tmpfiles.settings."10-archtika" = {
+        "/var/www" = {
+          d = {
+            mode = "0755";
+            user = "root";
+            group = "root";
           };
-          "/var/www/archtika-websites" = {
-            d = {
-              mode = "0770";
-              user = cfg.user;
-              group = cfg.group;
-            };
+        };
+        "/var/www/archtika-websites" = {
+          d = {
+            mode = "0770";
+            user = cfg.user;
+            group = cfg.group;
           };
         };
       };
@@ -171,9 +169,7 @@ in
 
         script =
           let
-            dbUrl =
-              user:
-              "postgres://${user}@127.0.0.1:${toString config.services.postgresql.settings.port}/${cfg.databaseName}";
+            dbUrl = user: "postgres://${user}@/${cfg.databaseName}?host=/var/run/postgresql";
           in
           ''
             JWT_SECRET=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
@@ -183,7 +179,7 @@ in
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_storage_size\" TO ${toString cfg.settings.maxWebsiteStorageSize}" \
               -c "ALTER DATABASE ${cfg.databaseName} SET \"app.website_max_number_user\" TO ${toString cfg.settings.maxUserWebsites}"
 
-            ${pkgs.dbmate}/bin/dbmate --url ${dbUrl "postgres"}?sslmode=disable --migrations-dir ${cfg.package}/rest-api/db/migrations up
+            ${lib.getExe pkgs.dbmate} --url "${dbUrl "postgres"}&sslmode=disable" --migrations-dir ${cfg.package}/rest-api/db/migrations up
 
             PGRST_SERVER_CORS_ALLOWED_ORIGINS="https://${cfg.domain}" \
             PGRST_ADMIN_SERVER_PORT=${toString cfg.apiAdminPort} \
@@ -193,7 +189,7 @@ in
             PGRST_OPENAPI_MODE="ignore-privileges" \
             PGRST_DB_URI=${dbUrl "authenticator"} \
             PGRST_JWT_SECRET="$JWT_SECRET" \
-            ${pkgs.postgrest}/bin/postgrest
+            ${lib.getExe pkgs.postgrest}
           '';
       };
 
@@ -220,24 +216,23 @@ in
           PORT = toString cfg.webAppPort;
         };
 
-        script = "${pkgs.nodejs_22}/bin/node ${cfg.package}/web-app";
+        script = "${lib.getExe pkgs.nodejs} ${cfg.package}/web-app";
       };
 
       services.postgresql = {
         enable = true;
         ensureDatabases = [ cfg.databaseName ];
-        authentication = lib.mkOverride 51 ''
-          host    all    all    127.0.0.1/32    trust
-          host    all    all    ::1/128         trust
-          local   all    all                    trust
-        '';
         extensions = ps: with ps; [ pgjwt ];
+        authentication = lib.mkOverride 11 ''
+          local all all trust
+        '';
       };
 
       systemd.services.postgresql = {
-        path = builtins.attrValues {
-          inherit (pkgs) gnutar gzip;
-        };
+        path = with pkgs; [
+          gnutar
+          gzip
+        ];
         serviceConfig = {
           ReadWritePaths = [ "/var/www/archtika-websites" ];
           SystemCallFilter = [ "@system-service" ];
@@ -252,13 +247,7 @@ in
         recommendedOptimisation = true;
 
         appendHttpConfig = ''
-          add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-          add_header X-Frame-Options "SAMEORIGIN" always;
-          add_header X-Content-Type-Options "nosniff" always;
-          add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-          add_header Permissions-Policy "accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(self),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(self),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),xr-spatial-tracking=(),clipboard-read=(self),clipboard-write=(self),gamepad=(),hid=(),idle-detection=(),interest-cohort=(),serial=(),unload=()" always;
-
-          map $http_cookie $auth_header {
+          map $http_cookie $archtika_auth_header {
             default "";
             "~*session_token=([^;]+)" "Bearer $1";
           }
@@ -281,7 +270,7 @@ in
                 proxyPass = "http://127.0.0.1:${toString cfg.apiPort}/rpc/export_articles_zip";
                 extraConfig = ''
                   default_type application/json;
-                  proxy_set_header Authorization $auth_header;
+                  proxy_set_header Authorization $archtika_auth_header;
                 '';
               };
               "/api/" = {
