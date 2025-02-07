@@ -224,6 +224,7 @@ in
         ensureDatabases = [ cfg.databaseName ];
         extensions = ps: with ps; [ pgjwt ];
         authentication = lib.mkOverride 11 ''
+          local postgres postgres trust
           local ${cfg.databaseName} all trust
         '';
       };
