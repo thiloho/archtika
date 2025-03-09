@@ -10,7 +10,7 @@ let
   web = buildNpmPackage {
     name = "web-app";
     src = ../web-app;
-    npmDepsHash = "sha256-RTyo7K/Hr1hBGtcBKynrziUInl91JqZl84NkJg16ufA=";
+    npmDepsHash = "sha256-VC5aoKqbH/Z7CTeYI6ERjW2o4a/qb0HPACLDdJaGIx0=";
     npmFlags = [ "--legacy-peer-deps" ];
     installPhase = ''
       mkdir -p $out/web-app
