@@ -6,7 +6,6 @@ in
   imports = [
     ./hardware-configuration.nix
     ../shared.nix
-    ../../module.nix
   ];
 
   networking.hostName = "archtika-qs";
