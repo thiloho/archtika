@@ -39,7 +39,7 @@
 
   <nav class="operations__nav">
     <ul class="unpadded">
-      {#each tabs.filter((tab) => (tab !== "categories" && contentType === "Blog") || contentType === "Docs") as tab}
+      {#each tabs.filter((tab) => (tab !== "categories" && contentType === "Blog") || contentType === "Docs") as tab (tab)}
         <li>
           <a
             href="/website/{id}{tab === 'settings' ? '' : `/${tab}`}"

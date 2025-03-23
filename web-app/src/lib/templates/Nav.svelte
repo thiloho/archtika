@@ -55,11 +55,11 @@
 
       <section id="docs-navigation" class="docs-navigation">
         <ul>
-          {#each Object.keys(categorizedArticles) as key}
+          {#each Object.keys(categorizedArticles) as key (key)}
             <li>
               <strong>{key}</strong>
               <ul>
-                {#each categorizedArticles[key] as { title, slug }}
+                {#each categorizedArticles[key] as { title, slug } (slug)}
                   <li>
                     <a href="{isIndexPage ? './articles' : '.'}/{slug}">{title}</a>
                   </li>
