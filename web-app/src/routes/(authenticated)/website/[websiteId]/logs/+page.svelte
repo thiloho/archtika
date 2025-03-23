@@ -141,9 +141,13 @@
                       <button type="submit">Compute diff</button>
                     </form>
                     {#if form?.logId === id && form?.currentDiff}
-                      <pre>{@html DOMPurify.sanitize(form.currentDiff, {
-                          ALLOWED_TAGS: ["ins", "del"]
-                        })}</pre>
+                      <pre>{@html DOMPurify.sanitize(
+                          // .replace takes escaped text representations of line breaks and converts them to real line breaks that render correctly in HTML
+                          form.currentDiff.replace(/\\r\\n|\\n|\\r/g, "\n"),
+                          {
+                            ALLOWED_TAGS: ["ins", "del"]
+                          }
+                        )}</pre>
                     {/if}
                   {/if}
 
