@@ -16,6 +16,7 @@ export const apiRequest = async (
   method: "HEAD" | "GET" | "POST" | "PATCH" | "DELETE",
   options: {
     headers?: Record<string, string>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: any;
     successMessage?: string;
     returnData?: boolean;

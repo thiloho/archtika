@@ -54,18 +54,18 @@
         </h2>
 
         <ul class="unpadded">
-          {#each sortedArticles as article}
+          {#each sortedArticles as { id, publication_date, slug, title, meta_description } (id)}
             <li>
-              {#if article.publication_date}
-                <p>{article.publication_date}</p>
+              {#if publication_date}
+                <p>{publication_date}</p>
               {/if}
               <p>
                 <strong>
-                  <a href="./articles/{article.slug}">{article.title}</a>
+                  <a href="./articles/{slug}">{title}</a>
                 </strong>
               </p>
-              {#if article.meta_description}
-                <p>{article.meta_description}</p>
+              {#if meta_description}
+                <p>{meta_description}</p>
               {/if}
             </li>
           {/each}

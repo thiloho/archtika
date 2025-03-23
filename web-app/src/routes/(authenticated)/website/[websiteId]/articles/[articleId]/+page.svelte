@@ -48,7 +48,7 @@
           <label>
             Category:
             <select name="category">
-              {#each data.categories as { id, category_name }}
+              {#each data.categories as { id, category_name } (id)}
                 <option value={id} selected={id === data.article.category}>{category_name}</option>
               {/each}
             </select>

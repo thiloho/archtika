@@ -39,7 +39,7 @@
       <a href="#storage">Storage</a>
     </h2>
     <ul class="unpadded storage-grid">
-      {#each data.storageSizes.data as { website_title, storage_size_bytes, max_storage_bytes, max_storage_pretty, diff_storage_pretty }}
+      {#each data.storageSizes.data as { website_id, website_title, storage_size_bytes, max_storage_bytes, max_storage_pretty, diff_storage_pretty } (website_id)}
         <li>
           <strong>{website_title}</strong>
           <label>

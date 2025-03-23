@@ -63,7 +63,7 @@
           />
           <datalist id="users-{data.website.id}">
             <option value={data.website.user.username}></option>
-            {#each data.collaborators as { user: { username } }}
+            {#each data.collaborators as { user: { username } } (username)}
               <option value={username}></option>
             {/each}
           </datalist>
@@ -72,7 +72,7 @@
           Resource:
           <select name="resource">
             <option value="all">Show all</option>
-            {#each Object.keys(resources) as resource}
+            {#each Object.keys(resources) as resource (resource)}
               <option
                 value={resource}
                 selected={resource === $page.url.searchParams.get("resource")}>{resource}</option

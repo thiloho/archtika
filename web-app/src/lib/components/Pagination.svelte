@@ -8,7 +8,7 @@
 
 <div class="pagination">
   {#snippet commonFilterInputs()}
-    {#each commonFilters as filter}
+    {#each commonFilters as filter (filter)}
       <input type="hidden" name={filter} value={$page.url.searchParams.get(filter)} />
     {/each}
   {/snippet}
