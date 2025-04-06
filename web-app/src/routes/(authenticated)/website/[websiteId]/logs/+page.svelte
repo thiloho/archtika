@@ -141,24 +141,20 @@
                       <button type="submit">Compute diff</button>
                     </form>
                     {#if form?.logId === id && form?.currentDiff}
-                      <pre>{@html DOMPurify.sanitize(
-                          // .replace takes escaped text representations of line breaks and converts them to real line breaks that render correctly in HTML
-                          form.currentDiff.replace(/\\r\\n|\\n|\\r/g, "\n").replace(/\\\"/g, '"'),
-                          {
-                            ALLOWED_TAGS: ["ins", "del"]
-                          }
-                        )}</pre>
+                      <pre>{@html form.currentDiff
+                          .replace(/\\\"/g, '"')
+                          .replace(/\\r\\n|\\n|\\r/g, "\n")}</pre>
                     {/if}
                   {/if}
 
                   {#if new_value && !old_value}
                     <h4>New value</h4>
-                    <pre>{DOMPurify.sanitize(newValue)}</pre>
+                    <pre>{newValue.replace(/\\\"/g, '"').replace(/\\r\\n|\\n|\\r/g, "\n")}</pre>
                   {/if}
 
                   {#if old_value && !new_value}
                     <h4>Old value</h4>
-                    <pre>{DOMPurify.sanitize(oldValue)}</pre>
+                    <pre>{oldValue.replace(/\\\"/g, '"').replace(/\\r\\n|\\n|\\r/g, "\n")}</pre>
                   {/if}
                 </Modal>
               </td>
