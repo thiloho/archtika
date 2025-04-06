@@ -80,17 +80,18 @@ export const actions: Actions = {
 
     const htmlDiff = (oldValue: string, newValue: string) => {
       const diff = dmp.diff_main(oldValue, newValue);
-      dmp.diff_cleanupSemantic(diff);
 
       return diff
         .map(([op, text]) => {
+          const escapedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
           switch (op) {
             case 1:
-              return `<ins>${text}</ins>`;
+              return `<ins>${escapedText}</ins>`;
             case -1:
-              return `<del>${text}</del>`;
+              return `<del>${escapedText}</del>`;
             default:
-              return text;
+              return escapedText;
           }
         })
         .join("");
