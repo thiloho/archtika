@@ -143,7 +143,7 @@
                     {#if form?.logId === id && form?.currentDiff}
                       <pre>{@html DOMPurify.sanitize(
                           // .replace takes escaped text representations of line breaks and converts them to real line breaks that render correctly in HTML
-                          form.currentDiff.replace(/\\r\\n|\\n|\\r/g, "\n"),
+                          form.currentDiff.replace(/\\r\\n|\\n|\\r/g, "\n").replace(/\\\"/g, '"'),
                           {
                             ALLOWED_TAGS: ["ins", "del"]
                           }
