@@ -30,4 +30,6 @@ in
       group = "nginx";
     };
   };
+
+  services.postgresql.settings.default_text_search_config = "pg_catalog.english";
 }

@@ -26,7 +26,6 @@ header > .container {
   gap: var(--space-s);
 }
 
-nav,
 header,
 main {
   padding-block: var(--space-s);
@@ -47,11 +46,6 @@ footer > .container {
 
 section {
   scroll-margin-block-start: var(--space-xl);
-}
-
-.top-nav-logo {
-  max-block-size: var(--space-xl);
-  padding-block: var(--space-xs);
 }
 
 .docs-navigation {

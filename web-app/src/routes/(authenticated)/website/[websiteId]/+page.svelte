@@ -136,7 +136,7 @@
       </label>
       <div class="file-field">
         <label>
-          Logo image:
+          Logo image (height should be &lt;= 32px):
           <input type="file" name="logo-image" accept={ALLOWED_MIME_TYPES.join(", ")} />
         </label>
         {#if data.header.logo_image}
