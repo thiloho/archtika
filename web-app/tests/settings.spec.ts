@@ -50,9 +50,9 @@ test.describe("Website owner", () => {
     await page.getByLabel("Logo text:").click();
     await page.getByLabel("Logo text:").press("ControlOrMeta+a");
     await page.getByLabel("Logo text:").fill("Logo text");
-    await page.getByLabel("Logo image:").click();
+    await page.getByLabel(/Logo image/).click();
     await page
-      .getByLabel("Logo image")
+      .getByLabel(/Logo image/)
       .setInputFiles(join(__dirname, "sample-files", "archtika-logo-512x512.png"));
     await page.getByRole("button", { name: "Update header" }).click();
     await expect(page.getByText("Successfully updated header")).toBeVisible();
@@ -122,9 +122,9 @@ for (const permissionLevel of permissionLevels) {
       await page.getByLabel("Logo text:").click();
       await page.getByLabel("Logo text:").press("ControlOrMeta+a");
       await page.getByLabel("Logo text:").fill("Logo text");
-      await page.getByLabel("Logo image:").click();
+      await page.getByLabel(/Logo image/).click();
       await page
-        .getByLabel("Logo image")
+        .getByLabel(/Logo image/)
         .setInputFiles(join(__dirname, "sample-files", "archtika-logo-512x512.png"));
       await page
         .getByRole("button", { name: "Update header" })
