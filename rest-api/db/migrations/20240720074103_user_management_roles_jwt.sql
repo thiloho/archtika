@@ -170,23 +170,3 @@ GRANT EXECUTE ON FUNCTION api.login TO anon;
 GRANT EXECUTE ON FUNCTION api.delete_account TO authenticated_user;
 
 -- migrate:down
-DROP TRIGGER encrypt_pass ON internal.user;
-
-DROP TRIGGER ensure_user_role_exists ON internal.user;
-
-DROP FUNCTION api.register;
-
-DROP FUNCTION api.login;
-
-DROP FUNCTION api.delete_account;
-
-DROP FUNCTION internal.user_role;
-
-DROP FUNCTION internal.encrypt_pass;
-
-DROP FUNCTION internal.check_role_exists;
-
-DROP EXTENSION pgjwt;
-
-DROP EXTENSION pgcrypto;
-

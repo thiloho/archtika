@@ -1,8 +1,8 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { ChangeLog, User, Collab } from "$lib/db-schema";
-import DiffMatchPatch from "diff-match-patch";
 import { PAGINATION_MAX_ITEMS } from "$lib/utils";
+import * as Diff from "diff";
 
 export const load: PageServerLoad = async ({ parent, fetch, params, url }) => {
   const userFilter = url.searchParams.get("user");
@@ -76,22 +76,19 @@ export const actions: Actions = {
   computeDiff: async ({ request, fetch }) => {
     const data = await request.formData();
 
-    const dmp = new DiffMatchPatch();
-
     const htmlDiff = (oldValue: string, newValue: string) => {
-      const diff = dmp.diff_main(oldValue, newValue);
+      const diff = Diff.diffWordsWithSpace(oldValue, newValue);
 
       return diff
-        .map(([op, text]) => {
-          const escapedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        .map((part) => {
+          const escapedText = part.value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-          switch (op) {
-            case 1:
-              return `<ins>${escapedText}</ins>`;
-            case -1:
-              return `<del>${escapedText}</del>`;
-            default:
-              return escapedText;
+          if (part.added) {
+            return `<ins>${escapedText}</ins>`;
+          } else if (part.removed) {
+            return `<del>${escapedText}</del>`;
+          } else {
+            return escapedText;
           }
         })
         .join("");
@@ -112,8 +109,12 @@ export const actions: Actions = {
     return {
       logId: data.get("id"),
       currentDiff: htmlDiff(
-        JSON.stringify(log.old_value, null, 2),
+        JSON.stringify(log.old_value, null, 2)
+          .replace(/\\r\\n|\\n|\\r/g, "\n")
+          .replace(/\\\"/g, '"'),
         JSON.stringify(log.new_value, null, 2)
+          .replace(/\\r\\n|\\n|\\r/g, "\n")
+          .replace(/\\\"/g, '"')
       )
     };
   }

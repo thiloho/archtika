@@ -133,29 +133,3 @@ CREATE TRIGGER track_changes_collab
   EXECUTE FUNCTION internal.track_changes ();
 
 -- migrate:down
-DROP TRIGGER track_changes_website ON internal.website;
-
-DROP TRIGGER track_changes_media ON internal.media;
-
-DROP TRIGGER track_changes_settings ON internal.settings;
-
-DROP TRIGGER track_changes_header ON internal.header;
-
-DROP TRIGGER track_changes_home ON internal.home;
-
-DROP TRIGGER track_changes_article ON internal.article;
-
-DROP TRIGGER track_changes_docs_category ON internal.docs_category;
-
-DROP TRIGGER track_changes_footer ON internal.footer;
-
-DROP TRIGGER track_changes_collab ON internal.collab;
-
-DROP FUNCTION internal.track_changes;
-
-DROP VIEW api.change_log;
-
-DROP TABLE internal.change_log;
-
-DROP EXTENSION hstore;
-
