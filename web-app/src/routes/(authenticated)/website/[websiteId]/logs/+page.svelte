@@ -141,9 +141,7 @@
                       <button type="submit">Compute diff</button>
                     </form>
                     {#if form?.logId === id && form?.currentDiff}
-                      <pre>{@html form.currentDiff
-                          .replace(/\\\"/g, '"')
-                          .replace(/\\r\\n|\\n|\\r/g, "\n")}</pre>
+                      <pre>{@html form.currentDiff}</pre>
                     {/if}
                   {/if}
 
