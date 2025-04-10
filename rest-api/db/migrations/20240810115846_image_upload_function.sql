@@ -95,9 +95,3 @@ GRANT EXECUTE ON FUNCTION api.retrieve_file TO anon;
 GRANT EXECUTE ON FUNCTION api.retrieve_file TO authenticated_user;
 
 -- migrate:down
-DROP FUNCTION api.upload_file;
-
-DROP FUNCTION api.retrieve_file;
-
-DROP DOMAIN "*/*";
-

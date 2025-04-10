@@ -24,7 +24,3 @@ CREATE CONSTRAINT TRIGGER check_user_not_website_owner
   EXECUTE FUNCTION internal.check_user_not_website_owner ();
 
 -- migrate:down
-DROP TRIGGER check_user_not_website_owner ON internal.collab;
-
-DROP FUNCTION internal.check_user_not_website_owner;
-

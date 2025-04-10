@@ -39,5 +39,3 @@ SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION api.export_articles_zip TO authenticated_user;
 
 -- migrate:down
-DROP FUNCTION api.export_articles_zip;
-

@@ -74,21 +74,3 @@ CREATE TRIGGER update_collab_last_modified
   EXECUTE FUNCTION internal.update_last_modified ();
 
 -- migrate:down
-DROP TRIGGER update_website_last_modified ON internal.website;
-
-DROP TRIGGER update_settings_last_modified ON internal.settings;
-
-DROP TRIGGER update_header_last_modified ON internal.header;
-
-DROP TRIGGER update_home_last_modified ON internal.home;
-
-DROP TRIGGER update_article_last_modified ON internal.article;
-
-DROP TRIGGER update_docs_category_modified ON internal.docs_category;
-
-DROP TRIGGER update_footer_last_modified ON internal.footer;
-
-DROP TRIGGER update_collab_last_modified ON internal.collab;
-
-DROP FUNCTION internal.update_last_modified;
-

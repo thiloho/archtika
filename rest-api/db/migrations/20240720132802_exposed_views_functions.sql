@@ -163,25 +163,3 @@ GRANT SELECT, INSERT (website_id, user_id, permission_level), UPDATE (permission
 GRANT SELECT, INSERT, UPDATE, DELETE ON api.collab TO authenticated_user;
 
 -- migrate:down
-DROP FUNCTION api.create_website;
-
-DROP VIEW api.collab;
-
-DROP VIEW api.footer;
-
-DROP VIEW api.home;
-
-DROP VIEW api.docs_category;
-
-DROP VIEW api.article;
-
-DROP VIEW api.header;
-
-DROP VIEW api.settings;
-
-DROP VIEW api.website;
-
-DROP VIEW api.user;
-
-DROP VIEW api.account;
-

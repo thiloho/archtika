@@ -141,29 +141,3 @@ GRANT UPDATE, DELETE ON internal.user TO administrator;
 GRANT UPDATE, DELETE ON api.user TO administrator;
 
 -- migrate:down
-DROP FUNCTION api.user_websites_storage_size;
-
-DROP TRIGGER _prevent_storage_excess_article ON internal.article;
-
-DROP TRIGGER _prevent_storage_excess_collab ON internal.collab;
-
-DROP TRIGGER _prevent_storage_excess_docs_category ON internal.docs_category;
-
-DROP TRIGGER _prevent_storage_excess_footer ON internal.footer;
-
-DROP TRIGGER _prevent_storage_excess_header ON internal.header;
-
-DROP TRIGGER _prevent_storage_excess_home ON internal.home;
-
-DROP TRIGGER _prevent_storage_excess_media ON internal.media;
-
-DROP TRIGGER _prevent_storage_excess_settings ON internal.settings;
-
-DROP FUNCTION internal.prevent_website_storage_size_excess;
-
-REVOKE UPDATE (max_storage_size) ON internal.website FROM administrator;
-
-REVOKE UPDATE, DELETE ON internal.user FROM administrator;
-
-REVOKE UPDATE, DELETE ON api.user FROM administrator;
-
