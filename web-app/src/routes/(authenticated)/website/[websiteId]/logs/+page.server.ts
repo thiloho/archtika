@@ -1,7 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { API_BASE_PREFIX, apiRequest } from "$lib/server/utils";
 import type { ChangeLog, User, Collab } from "$lib/db-schema";
-import DiffMatchPatch from "diff-match-patch";
 import { PAGINATION_MAX_ITEMS } from "$lib/utils";
 import * as Diff from "diff";
 
